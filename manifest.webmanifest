@@ -1,10 +1,10 @@
 {
-  "name": "Bilancio Famiglia v5",
-  "short_name": "Bilancio v5",
+  "name": "Spese Famiglia v9",
+  "short_name": "Spese Famiglia",
   "start_url": "./",
   "display": "standalone",
-  "background_color": "#f3f6f9",
-  "theme_color": "#14233a",
+  "background_color": "#f5f7fa",
+  "theme_color": "#ffffff",
   "lang": "it",
   "icons": [
     {
