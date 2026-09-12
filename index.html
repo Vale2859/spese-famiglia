@@ -14,14 +14,13 @@
     :root{
       --bg:#f3f6f9; --ink:#14233a; --muted:#6b7a8d; --green:#dff3e7; --green-ink:#0e7b49;
       --red:#fde7e7; --red-ink:#b33131; --purple:#eee5fb; --purple-ink:#6f49a8;
-      --line:#dde5ed; --shadow:0 16px 38px rgba(20,35,58,.11);
+      --line:#dde5ed; --shadow:0 16px 38px rgba(20,35,58,.11)
     }
     *{box-sizing:border-box}
     html,body{min-height:100%;margin:0}
     body{
       font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
-      background:linear-gradient(180deg,#f9fbfd 0%,#edf2f6 100%);
-      color:var(--ink)
+      background:linear-gradient(180deg,#f9fbfd 0%,#edf2f6 100%);color:var(--ink)
     }
     button,input,select{font:inherit}
     button{touch-action:manipulation}
@@ -34,6 +33,9 @@
     .month-btn{flex:0 0 auto;min-width:110px;border:0;border-radius:14px;padding:11px 13px;background:#eef2f6;color:var(--ink);font-weight:950}
     .month-btn.active{background:#14233a;color:#fff}
     .month-year{display:block;font-size:12px;opacity:.75;margin-top:2px}
+    .selected-month{
+      margin:0 0 14px;text-align:center;font-size:18px;font-weight:950;color:var(--ink)
+    }
     .stack{display:grid;grid-template-columns:1fr;gap:18px}
     .big-card{
       border:0;border-radius:26px;padding:28px 22px;box-shadow:var(--shadow);min-height:180px;
@@ -68,14 +70,19 @@
     input,select{width:100%;border:2px solid var(--line);border-radius:13px;padding:14px 13px;background:#fff;font-size:18px}
     .add{width:100%;border:0;border-radius:14px;background:#14233a;color:#fff;padding:15px;font-weight:1000}
     .empty{text-align:center;color:var(--muted);padding:20px 0;font-weight:800}
-    .install-note{
-      margin:14px 0 0;padding:12px 14px;border-radius:14px;background:#fff7d8;color:#715500;
-      font-size:14px;font-weight:800;display:none
+    .month-badge{
+      padding:12px 14px;border-radius:14px;background:#eef3f7;font-weight:950;text-align:center;margin-bottom:12px
+    }
+    .fixed-note{
+      padding:11px 13px;border-radius:13px;background:#fff5d8;color:#725400;font-size:14px;font-weight:850;margin-top:10px
+    }
+    .backup-note{
+      margin:12px 0 0;padding:11px 13px;border-radius:13px;background:#eaf5ff;color:#175485;font-size:13px;font-weight:800
     }
     @media(max-width:520px){
       .app{padding:10px 10px calc(90px + env(safe-area-inset-bottom))}
       .big-card{min-height:165px;padding:24px 16px}.stack{gap:14px}
-      .months-wrap{margin-bottom:14px}.month-btn{min-width:100px}
+      .months-wrap{margin-bottom:12px}.month-btn{min-width:100px}
       .fab{right:14px;bottom:calc(14px + env(safe-area-inset-bottom));width:62px;height:62px}
       .form{grid-template-columns:1fr}.form .full{grid-column:auto}
     }
@@ -91,9 +98,7 @@
     <div class="months" id="monthsBar"></div>
   </div>
 
-  <div class="install-note" id="installNote">
-    Su iPhone: apri questa pagina in Safari → Condividi → “Aggiungi alla schermata Home”.
-  </div>
+  <div class="selected-month" id="selectedMonthLabel"></div>
 
   <div class="stack">
     <button id="incomeCard" class="big-card income" type="button">
@@ -114,11 +119,13 @@
       <div class="card-note">Disponibile per vacanze, extra e risparmio</div>
     </button>
   </div>
+
+  <div class="backup-note" id="backupStatus"></div>
 </div>
 
 <button id="fab" class="fab" type="button" aria-label="Aggiungi voce">+</button>
 
-<div class="modal" id="detailModal" aria-hidden="true">
+<div class="modal" id="detailModal">
   <div class="sheet">
     <div class="sheet-head">
       <div class="sheet-title" id="detailTitle"></div>
@@ -129,12 +136,15 @@
   </div>
 </div>
 
-<div class="modal" id="addModal" aria-hidden="true">
+<div class="modal" id="addModal">
   <div class="sheet">
     <div class="sheet-head">
       <div class="sheet-title">Aggiungi voce</div>
       <button id="closeAddBtn" class="close" type="button">✕</button>
     </div>
+
+    <div class="month-badge" id="addMonthLabel"></div>
+
     <div class="form">
       <select id="newType">
         <option value="income">Entrata</option>
@@ -146,6 +156,10 @@
       <input class="full" id="newName" placeholder="Nome voce">
       <button id="addBtn" class="add full" type="button">Aggiungi</button>
     </div>
+
+    <div class="fixed-note" id="fixedNote">
+      Se scegli “Uscita fissa”, la voce verrà inserita dal mese selezionato in avanti, fino a dicembre 2100.
+    </div>
   </div>
 </div>
 
@@ -153,63 +167,50 @@
 (function(){
   "use strict";
 
-  const $ = (id) => document.getElementById(id);
-  const KEY = 'bilancioFamigliaPWA_v1';
+  const $ = id => document.getElementById(id);
+  const KEY = 'bilancioFamigliaPWA_v2';
+  const BACKUP_KEY = 'bilancioFamigliaPWA_dailyBackups_v2';
+  const START_YEAR = 2026;
+  const END_YEAR = 2100;
   const MONTHS = ['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno','Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre'];
-  const euro = (n) => new Intl.NumberFormat('it-IT',{style:'currency',currency:'EUR',minimumFractionDigits:2}).format(Number(n||0));
+  const euro = n => new Intl.NumberFormat('it-IT',{style:'currency',currency:'EUR',minimumFractionDigits:2}).format(Number(n||0));
 
   let data;
-  try {
-    data = JSON.parse(localStorage.getItem(KEY) || 'null') || {months:{}};
-  } catch(e) {
-    data = {months:{}};
+  try { data = JSON.parse(localStorage.getItem(KEY) || 'null') || {months:{}}; }
+  catch(e){ data = {months:{}}; }
+
+  // Migrazione: questa versione parte completamente vuota.
+  // Se non esiste ancora il flag "cleanStart", resetta i dati della versione precedente.
+  if(!data.cleanStart){
+    data = {months:{}, cleanStart:true};
+    localStorage.setItem(KEY, JSON.stringify(data));
   }
 
   const now = new Date();
-  let currentYear = now.getFullYear();
-  let currentMonth = now.getMonth();
+  let currentYear = Math.min(END_YEAR, Math.max(START_YEAR, now.getFullYear()));
+  let currentMonth = currentYear === START_YEAR && now.getFullYear() < START_YEAR ? 0 : now.getMonth();
 
-  function monthKey(){
-    return currentYear + '-' + String(currentMonth + 1).padStart(2,'0');
+  function monthKey(y=currentYear,m=currentMonth){
+    return y + '-' + String(m+1).padStart(2,'0');
   }
 
-  function defaultMonth(){
-    return {
-      income:[{id:1,name:'Stipendio',amount:3900}],
-      fixed:[
-        {id:2,name:'Garage Perrone',amount:116},
-        {id:3,name:'Condominio',amount:80},
-        {id:4,name:'Sky',amount:40},
-        {id:5,name:'Fastweb',amount:30},
-        {id:6,name:'Acqua / Luce / Gas',amount:300},
-        {id:7,name:'Emanuela',amount:500},
-        {id:8,name:'Suzuki Ignis finanziamento',amount:374.40}
-      ],
-      policies:[
-        {id:9,name:'Polizza EY54591',amount:38},
-        {id:10,name:'Polizza Ignis',amount:55},
-        {id:11,name:'Polizza Honda SH',amount:41}
-      ],
-      needs:[
-        {id:12,name:'Cibo',amount:200},
-        {id:13,name:'Benzina',amount:200}
-      ]
-    };
+  function blankMonth(){
+    return {income:[],fixed:[],policies:[],needs:[]};
   }
 
-  function ensureMonth(){
-    const k = monthKey();
-    if(!data.months[k]){
-      data.months[k] = defaultMonth();
-    }
+  function ensureMonth(y=currentYear,m=currentMonth){
+    const k = monthKey(y,m);
+    if(!data.months[k]) data.months[k] = blankMonth();
   }
 
   function save(){
     localStorage.setItem(KEY, JSON.stringify(data));
+    dailyBackup();
     render();
   }
 
   function sum(type){
+    ensureMonth();
     return data.months[monthKey()][type].reduce((s,x)=>s+Number(x.amount||0),0);
   }
 
@@ -217,176 +218,222 @@
     return sum('fixed') + sum('policies') + sum('needs');
   }
 
+  function monthLabel(y=currentYear,m=currentMonth){
+    return MONTHS[m] + ' ' + y;
+  }
+
   function renderMonths(){
     const bar = $('monthsBar');
     bar.innerHTML = '';
-    const items = [];
-    for(let offset=-12; offset<=24; offset++){
-      const d = new Date(now.getFullYear(), now.getMonth()+offset, 1);
-      items.push({y:d.getFullYear(),m:d.getMonth()});
+    for(let y=START_YEAR; y<=END_YEAR; y++){
+      for(let m=0; m<12; m++){
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'month-btn' + (y===currentYear && m===currentMonth ? ' active' : '');
+        b.innerHTML = MONTHS[m] + '<span class="month-year">' + y + '</span>';
+        b.addEventListener('click', ()=>{
+          currentYear=y; currentMonth=m;
+          ensureMonth();
+          render();
+        });
+        bar.appendChild(b);
+      }
     }
-    items.forEach((x)=>{
-      const b = document.createElement('button');
-      b.type = 'button';
-      b.className = 'month-btn' + (x.y===currentYear && x.m===currentMonth ? ' active' : '');
-      b.innerHTML = MONTHS[x.m] + '<span class="month-year">' + x.y + '</span>';
-      b.addEventListener('click', ()=>{
-        currentYear = x.y;
-        currentMonth = x.m;
-        ensureMonth();
-        render();
-      });
-      bar.appendChild(b);
-    });
-    setTimeout(()=>{
+    requestAnimationFrame(()=>{
       const active = bar.querySelector('.active');
-      if(active) active.scrollIntoView({inline:'center',block:'nearest',behavior:'smooth'});
-    }, 0);
+      if(active) active.scrollIntoView({inline:'center',block:'nearest'});
+    });
   }
 
   function render(){
     ensureMonth();
     renderMonths();
+    $('selectedMonthLabel').textContent = 'MESE SELEZIONATO: ' + monthLabel().toUpperCase();
     $('incomeValue').textContent = euro(sum('income'));
     $('expenseValue').textContent = euro(allExpenses());
     $('savingValue').textContent = euro(sum('income') - allExpenses());
+    updateBackupStatus();
   }
 
-  function rowHtml(type, x){
-    const row = document.createElement('div');
-    row.className = 'detail-row';
+  function rowElement(type, item){
+    const row=document.createElement('div');
+    row.className='detail-row';
 
-    const name = document.createElement('div');
-    name.className = 'detail-name';
-    name.textContent = x.name;
+    const name=document.createElement('div');
+    name.className='detail-name';
+    name.textContent=item.name;
 
-    const amount = document.createElement('div');
-    amount.className = 'detail-amount';
-    amount.textContent = euro(x.amount);
+    const amount=document.createElement('div');
+    amount.className='detail-amount';
+    amount.textContent=euro(item.amount);
 
-    const del = document.createElement('button');
-    del.type = 'button';
-    del.className = 'del';
-    del.textContent = 'Elimina';
+    const del=document.createElement('button');
+    del.type='button';
+    del.className='del';
+    del.textContent='Elimina';
     del.addEventListener('click', ()=>{
-      if(!confirm('Eliminare questa voce?')) return;
-      data.months[monthKey()][type] = data.months[monthKey()][type].filter(i=>i.id!==x.id);
+      if(!confirm('Eliminare questa voce da '+monthLabel()+'?')) return;
+      data.months[monthKey()][type] = data.months[monthKey()][type].filter(x=>x.id!==item.id);
       save();
-      if(type==='income') openIncome(); else openExpenses();
+      type==='income' ? openIncome() : openExpenses();
     });
 
-    row.append(name, amount, del);
+    row.append(name,amount,del);
     return row;
   }
 
   function openIncome(){
-    $('detailTitle').textContent = 'Entrate · ' + MONTHS[currentMonth] + ' ' + currentYear;
-    $('detailTotal').textContent = euro(sum('income'));
-    const c = $('detailContent');
-    c.innerHTML = '';
-    const items = data.months[monthKey()].income;
-    if(!items.length){
-      c.innerHTML = '<div class="empty">Nessuna entrata.</div>';
-    } else {
-      items.forEach(x=>c.appendChild(rowHtml('income',x)));
-    }
+    $('detailTitle').textContent='Entrate · '+monthLabel();
+    $('detailTotal').textContent=euro(sum('income'));
+    const c=$('detailContent'); c.innerHTML='';
+    const items=data.months[monthKey()].income;
+    if(!items.length)c.innerHTML='<div class="empty">Nessuna entrata registrata.</div>';
+    else items.forEach(x=>c.appendChild(rowElement('income',x)));
     $('detailModal').classList.add('open');
-    $('detailModal').setAttribute('aria-hidden','false');
   }
 
   function openExpenses(){
-    $('detailTitle').textContent = 'Uscite · ' + MONTHS[currentMonth] + ' ' + currentYear;
-    $('detailTotal').textContent = euro(allExpenses());
-    const c = $('detailContent');
-    c.innerHTML = '';
+    $('detailTitle').textContent='Uscite · '+monthLabel();
+    $('detailTotal').textContent=euro(allExpenses());
+    const c=$('detailContent'); c.innerHTML='';
 
     [['USCITE FISSE','fixed'],['USCITE POLIZZE','policies'],['FABBISOGNO MENSILE','needs']].forEach(([label,type])=>{
-      const h = document.createElement('div');
-      h.className = 'section-title';
-      h.textContent = label + ' · ' + euro(sum(type));
+      const h=document.createElement('div');
+      h.className='section-title';
+      h.textContent=label+' · '+euro(sum(type));
       c.appendChild(h);
 
-      const items = data.months[monthKey()][type];
+      const items=data.months[monthKey()][type];
       if(!items.length){
-        const e = document.createElement('div');
-        e.className = 'empty';
-        e.textContent = 'Nessuna voce.';
+        const e=document.createElement('div');
+        e.className='empty';
+        e.textContent='Nessuna voce.';
         c.appendChild(e);
-      } else {
-        items.forEach(x=>c.appendChild(rowHtml(type,x)));
-      }
+      } else items.forEach(x=>c.appendChild(rowElement(type,x)));
     });
     $('detailModal').classList.add('open');
-    $('detailModal').setAttribute('aria-hidden','false');
   }
 
   function openSavings(){
-    const inc = sum('income');
-    const exp = allExpenses();
-    $('detailTitle').textContent = 'Utile / Risparmi · ' + MONTHS[currentMonth] + ' ' + currentYear;
-    $('detailTotal').textContent = euro(inc-exp);
-    $('detailContent').innerHTML =
+    const inc=sum('income'), exp=allExpenses();
+    $('detailTitle').textContent='Utile / Risparmi · '+monthLabel();
+    $('detailTotal').textContent=euro(inc-exp);
+    $('detailContent').innerHTML=
       '<div class="detail-row"><div class="detail-name">Entrate totali</div><div class="detail-amount">'+euro(inc)+'</div><div></div></div>'+
       '<div class="detail-row"><div class="detail-name">Uscite totali</div><div class="detail-amount">'+euro(exp)+'</div><div></div></div>'+
       '<div class="detail-row"><div class="detail-name">Disponibile</div><div class="detail-amount">'+euro(inc-exp)+'</div><div></div></div>';
     $('detailModal').classList.add('open');
-    $('detailModal').setAttribute('aria-hidden','false');
   }
 
-  function closeDetail(){
-    $('detailModal').classList.remove('open');
-    $('detailModal').setAttribute('aria-hidden','true');
-  }
+  function closeDetail(){ $('detailModal').classList.remove('open'); }
 
   function openAdd(){
+    $('addMonthLabel').textContent='STAI REGISTRANDO SU: '+monthLabel().toUpperCase();
     $('addModal').classList.add('open');
-    $('addModal').setAttribute('aria-hidden','false');
-    setTimeout(()=>$('newName').focus(),100);
+    toggleFixedNote();
   }
 
-  function closeAdd(){
-    $('addModal').classList.remove('open');
-    $('addModal').setAttribute('aria-hidden','true');
+  function closeAdd(){ $('addModal').classList.remove('open'); }
+
+  function toggleFixedNote(){
+    $('fixedNote').style.display = $('newType').value==='fixed' ? 'block' : 'none';
+  }
+
+  function addFixedFromSelectedMonth(name,amount){
+    const recurringId='fixed-'+Date.now()+'-'+Math.random().toString(16).slice(2);
+
+    for(let y=currentYear; y<=END_YEAR; y++){
+      const startM = y===currentYear ? currentMonth : 0;
+      for(let m=startM; m<12; m++){
+        ensureMonth(y,m);
+        data.months[monthKey(y,m)].fixed.push({
+          id: Date.now()+Math.random(),
+          recurringId,
+          name,
+          amount
+        });
+      }
+    }
   }
 
   function addItem(){
-    const type = $('newType').value;
-    const name = $('newName').value.trim();
-    const amount = Number($('newAmount').value);
+    const type=$('newType').value;
+    const name=$('newName').value.trim();
+    const amount=Number($('newAmount').value);
+
     if(!name || amount<=0){
       alert('Inserisci nome e importo.');
       return;
     }
-    data.months[monthKey()][type].push({id:Date.now(),name,amount});
+
+    ensureMonth();
+
+    if(type==='fixed'){
+      const ok=confirm(
+        'Confermi "'+name+'" da '+euro(amount)+' come USCITA FISSA?\n\n'+
+        'Verrà inserita da '+monthLabel()+' fino a dicembre '+END_YEAR+'.'
+      );
+      if(!ok)return;
+      addFixedFromSelectedMonth(name,amount);
+    } else {
+      data.months[monthKey()][type].push({id:Date.now(),name,amount});
+    }
+
     $('newName').value='';
     $('newAmount').value='';
     closeAdd();
     save();
   }
 
-  $('incomeCard').addEventListener('click', openIncome);
-  $('expenseCard').addEventListener('click', openExpenses);
-  $('savingCard').addEventListener('click', openSavings);
-  $('fab').addEventListener('click', openAdd);
-  $('closeDetailBtn').addEventListener('click', closeDetail);
-  $('closeAddBtn').addEventListener('click', closeAdd);
-  $('addBtn').addEventListener('click', addItem);
+  // Backup automatico locale: una copia al giorno, eseguita quando l'app viene aperta/usata.
+  // Mantiene gli ultimi 60 backup giornalieri.
+  function dailyBackup(){
+    const today = new Date();
+    const dateKey = today.getFullYear()+'-'+String(today.getMonth()+1).padStart(2,'0')+'-'+String(today.getDate()).padStart(2,'0');
 
-  $('detailModal').addEventListener('click', (e)=>{ if(e.target === $('detailModal')) closeDetail(); });
-  $('addModal').addEventListener('click', (e)=>{ if(e.target === $('addModal')) closeAdd(); });
+    let backups=[];
+    try{ backups=JSON.parse(localStorage.getItem(BACKUP_KEY)||'[]'); }
+    catch(e){ backups=[]; }
+
+    const existing=backups.findIndex(b=>b.date===dateKey);
+    const snapshot={date:dateKey,createdAt:new Date().toISOString(),data:JSON.parse(JSON.stringify(data))};
+
+    if(existing>=0) backups[existing]=snapshot;
+    else backups.push(snapshot);
+
+    backups.sort((a,b)=>a.date.localeCompare(b.date));
+    if(backups.length>60) backups=backups.slice(backups.length-60);
+
+    localStorage.setItem(BACKUP_KEY,JSON.stringify(backups));
+  }
+
+  function updateBackupStatus(){
+    let backups=[];
+    try{ backups=JSON.parse(localStorage.getItem(BACKUP_KEY)||'[]'); }catch(e){}
+    const last=backups[backups.length-1];
+    $('backupStatus').textContent = last
+      ? 'Backup automatico locale: ultimo salvataggio '+last.date+' · conservati '+backups.length+' backup giornalieri.'
+      : 'Backup automatico locale attivo.';
+  }
+
+  $('incomeCard').addEventListener('click',openIncome);
+  $('expenseCard').addEventListener('click',openExpenses);
+  $('savingCard').addEventListener('click',openSavings);
+  $('fab').addEventListener('click',openAdd);
+  $('closeDetailBtn').addEventListener('click',closeDetail);
+  $('closeAddBtn').addEventListener('click',closeAdd);
+  $('addBtn').addEventListener('click',addItem);
+  $('newType').addEventListener('change',toggleFixedNote);
+
+  $('detailModal').addEventListener('click',e=>{if(e.target===$('detailModal'))closeDetail()});
+  $('addModal').addEventListener('click',e=>{if(e.target===$('addModal'))closeAdd()});
+
+  dailyBackup();
+  render();
 
   if('serviceWorker' in navigator){
-    window.addEventListener('load', ()=>{
-      navigator.serviceWorker.register('./sw.js').catch(()=>{});
-    });
+    window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
   }
-
-  const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
-  if(!isStandalone){
-    $('installNote').style.display='block';
-  }
-
-  render();
 })();
 </script>
 </body>
