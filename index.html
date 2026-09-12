@@ -2,7 +2,7 @@
 <html lang="it">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#14233a">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -12,125 +12,99 @@
   <title>Bilancio Mensile Generale</title>
   <style>
     :root{
-      --bg:#f3f6f9; --ink:#14233a; --muted:#6b7a8d; --green:#dff3e7; --green-ink:#0e7b49;
-      --red:#fde7e7; --red-ink:#b33131; --purple:#eee5fb; --purple-ink:#6f49a8;
-      --line:#dde5ed; --shadow:0 16px 38px rgba(20,35,58,.11)
+      --bg:#f3f6f9;--ink:#14233a;--muted:#6b7a8d;--green:#dff3e7;--greenInk:#0e7b49;
+      --red:#fde7e7;--redInk:#b33131;--purple:#eee5fb;--purpleInk:#6f49a8;--line:#dde5ed;
+      --blue:#dceafa;--blueInk:#1b5c9c;--gold:#fff2cf;--goldInk:#7a5a00;
+      --shadow:0 16px 38px rgba(20,35,58,.11)
     }
     *{box-sizing:border-box}
-    html,body{min-height:100%;margin:0}
-    body{
-      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
-      background:linear-gradient(180deg,#f9fbfd 0%,#edf2f6 100%);color:var(--ink)
-    }
+    html,body{margin:0;min-height:100%}
+    body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;background:linear-gradient(180deg,#f9fbfd,#edf2f6);color:var(--ink)}
     button,input,select{font:inherit}
     button{touch-action:manipulation}
-    .app{width:min(100%,760px);margin:0 auto;min-height:100vh;padding:14px 14px calc(100px + env(safe-area-inset-bottom))}
-    .header{text-align:center;padding:12px 8px 8px}
+    .app{width:min(100%,760px);margin:0 auto;min-height:100vh;padding:14px 14px calc(105px + env(safe-area-inset-bottom))}
+    .header{text-align:center;padding:10px 6px 6px}
     .header h1{margin:0;font-size:clamp(32px,8vw,52px);line-height:1.02;font-weight:1000;letter-spacing:-.035em}
-    .months-wrap{margin:12px 0 18px;background:#fff;border-radius:18px;box-shadow:var(--shadow);padding:10px}
+    .months-wrap{margin:12px 0 10px;background:#fff;border-radius:18px;box-shadow:var(--shadow);padding:10px}
     .months{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
     .months::-webkit-scrollbar{display:none}
-    .month-btn{flex:0 0 auto;min-width:110px;border:0;border-radius:14px;padding:11px 13px;background:#eef2f6;color:var(--ink);font-weight:950}
+    .month-btn{flex:0 0 auto;min-width:108px;border:0;border-radius:14px;padding:11px 13px;background:#eef2f6;color:var(--ink);font-weight:950}
     .month-btn.active{background:#14233a;color:#fff}
     .month-year{display:block;font-size:12px;opacity:.75;margin-top:2px}
-    .selected-month{
-      margin:0 0 14px;text-align:center;font-size:18px;font-weight:950;color:var(--ink)
-    }
-    .stack{display:grid;grid-template-columns:1fr;gap:18px}
-    .big-card{
-      border:0;border-radius:26px;padding:28px 22px;box-shadow:var(--shadow);min-height:180px;
-      cursor:pointer;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center
-    }
-    .big-card.income{background:var(--green);color:var(--green-ink)}
-    .big-card.expense{background:var(--red);color:var(--red-ink)}
-    .big-card.saving{background:var(--purple);color:var(--purple-ink)}
-    .card-label{font-size:clamp(28px,6vw,42px);line-height:1;font-weight:1000}
-    .card-value{margin-top:18px;font-size:clamp(46px,11vw,78px);line-height:.95;font-weight:1000;letter-spacing:-.04em}
-    .card-note{margin-top:10px;font-weight:800;font-size:14px;opacity:.75}
-    .fab{
-      position:fixed;right:18px;bottom:calc(18px + env(safe-area-inset-bottom));width:68px;height:68px;border-radius:50%;
-      border:0;background:#14233a;color:white;font-size:38px;line-height:1;box-shadow:0 16px 34px rgba(20,35,58,.3);z-index:30
-    }
-    .modal{position:fixed;inset:0;background:rgba(10,20,32,.48);display:none;align-items:flex-end;justify-content:center;z-index:50}
+    .selected{font-size:18px;font-weight:1000;text-align:center;margin:9px 0 14px}
+    .future-banner{display:none;background:var(--gold);color:var(--goldInk);padding:12px 14px;border-radius:14px;font-weight:900;text-align:center;margin-bottom:14px}
+    .stack{display:grid;gap:16px}
+    .big-card{border:0;border-radius:26px;padding:26px 20px;min-height:170px;box-shadow:var(--shadow);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+    .income{background:var(--green);color:var(--greenInk)}.expense{background:var(--red);color:var(--redInk)}.saving{background:var(--purple);color:var(--purpleInk)}
+    .card-label{font-size:clamp(27px,6vw,41px);font-weight:1000;line-height:1}
+    .card-value{font-size:clamp(46px,11vw,76px);font-weight:1000;line-height:.95;margin-top:17px;letter-spacing:-.04em}
+    .card-note{font-size:14px;font-weight:850;opacity:.76;margin-top:10px}
+    .backup{margin-top:14px;background:#eaf5ff;color:#175485;border-radius:14px;padding:11px 13px;font-size:13px;font-weight:850;text-align:center}
+    .fab{position:fixed;right:18px;bottom:calc(18px + env(safe-area-inset-bottom));width:68px;height:68px;border:0;border-radius:50%;background:#14233a;color:#fff;font-size:38px;box-shadow:0 16px 34px rgba(20,35,58,.3);z-index:30}
+    .fab:disabled{opacity:.35}
+    .modal{position:fixed;inset:0;background:rgba(10,20,32,.48);display:none;align-items:flex-end;justify-content:center;z-index:60}
     .modal.open{display:flex}
-    .sheet{
-      width:min(100%,760px);max-height:90vh;overflow:auto;background:#fff;border-radius:28px 28px 0 0;
-      padding:20px 18px calc(28px + env(safe-area-inset-bottom));box-shadow:0 -20px 50px rgba(0,0,0,.22)
-    }
-    .sheet-head{display:flex;justify-content:space-between;gap:12px;align-items:center}
-    .sheet-title{font-size:30px;font-weight:1000}
-    .close{width:48px;height:48px;border:0;border-radius:14px;background:#eef2f6;font-size:22px}
-    .detail-total{font-size:46px;font-weight:1000;margin:10px 0 16px;letter-spacing:-.04em}
-    .section-title{font-size:18px;font-weight:1000;margin:18px 0 8px}
+    .sheet{width:min(100%,760px);max-height:91vh;overflow:auto;background:#fff;border-radius:28px 28px 0 0;padding:20px 18px calc(28px + env(safe-area-inset-bottom));box-shadow:0 -20px 50px rgba(0,0,0,.22)}
+    .sheet-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
+    .sheet-title{font-size:29px;font-weight:1000}
+    .close{width:46px;height:46px;border:0;border-radius:14px;background:#eef2f6;font-size:21px}
+    .detail-total{font-size:45px;font-weight:1000;margin:9px 0 16px;letter-spacing:-.04em}
+    .section-title{font-size:19px;font-weight:1000;margin:20px 0 7px}
     .detail-row{display:grid;grid-template-columns:1fr auto auto;gap:10px;align-items:center;padding:14px 0;border-bottom:1px solid var(--line)}
-    .detail-name{font-weight:900}.detail-amount{font-weight:1000}
-    .del{border:0;border-radius:10px;background:#fee8e8;color:#a92c2c;padding:8px 10px;font-weight:900}
-    .form{display:grid;grid-template-columns:1.2fr .8fr;gap:10px;margin-top:14px}
-    .form .full{grid-column:1/-1}
+    .detail-name{font-weight:950}.detail-sub{font-size:12px;color:var(--muted);font-weight:800;margin-top:3px}.detail-amount{font-weight:1000}
+    .trash{border:0;border-radius:10px;background:#fee8e8;color:#a92c2c;padding:8px 10px;font-weight:900}
+    .empty{text-align:center;color:var(--muted);padding:20px 0;font-weight:850}
+    .month-badge{padding:13px 14px;border-radius:14px;background:#eef3f7;font-weight:1000;text-align:center;margin:14px 0}
+    .form{display:grid;grid-template-columns:1.2fr .8fr;gap:10px}
+    .full{grid-column:1/-1}
     input,select{width:100%;border:2px solid var(--line);border-radius:13px;padding:14px 13px;background:#fff;font-size:18px}
+    .togglebox{display:flex;align-items:center;justify-content:space-between;gap:12px;background:#f6f8fa;border-radius:14px;padding:14px;font-weight:900}
+    .switch{width:58px;height:34px;border-radius:17px;background:#cfd8e2;padding:4px;cursor:pointer;transition:.2s}
+    .switch.on{background:#177a4d}
+    .knob{width:26px;height:26px;border-radius:50%;background:#fff;transition:.2s}
+    .switch.on .knob{transform:translateX(24px)}
+    .repeat-note{font-size:13px;color:var(--muted);font-weight:800;margin-top:8px}
     .add{width:100%;border:0;border-radius:14px;background:#14233a;color:#fff;padding:15px;font-weight:1000}
-    .empty{text-align:center;color:var(--muted);padding:20px 0;font-weight:800}
-    .month-badge{
-      padding:12px 14px;border-radius:14px;background:#eef3f7;font-weight:950;text-align:center;margin-bottom:12px
-    }
-    .fixed-note{
-      padding:11px 13px;border-radius:13px;background:#fff5d8;color:#725400;font-size:14px;font-weight:850;margin-top:10px
-    }
-    .backup-note{
-      margin:12px 0 0;padding:11px 13px;border-radius:13px;background:#eaf5ff;color:#175485;font-size:13px;font-weight:800
-    }
+    .choice{display:grid;gap:10px;margin-top:16px}
+    .choice button{border:0;border-radius:15px;padding:15px;font-weight:1000;text-align:left}
+    .only{background:#eef3f7;color:#14233a}.forever{background:#fee8e8;color:#a92c2c}.cancel{background:#f5f5f5;color:#555}
     @media(max-width:520px){
-      .app{padding:10px 10px calc(90px + env(safe-area-inset-bottom))}
-      .big-card{min-height:165px;padding:24px 16px}.stack{gap:14px}
-      .months-wrap{margin-bottom:12px}.month-btn{min-width:100px}
+      .app{padding:10px 10px calc(95px + env(safe-area-inset-bottom))}
+      .big-card{min-height:160px;padding:22px 16px}.stack{gap:13px}.month-btn{min-width:98px}
       .fab{right:14px;bottom:calc(14px + env(safe-area-inset-bottom));width:62px;height:62px}
-      .form{grid-template-columns:1fr}.form .full{grid-column:auto}
+      .form{grid-template-columns:1fr}.full{grid-column:auto}
+      .detail-row{grid-template-columns:1fr auto}.trash{grid-column:1/-1}
     }
   </style>
 </head>
 <body>
 <div class="app">
-  <div class="header">
-    <h1>BILANCIO MENSILE<br>GENERALE</h1>
-  </div>
+  <div class="header"><h1>BILANCIO MENSILE<br>GENERALE</h1></div>
 
-  <div class="months-wrap">
-    <div class="months" id="monthsBar"></div>
-  </div>
-
-  <div class="selected-month" id="selectedMonthLabel"></div>
+  <div class="months-wrap"><div class="months" id="monthsBar"></div></div>
+  <div class="selected" id="selectedLabel"></div>
+  <div class="future-banner" id="futureBanner">Questo è un mese futuro. I dati ricorrenti compariranno automaticamente quando arriverà questo mese.</div>
 
   <div class="stack">
     <button id="incomeCard" class="big-card income" type="button">
-      <div class="card-label">ENTRATE</div>
-      <div class="card-value" id="incomeValue">€ 0</div>
-      <div class="card-note">Tocca per vedere il dettaglio</div>
+      <div class="card-label">ENTRATE</div><div class="card-value" id="incomeValue">€ 0</div><div class="card-note">Tocca per il dettaglio</div>
     </button>
-
     <button id="expenseCard" class="big-card expense" type="button">
-      <div class="card-label">USCITE</div>
-      <div class="card-value" id="expenseValue">€ 0</div>
-      <div class="card-note">Tocca per vedere tutte le spese</div>
+      <div class="card-label">USCITE</div><div class="card-value" id="expenseValue">€ 0</div><div class="card-note">Fisse · Polizze · Fabbisogno</div>
     </button>
-
     <button id="savingCard" class="big-card saving" type="button">
-      <div class="card-label">UTILE / RISPARMI</div>
-      <div class="card-value" id="savingValue">€ 0</div>
-      <div class="card-note">Disponibile per vacanze, extra e risparmio</div>
+      <div class="card-label">UTILE / RISPARMI</div><div class="card-value" id="savingValue">€ 0</div><div class="card-note">Vacanze · Extra · Risparmio</div>
     </button>
   </div>
 
-  <div class="backup-note" id="backupStatus"></div>
+  <div class="backup" id="backupStatus"></div>
 </div>
 
-<button id="fab" class="fab" type="button" aria-label="Aggiungi voce">+</button>
+<button class="fab" id="fab" type="button">+</button>
 
 <div class="modal" id="detailModal">
   <div class="sheet">
-    <div class="sheet-head">
-      <div class="sheet-title" id="detailTitle"></div>
-      <button id="closeDetailBtn" class="close" type="button">✕</button>
-    </div>
+    <div class="sheet-head"><div class="sheet-title" id="detailTitle"></div><button class="close" id="closeDetail">✕</button></div>
     <div class="detail-total" id="detailTotal"></div>
     <div id="detailContent"></div>
   </div>
@@ -138,13 +112,8 @@
 
 <div class="modal" id="addModal">
   <div class="sheet">
-    <div class="sheet-head">
-      <div class="sheet-title">Aggiungi voce</div>
-      <button id="closeAddBtn" class="close" type="button">✕</button>
-    </div>
-
+    <div class="sheet-head"><div class="sheet-title">Aggiungi voce</div><button class="close" id="closeAdd">✕</button></div>
     <div class="month-badge" id="addMonthLabel"></div>
-
     <div class="form">
       <select id="newType">
         <option value="income">Entrata</option>
@@ -153,12 +122,27 @@
         <option value="needs">Fabbisogno mensile</option>
       </select>
       <input id="newAmount" inputmode="decimal" type="number" min="0" step="0.01" placeholder="Importo €">
-      <input class="full" id="newName" placeholder="Nome voce">
-      <button id="addBtn" class="add full" type="button">Aggiungi</button>
+      <input id="newName" class="full" placeholder="Nome voce">
+      <div class="togglebox full">
+        <div>
+          <div>Ripeti ogni mese</div>
+          <div class="repeat-note" id="repeatText">La voce verrà riportata automaticamente nei mesi successivi quando arriveranno.</div>
+        </div>
+        <div class="switch on" id="repeatSwitch"><div class="knob"></div></div>
+      </div>
+      <button class="add full" id="addBtn">Aggiungi</button>
     </div>
+  </div>
+</div>
 
-    <div class="fixed-note" id="fixedNote">
-      Se scegli “Uscita fissa”, la voce verrà inserita dal mese selezionato in avanti, fino a dicembre 2100.
+<div class="modal" id="deleteModal">
+  <div class="sheet">
+    <div class="sheet-head"><div class="sheet-title">Elimina voce</div><button class="close" id="closeDelete">✕</button></div>
+    <div class="month-badge" id="deleteLabel"></div>
+    <div class="choice">
+      <button class="only" id="deleteOnly">🗓️ Elimina solo per questo mese</button>
+      <button class="forever" id="deleteForever">🛑 Elimina da questo mese in poi</button>
+      <button class="cancel" id="deleteCancel">Annulla</button>
     </div>
   </div>
 </div>
@@ -166,273 +150,268 @@
 <script>
 (function(){
   "use strict";
-
-  const $ = id => document.getElementById(id);
-  const KEY = 'bilancioFamigliaPWA_v2';
-  const BACKUP_KEY = 'bilancioFamigliaPWA_dailyBackups_v2';
-  const START_YEAR = 2026;
-  const END_YEAR = 2100;
-  const MONTHS = ['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno','Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre'];
-  const euro = n => new Intl.NumberFormat('it-IT',{style:'currency',currency:'EUR',minimumFractionDigits:2}).format(Number(n||0));
+  const $=id=>document.getElementById(id);
+  const KEY='bilancioFamigliaPWA_v3';
+  const BACKUP_KEY='bilancioFamigliaPWA_dailyBackups_v3';
+  const START='2026-01';
+  const END='2100-12';
+  const MONTHS=['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno','Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre'];
+  const euro=n=>new Intl.NumberFormat('it-IT',{style:'currency',currency:'EUR',minimumFractionDigits:2}).format(Number(n||0));
 
   let data;
-  try { data = JSON.parse(localStorage.getItem(KEY) || 'null') || {months:{}}; }
-  catch(e){ data = {months:{}}; }
+  try{data=JSON.parse(localStorage.getItem(KEY)||'null')||{months:{},rules:{}}}catch(e){data={months:{},rules:{}}}
+  if(!data.months)data.months={};
+  if(!data.rules)data.rules={};
 
-  // Migrazione: questa versione parte completamente vuota.
-  // Se non esiste ancora il flag "cleanStart", resetta i dati della versione precedente.
-  if(!data.cleanStart){
-    data = {months:{}, cleanStart:true};
-    localStorage.setItem(KEY, JSON.stringify(data));
+  const now=new Date();
+  const realCurrentKey=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0');
+  let currentYear=Math.max(2026,now.getFullYear());
+  let currentMonth=(currentYear===now.getFullYear()?now.getMonth():0);
+  let repeatMonthly=true;
+  let pendingDelete=null;
+  let lastDetail='';
+
+  function mk(y=currentYear,m=currentMonth){return y+'-'+String(m+1).padStart(2,'0')}
+  function splitKey(k){const [y,m]=k.split('-').map(Number);return {y,m:m-1}}
+  function compareKey(a,b){return a.localeCompare(b)}
+  function prevKey(k){
+    const {y,m}=splitKey(k);const d=new Date(y,m-1,1);
+    return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')
+  }
+  function blank(){return {income:[],fixed:[],policies:[],needs:[]}}
+  function isFuture(k=mk()){return compareKey(k,realCurrentKey)>0}
+
+  function ruleActive(rule,k){
+    if(compareKey(k,rule.start)<0)return false;
+    if(rule.end && compareKey(k,rule.end)>0)return false;
+    if((rule.skipMonths||[]).includes(k))return false;
+    return true
   }
 
-  const now = new Date();
-  let currentYear = Math.min(END_YEAR, Math.max(START_YEAR, now.getFullYear()));
-  let currentMonth = currentYear === START_YEAR && now.getFullYear() < START_YEAR ? 0 : now.getMonth();
+  function ensureMonthByKey(k){
+    if(compareKey(k,START)<0 || compareKey(k,END)>0)return;
+    if(isFuture(k))return; // nessun dato nei mesi futuri
+    if(!data.months[k])data.months[k]=blank();
 
-  function monthKey(y=currentYear,m=currentMonth){
-    return y + '-' + String(m+1).padStart(2,'0');
+    Object.values(data.rules).forEach(rule=>{
+      if(!ruleActive(rule,k))return;
+      const arr=data.months[k][rule.type];
+      if(!arr.some(x=>x.ruleId===rule.id)){
+        arr.push({id:'i-'+rule.id+'-'+k,name:rule.name,amount:rule.amount,ruleId:rule.id});
+      }
+    });
   }
 
-  function blankMonth(){
-    return {income:[],fixed:[],policies:[],needs:[]};
-  }
-
-  function ensureMonth(y=currentYear,m=currentMonth){
-    const k = monthKey(y,m);
-    if(!data.months[k]) data.months[k] = blankMonth();
-  }
+  function ensureSelected(){ensureMonthByKey(mk())}
 
   function save(){
-    localStorage.setItem(KEY, JSON.stringify(data));
+    localStorage.setItem(KEY,JSON.stringify(data));
     dailyBackup();
     render();
   }
 
-  function sum(type){
-    ensureMonth();
-    return data.months[monthKey()][type].reduce((s,x)=>s+Number(x.amount||0),0);
+  function arr(type){
+    if(isFuture())return [];
+    ensureSelected();
+    return data.months[mk()][type]||[];
   }
-
-  function allExpenses(){
-    return sum('fixed') + sum('policies') + sum('needs');
-  }
-
-  function monthLabel(y=currentYear,m=currentMonth){
-    return MONTHS[m] + ' ' + y;
-  }
+  function sum(type){return arr(type).reduce((s,x)=>s+Number(x.amount||0),0)}
+  function allExpenses(){return sum('fixed')+sum('policies')+sum('needs')}
+  function monthLabel(k=mk()){const {y,m}=splitKey(k);return MONTHS[m]+' '+y}
 
   function renderMonths(){
-    const bar = $('monthsBar');
-    bar.innerHTML = '';
-    for(let y=START_YEAR; y<=END_YEAR; y++){
-      for(let m=0; m<12; m++){
-        const b = document.createElement('button');
-        b.type = 'button';
-        b.className = 'month-btn' + (y===currentYear && m===currentMonth ? ' active' : '');
-        b.innerHTML = MONTHS[m] + '<span class="month-year">' + y + '</span>';
-        b.addEventListener('click', ()=>{
-          currentYear=y; currentMonth=m;
-          ensureMonth();
-          render();
-        });
+    const bar=$('monthsBar');bar.innerHTML='';
+    for(let y=2026;y<=2100;y++){
+      for(let m=0;m<12;m++){
+        const k=y+'-'+String(m+1).padStart(2,'0');
+        if(compareKey(k,START)<0||compareKey(k,END)>0)continue;
+        const b=document.createElement('button');
+        b.type='button';b.className='month-btn'+(y===currentYear&&m===currentMonth?' active':'');
+        b.innerHTML=MONTHS[m]+'<span class="month-year">'+y+'</span>';
+        b.addEventListener('click',()=>{currentYear=y;currentMonth=m;ensureSelected();render()});
         bar.appendChild(b);
       }
     }
-    requestAnimationFrame(()=>{
-      const active = bar.querySelector('.active');
-      if(active) active.scrollIntoView({inline:'center',block:'nearest'});
-    });
+    requestAnimationFrame(()=>{const a=bar.querySelector('.active');if(a)a.scrollIntoView({inline:'center',block:'nearest'})});
   }
 
   function render(){
-    ensureMonth();
     renderMonths();
-    $('selectedMonthLabel').textContent = 'MESE SELEZIONATO: ' + monthLabel().toUpperCase();
-    $('incomeValue').textContent = euro(sum('income'));
-    $('expenseValue').textContent = euro(allExpenses());
-    $('savingValue').textContent = euro(sum('income') - allExpenses());
+    $('selectedLabel').textContent='MESE SELEZIONATO: '+monthLabel().toUpperCase();
+    const future=isFuture();
+    $('futureBanner').style.display=future?'block':'none';
+    $('fab').disabled=future;
+    if(!future)ensureSelected();
+    $('incomeValue').textContent=euro(sum('income'));
+    $('expenseValue').textContent=euro(allExpenses());
+    $('savingValue').textContent=euro(sum('income')-allExpenses());
     updateBackupStatus();
   }
 
-  function rowElement(type, item){
-    const row=document.createElement('div');
-    row.className='detail-row';
-
-    const name=document.createElement('div');
-    name.className='detail-name';
-    name.textContent=item.name;
-
-    const amount=document.createElement('div');
-    amount.className='detail-amount';
-    amount.textContent=euro(item.amount);
-
-    const del=document.createElement('button');
-    del.type='button';
-    del.className='del';
-    del.textContent='Elimina';
-    del.addEventListener('click', ()=>{
-      if(!confirm('Eliminare questa voce da '+monthLabel()+'?')) return;
-      data.months[monthKey()][type] = data.months[monthKey()][type].filter(x=>x.id!==item.id);
-      save();
-      type==='income' ? openIncome() : openExpenses();
-    });
-
-    row.append(name,amount,del);
-    return row;
+  function makeRow(type,item){
+    const row=document.createElement('div');row.className='detail-row';
+    const nameBox=document.createElement('div');
+    const name=document.createElement('div');name.className='detail-name';name.textContent=item.name;
+    const sub=document.createElement('div');sub.className='detail-sub';
+    sub.textContent=item.ruleId?'Ricorrente ogni mese':'Solo questo mese';
+    nameBox.append(name,sub);
+    const amount=document.createElement('div');amount.className='detail-amount';amount.textContent=euro(item.amount);
+    const del=document.createElement('button');del.type='button';del.className='trash';del.textContent='Elimina';
+    del.addEventListener('click',()=>requestDelete(type,item));
+    row.append(nameBox,amount,del);return row
   }
 
   function openIncome(){
+    lastDetail='income';
     $('detailTitle').textContent='Entrate · '+monthLabel();
     $('detailTotal').textContent=euro(sum('income'));
-    const c=$('detailContent'); c.innerHTML='';
-    const items=data.months[monthKey()].income;
-    if(!items.length)c.innerHTML='<div class="empty">Nessuna entrata registrata.</div>';
-    else items.forEach(x=>c.appendChild(rowElement('income',x)));
-    $('detailModal').classList.add('open');
+    const c=$('detailContent');c.innerHTML='';
+    const items=arr('income');
+    if(!items.length)c.innerHTML='<div class="empty">Nessuna entrata.</div>';else items.forEach(x=>c.appendChild(makeRow('income',x)));
+    $('detailModal').classList.add('open')
   }
 
   function openExpenses(){
+    lastDetail='expenses';
     $('detailTitle').textContent='Uscite · '+monthLabel();
     $('detailTotal').textContent=euro(allExpenses());
-    const c=$('detailContent'); c.innerHTML='';
-
+    const c=$('detailContent');c.innerHTML='';
     [['USCITE FISSE','fixed'],['USCITE POLIZZE','policies'],['FABBISOGNO MENSILE','needs']].forEach(([label,type])=>{
-      const h=document.createElement('div');
-      h.className='section-title';
-      h.textContent=label+' · '+euro(sum(type));
-      c.appendChild(h);
-
-      const items=data.months[monthKey()][type];
-      if(!items.length){
-        const e=document.createElement('div');
-        e.className='empty';
-        e.textContent='Nessuna voce.';
-        c.appendChild(e);
-      } else items.forEach(x=>c.appendChild(rowElement(type,x)));
+      const h=document.createElement('div');h.className='section-title';h.textContent=label+' · '+euro(sum(type));c.appendChild(h);
+      const items=arr(type);
+      if(!items.length){const e=document.createElement('div');e.className='empty';e.textContent='Nessuna voce.';c.appendChild(e)}
+      else items.forEach(x=>c.appendChild(makeRow(type,x)))
     });
-    $('detailModal').classList.add('open');
+    $('detailModal').classList.add('open')
   }
 
   function openSavings(){
-    const inc=sum('income'), exp=allExpenses();
+    lastDetail='savings';
+    const inc=sum('income'),exp=allExpenses();
     $('detailTitle').textContent='Utile / Risparmi · '+monthLabel();
     $('detailTotal').textContent=euro(inc-exp);
     $('detailContent').innerHTML=
       '<div class="detail-row"><div class="detail-name">Entrate totali</div><div class="detail-amount">'+euro(inc)+'</div><div></div></div>'+
       '<div class="detail-row"><div class="detail-name">Uscite totali</div><div class="detail-amount">'+euro(exp)+'</div><div></div></div>'+
       '<div class="detail-row"><div class="detail-name">Disponibile</div><div class="detail-amount">'+euro(inc-exp)+'</div><div></div></div>';
-    $('detailModal').classList.add('open');
+    $('detailModal').classList.add('open')
   }
 
-  function closeDetail(){ $('detailModal').classList.remove('open'); }
+  function reopenDetail(){if(lastDetail==='income')openIncome();else if(lastDetail==='expenses')openExpenses();else if(lastDetail==='savings')openSavings()}
 
   function openAdd(){
+    if(isFuture())return;
+    repeatMonthly=true;updateRepeatUI();
     $('addMonthLabel').textContent='STAI REGISTRANDO SU: '+monthLabel().toUpperCase();
-    $('addModal').classList.add('open');
-    toggleFixedNote();
+    $('addModal').classList.add('open')
   }
-
-  function closeAdd(){ $('addModal').classList.remove('open'); }
-
-  function toggleFixedNote(){
-    $('fixedNote').style.display = $('newType').value==='fixed' ? 'block' : 'none';
-  }
-
-  function addFixedFromSelectedMonth(name,amount){
-    const recurringId='fixed-'+Date.now()+'-'+Math.random().toString(16).slice(2);
-
-    for(let y=currentYear; y<=END_YEAR; y++){
-      const startM = y===currentYear ? currentMonth : 0;
-      for(let m=startM; m<12; m++){
-        ensureMonth(y,m);
-        data.months[monthKey(y,m)].fixed.push({
-          id: Date.now()+Math.random(),
-          recurringId,
-          name,
-          amount
-        });
-      }
-    }
+  function updateRepeatUI(){
+    $('repeatSwitch').classList.toggle('on',repeatMonthly);
+    $('repeatText').textContent=repeatMonthly
+      ?'La voce comparirà in questo mese e verrà riportata automaticamente nei mesi successivi quando arriveranno.'
+      :'La voce resterà soltanto in '+monthLabel()+'.'
   }
 
   function addItem(){
-    const type=$('newType').value;
-    const name=$('newName').value.trim();
-    const amount=Number($('newAmount').value);
+    const type=$('newType').value,name=$('newName').value.trim(),amount=Number($('newAmount').value);
+    if(!name||amount<=0){alert('Inserisci nome e importo.');return}
+    ensureSelected();
 
-    if(!name || amount<=0){
-      alert('Inserisci nome e importo.');
-      return;
+    if(repeatMonthly){
+      const id='r-'+Date.now()+'-'+Math.random().toString(16).slice(2);
+      data.rules[id]={id,type,name,amount,start:mk(),end:null,skipMonths:[]};
+      // genera solo da mese scelto fino al mese reale corrente, mai nei futuri
+      let {y,m}=splitKey(mk());
+      while(true){
+        const k=y+'-'+String(m+1).padStart(2,'0');
+        if(compareKey(k,realCurrentKey)>0)break;
+        ensureMonthByKey(k);
+        if(k===realCurrentKey)break;
+        m++;if(m>11){m=0;y++}
+      }
+    }else{
+      data.months[mk()][type].push({id:'o-'+Date.now(),name,amount});
     }
 
-    ensureMonth();
-
-    if(type==='fixed'){
-      const ok=confirm(
-        'Confermi "'+name+'" da '+euro(amount)+' come USCITA FISSA?\n\n'+
-        'Verrà inserita da '+monthLabel()+' fino a dicembre '+END_YEAR+'.'
-      );
-      if(!ok)return;
-      addFixedFromSelectedMonth(name,amount);
-    } else {
-      data.months[monthKey()][type].push({id:Date.now(),name,amount});
-    }
-
-    $('newName').value='';
-    $('newAmount').value='';
-    closeAdd();
-    save();
+    $('newName').value='';$('newAmount').value='';$('addModal').classList.remove('open');save()
   }
 
-  // Backup automatico locale: una copia al giorno, eseguita quando l'app viene aperta/usata.
-  // Mantiene gli ultimi 60 backup giornalieri.
+  function requestDelete(type,item){
+    pendingDelete={type,item};
+    $('deleteLabel').textContent=item.name+' · '+monthLabel();
+    $('detailModal').classList.remove('open');
+    if(item.ruleId){
+      $('deleteOnly').style.display='block';$('deleteForever').style.display='block'
+    }else{
+      $('deleteOnly').style.display='block';$('deleteOnly').textContent='🗑️ Elimina questa voce';
+      $('deleteForever').style.display='none'
+    }
+    $('deleteModal').classList.add('open')
+  }
+
+  function deleteOnly(){
+    if(!pendingDelete)return;
+    const {type,item}=pendingDelete,k=mk();
+    data.months[k][type]=data.months[k][type].filter(x=>x.id!==item.id);
+    if(item.ruleId){
+      const rule=data.rules[item.ruleId];
+      if(rule && !(rule.skipMonths||[]).includes(k)){
+        if(!rule.skipMonths)rule.skipMonths=[];
+        rule.skipMonths.push(k)
+      }
+    }
+    finishDelete()
+  }
+
+  function deleteForever(){
+    if(!pendingDelete||!pendingDelete.item.ruleId)return;
+    const {type,item}=pendingDelete,k=mk(),rule=data.rules[pendingDelete.item.ruleId];
+    if(rule)rule.end=prevKey(k);
+
+    Object.keys(data.months).forEach(month=>{
+      if(compareKey(month,k)>=0){
+        data.months[month][type]=data.months[month][type].filter(x=>x.ruleId!==item.ruleId)
+      }
+    });
+    finishDelete()
+  }
+
+  function finishDelete(){
+    pendingDelete=null;$('deleteModal').classList.remove('open');save();setTimeout(reopenDetail,0)
+  }
+
   function dailyBackup(){
-    const today = new Date();
-    const dateKey = today.getFullYear()+'-'+String(today.getMonth()+1).padStart(2,'0')+'-'+String(today.getDate()).padStart(2,'0');
-
-    let backups=[];
-    try{ backups=JSON.parse(localStorage.getItem(BACKUP_KEY)||'[]'); }
-    catch(e){ backups=[]; }
-
-    const existing=backups.findIndex(b=>b.date===dateKey);
-    const snapshot={date:dateKey,createdAt:new Date().toISOString(),data:JSON.parse(JSON.stringify(data))};
-
-    if(existing>=0) backups[existing]=snapshot;
-    else backups.push(snapshot);
-
-    backups.sort((a,b)=>a.date.localeCompare(b.date));
-    if(backups.length>60) backups=backups.slice(backups.length-60);
-
-    localStorage.setItem(BACKUP_KEY,JSON.stringify(backups));
+    const d=new Date(),day=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+    let b=[];try{b=JSON.parse(localStorage.getItem(BACKUP_KEY)||'[]')}catch(e){}
+    const snap={date:day,createdAt:new Date().toISOString(),data:JSON.parse(JSON.stringify(data))};
+    const i=b.findIndex(x=>x.date===day);if(i>=0)b[i]=snap;else b.push(snap);
+    b.sort((a,c)=>a.date.localeCompare(c.date));if(b.length>60)b=b.slice(-60);
+    localStorage.setItem(BACKUP_KEY,JSON.stringify(b))
   }
-
   function updateBackupStatus(){
-    let backups=[];
-    try{ backups=JSON.parse(localStorage.getItem(BACKUP_KEY)||'[]'); }catch(e){}
-    const last=backups[backups.length-1];
-    $('backupStatus').textContent = last
-      ? 'Backup automatico locale: ultimo salvataggio '+last.date+' · conservati '+backups.length+' backup giornalieri.'
-      : 'Backup automatico locale attivo.';
+    let b=[];try{b=JSON.parse(localStorage.getItem(BACKUP_KEY)||'[]')}catch(e){}
+    const last=b[b.length-1];
+    $('backupStatus').textContent=last?'Backup automatico locale: ultimo '+last.date+' · '+b.length+' copie giornaliere conservate.':'Backup automatico locale attivo.'
   }
 
   $('incomeCard').addEventListener('click',openIncome);
   $('expenseCard').addEventListener('click',openExpenses);
   $('savingCard').addEventListener('click',openSavings);
   $('fab').addEventListener('click',openAdd);
-  $('closeDetailBtn').addEventListener('click',closeDetail);
-  $('closeAddBtn').addEventListener('click',closeAdd);
+  $('closeDetail').addEventListener('click',()=>$('detailModal').classList.remove('open'));
+  $('closeAdd').addEventListener('click',()=>$('addModal').classList.remove('open'));
+  $('repeatSwitch').addEventListener('click',()=>{repeatMonthly=!repeatMonthly;updateRepeatUI()});
   $('addBtn').addEventListener('click',addItem);
-  $('newType').addEventListener('change',toggleFixedNote);
 
-  $('detailModal').addEventListener('click',e=>{if(e.target===$('detailModal'))closeDetail()});
-  $('addModal').addEventListener('click',e=>{if(e.target===$('addModal'))closeAdd()});
+  $('closeDelete').addEventListener('click',()=>{$('deleteModal').classList.remove('open');reopenDetail()});
+  $('deleteCancel').addEventListener('click',()=>{$('deleteModal').classList.remove('open');reopenDetail()});
+  $('deleteOnly').addEventListener('click',deleteOnly);
+  $('deleteForever').addEventListener('click',deleteForever);
 
-  dailyBackup();
-  render();
+  dailyBackup();render();
 
   if('serviceWorker' in navigator){
-    window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
+    window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}))
   }
 })();
 </script>

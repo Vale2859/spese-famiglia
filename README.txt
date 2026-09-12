@@ -1,20 +1,24 @@
-BILANCIO FAMIGLIA PWA - VERSIONE 2
+BILANCIO FAMIGLIA PWA - VERSIONE 3
 
-Novità:
+LOGICA RICORRENZE:
 - Calendario da gennaio 2026 a dicembre 2100.
-- Tutti i mesi partono vuoti.
-- Il mese selezionato è sempre mostrato chiaramente.
-- Una USCITA FISSA inserita in un mese viene replicata da quel mese fino a dicembre 2100.
-- Backup automatico locale giornaliero: una copia al giorno, mantenendo gli ultimi 60 giorni.
-- Card Entrate / Uscite / Utile-Risparmi cliccabili.
-- Pulsante + per aggiungere voci.
+- I mesi futuri restano vuoti: nessuna voce viene precompilata prima che il mese arrivi.
+- Quando inserisci una voce puoi scegliere:
+  1) Solo questo mese
+  2) Ripeti ogni mese
+- Le voci ricorrenti vengono riportate automaticamente nei mesi successivi SOLO quando quei mesi diventano correnti/passati.
+- Vale per Entrate, Uscite fisse, Polizze e Fabbisogno.
+- Per una voce ricorrente puoi scegliere:
+  - Elimina solo per questo mese
+  - Elimina da questo mese in poi
+- Le voci di un solo mese si eliminano normalmente.
+- Backup automatico locale giornaliero: conserva le ultime 60 copie.
 
-IMPORTANTE SUL BACKUP:
-Su iPhone/iOS un'app web non può garantire l'esecuzione di un download automatico in background ogni giorno quando l'app è completamente chiusa.
-Questa versione crea/aggiorna automaticamente un backup locale giornaliero ogni volta che l'app viene aperta o usata.
-Per un backup cloud realmente automatico anche a dispositivo chiuso serve collegare l'app a un backend/cloud.
+NOTA BACKUP:
+iOS non permette a una PWA chiusa di eseguire codice liberamente in background ogni giorno.
+Il backup giornaliero viene aggiornato automaticamente quando l'app viene aperta/usata.
+Per un backup cloud realmente autonomo serve un backend/cloud (es. Firebase).
 
-Installazione:
-1. Pubblica questa cartella su un hosting HTTPS.
-2. Apri il link in Safari su iPhone.
-3. Condividi > Aggiungi alla schermata Home.
+INSTALLAZIONE:
+Pubblica l'intera cartella su un hosting HTTPS, poi apri il link con Safari su iPhone e usa:
+Condividi > Aggiungi alla schermata Home.
