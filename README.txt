@@ -1,16 +1,22 @@
-Spese Famiglia - Versione 11
+Spese Famiglia - Versione 12
 
-Modifiche:
-- Eliminata completamente la barra inferiore Home / Entrate / Uscite / Calendario / Impostazioni.
-- Non c'è più nessuna barra di navigazione in basso.
-- Resta il + a destra delle Entrate.
-- Resta un + sotto ciascuna delle tre colonne Uscite: Fisse, Polizze, Fabbisogno.
-- Toccando direttamente una singola voce (es. Garage Perrone, Stipendio, Sky, Cibo) si apre la modifica SOLO di quella voce.
-- Nella modifica puoi scegliere:
-  - Modifica solo questo mese
-  - Modifica da questo mese in poi
-  - Elimina quella voce
-- Tutte le logiche precedenti su ricorrenze, annuali, mesi scelti, backup e mesi futuri restano attive.
+Modifiche richieste:
+- Tolto il + rosso affianco a USCITE.
+- Restano solo i pulsanti "Aggiungi voce" sotto:
+  - Uscite Fisse
+  - Polizze
+  - Fabbisogno
+- Resta il + verde a destra delle Entrate.
+- Toccando direttamente una singola voce (es. Garage Perrone) NON si apre più l'elenco di tutte le uscite.
+- Si apre direttamente e soltanto la scheda di quella voce.
+- Da quella scheda puoi:
+  - cambiare nome/importo solo per quel mese;
+  - cambiare nome/importo da quel mese in poi;
+  - eliminare quella voce.
+- Nessuna barra di navigazione dell'app in basso.
 
-Per aggiornare GitHub Pages:
-sostituisci TUTTI i file del repository con quelli di questo pacchetto, incluso sw.js.
+IMPORTANTE:
+I tasti scuri del browser Safari/Chrome (indietro, avanti, +, schede, menu) NON appartengono all'app e non possono essere rimossi da una pagina aperta nel browser.
+Per non vederli, apri il sito in Safari e scegli:
+Condividi > Aggiungi alla schermata Home.
+Aprendo poi l'icona installata, la PWA parte senza la barra del browser.

@@ -51,7 +51,7 @@ button{touch-action:manipulation}
 .name{font-size:12px;font-weight:950;line-height:1.05}.meta{font-size:9px;color:#65748a;font-weight:800;margin-top:2px}.amt{font-size:12px;font-weight:1000;white-space:nowrap}
 .dots{color:#65748a;font-size:18px;line-height:1}
 .expenseCard{background:#ffe9e9;padding:10px}
-.expenseHead{display:grid;grid-template-columns:32px 1fr auto 44px;align-items:center;gap:7px;color:var(--red2);margin-bottom:9px}
+.expenseHead{display:grid;grid-template-columns:32px 1fr auto;align-items:center;gap:7px;color:var(--red2);margin-bottom:9px}
 .expenseIcon{font-size:25px}.expenseLabel{font-size:17px;font-weight:1000}.expenseAmount{font-size:22px;font-weight:1000}.expenseAdd{background:#e74a4a}
 .cols{display:grid;grid-template-columns:1.16fr 1fr 1fr;gap:6px}
 .col{border-radius:14px;overflow:hidden;display:flex;flex-direction:column;min-width:0;background:#fff}
@@ -123,7 +123,7 @@ input,select{width:100%;border:2px solid var(--line);border-radius:11px;padding:
       <div class="expenseIcon">💸</div>
       <div class="expenseLabel">USCITE</div>
       <div class="expenseAmount" id="expenseTotal">€ 0</div>
-      <button class="roundAdd expenseAdd" data-add="fixed">+</button>
+      
     </div>
 
     <div class="cols">
@@ -197,7 +197,7 @@ input,select{width:100%;border:2px solid var(--line);border-radius:11px;padding:
 <div class="modal" id="editModal">
   <div class="sheet">
     <div class="sheetHead"><div class="sheetTitle" id="editTitle">Modifica voce</div><button class="close" data-close="editModal">✕</button></div>
-    <div class="badge" id="editMonth"></div>
+    <div class="badge" id="editMonth"></div><div class="badge" id="editCategory" style="background:#f7f9fb;color:#5f6f82"></div>
     <div class="form">
       <div><div class="label">Nome voce</div><input id="editName"></div>
       <div><div class="label">Importo €</div><input id="editAmount" type="number" step="0.01" min="0"></div>
@@ -225,8 +225,8 @@ input,select{width:100%;border:2px solid var(--line);border-radius:11px;padding:
 (function(){
 "use strict";
 const $=id=>document.getElementById(id);
-const KEY="bilancioFamigliaPWA_v11";
-const BACKUP_KEY="bilancioFamigliaPWA_dailyBackups_v11";
+const KEY="bilancioFamigliaPWA_v12";
+const BACKUP_KEY="bilancioFamigliaPWA_dailyBackups_v12";
 const START="2026-01",BASE="2026-09";
 const ML=["Gennaio","Febbraio","Marzo","Aprile","Maggio","Giugno","Luglio","Agosto","Settembre","Ottobre","Novembre","Dicembre"];
 const euro=n=>new Intl.NumberFormat("it-IT",{style:"currency",currency:"EUR",minimumFractionDigits:2}).format(Number(n||0));
@@ -306,7 +306,7 @@ $("nextMonth").onclick=()=>{const d=new Date(cy,cm+1,1);if(d.getFullYear()>2100)
 
 function itemNode(type,item){const d=document.createElement("div");d.className="item";d.innerHTML='<div><div class="itemName"></div><div class="itemMeta"></div></div><div class="itemAmount"></div><div class="actions"><button class="edit">Modifica</button><button class="del">Elimina</button></div>';d.querySelector(".itemName").textContent=item.name;d.querySelector(".itemMeta").textContent=meta(item);d.querySelector(".itemAmount").textContent=euro(item.amount);d.querySelector(".edit").onclick=()=>openEdit(type,item);d.querySelector(".del").onclick=()=>openDelete(type,item);return d}
 function openDetail(which){lastDetail=which;const c=$("detailContent");c.innerHTML="";if(which==="income"){$("detailTitle").textContent="Entrate · "+label();$("detailTotal").textContent=euro(sum("income"));items("income").forEach(x=>c.appendChild(itemNode("income",x)));if(!items("income").length)c.innerHTML='<div class="itemMeta">Nessuna entrata</div>'}else{$("detailTitle").textContent="Uscite · "+label();$("detailTotal").textContent=euro(expenses());[["FISSE","fixed"],["POLIZZE","policies"],["FABBISOGNO","needs"]].forEach(([n,t])=>{const h=document.createElement("div");h.className="detailSection";h.textContent=n+" · "+euro(sum(t));c.appendChild(h);items(t).forEach(x=>c.appendChild(itemNode(t,x)))})}$("detailModal").classList.add("open")}
-$("incomeCard").onclick=e=>{if(e.target.closest("[data-add]")||e.target.closest(".incomeRow"))return;openDetail("income")};document.querySelectorAll(".col").forEach(el=>el.onclick=e=>{if(e.target.closest(".colAdd")||e.target.closest(".colItem"))return;openDetail("expenses")});
+$("incomeCard").onclick=e=>{if(e.target.closest("[data-add]")||e.target.closest(".incomeRow"))return;};document.querySelectorAll(".col").forEach(el=>el.onclick=e=>{if(e.target.closest(".colAdd")||e.target.closest(".colItem"))return;});
 
 function buildSelectors(){$("annualMonth").innerHTML=ML.map((x,i)=>'<option value="'+i+'">'+x+"</option>").join("");$("targetYear").innerHTML=Array.from({length:75},(_,i)=>2026+i).map(y=>'<option value="'+y+'">'+y+"</option>").join("");const g=$("monthPickerGrid");g.innerHTML="";ML.forEach((name,i)=>{const b=document.createElement("div");b.className="mp";b.dataset.m=i;b.innerHTML='<div>'+name.slice(0,3)+'</div><input class="hidden" type="number" min="0" step="0.01" placeholder="€">';b.onclick=e=>{if(e.target.tagName==="INPUT")return;b.classList.toggle("sel");b.querySelector("input").classList.toggle("hidden",!b.classList.contains("sel"))};g.appendChild(b)})}
 buildSelectors();
@@ -318,8 +318,8 @@ document.querySelectorAll("[data-add]").forEach(b=>b.onclick=e=>{e.stopPropagati
 function collectMonthAmounts(baseAmount){const out={};document.querySelectorAll(".mp.sel").forEach(mp=>{const m=Number(mp.dataset.m),v=Number(mp.querySelector("input").value||baseAmount);out[m]=v});return out}
 $("addBtn").onclick=()=>{const type=$("newType").value,name=$("newName").value.trim(),amount=Number($("newAmount").value),f=$("frequency").value,k=key();if(!name||amount<=0)return alert("Inserisci nome e importo.");ensure(k);if(f==="once"){data.months[k][type].push({id:"o-"+Date.now(),name,amount})}else{const id="r-"+Date.now()+"-"+Math.random().toString(16).slice(2);let schedule;if(f==="monthly")schedule={kind:"monthly"};if(f==="annual")schedule={kind:"annual",month:Number($("annualMonth").value)};if(f==="selectedYearly"){const amounts=collectMonthAmounts(amount);if(!Object.keys(amounts).length)return alert("Seleziona almeno un mese.");schedule={kind:"selectedYearly",amounts}}if(f==="selectedOneYear"){const amounts=collectMonthAmounts(amount);if(!Object.keys(amounts).length)return alert("Seleziona almeno un mese.");schedule={kind:"selectedOneYear",year:Number($("targetYear").value),amounts}}data.rules[id]={id,type,name,start:k,end:null,skip:[],schedule,amount};if(cmp(k,realKey)<=0&&ruleActive(data.rules[id],k)){const a=amountForRule(data.rules[id],k);data.months[k][type].push({id:"i-"+id+"-"+k,name,amount:a,ruleId:id})}}$("addModal").classList.remove("open");save()};
 
-function openEdit(type,item){pendingEdit={type,item};$("editTitle").textContent=item.name;$("editMonth").textContent="MODIFICA SOLO QUESTA VOCE · "+label().toUpperCase();$("editName").value=item.name;$("editAmount").value=item.amount;$("detailModal").classList.remove("open");$("editModal").classList.add("open")}
-function applyEdit(mode){if(!pendingEdit)return;const {type,item}=pendingEdit,k=key(),name=$("editName").value.trim(),amount=Number($("editAmount").value);if(!name||amount<=0)return alert("Dati non validi");const a=data.months[k][type],idx=a.findIndex(x=>x.id===item.id);if(idx<0)return;if(mode==="month"){if(item.ruleId){const r=data.rules[item.ruleId];if(r&&!r.skip.includes(k))r.skip.push(k);a[idx]={id:"edit-"+Date.now(),name,amount}}else a[idx]={...a[idx],name,amount}}else{if(item.ruleId){const old=data.rules[item.ruleId];if(old)old.end=prev(k);Object.keys(data.months).forEach(m=>{if(cmp(m,k)>=0)data.months[m][type]=data.months[m][type].filter(x=>x.ruleId!==item.ruleId)});const nid="r-edit-"+Date.now(),nr={...old,id:nid,name,amount,start:k,end:null,skip:[]};if(nr.schedule?.kind==="selectedYearly"||nr.schedule?.kind==="selectedOneYear"){const {m}=split(k);if(nr.schedule.amounts&&nr.schedule.amounts[m]!=null)nr.schedule={...nr.schedule,amounts:{...nr.schedule.amounts,[m]:amount}}}data.rules[nid]=nr;if(cmp(k,realKey)<=0&&ruleActive(nr,k))data.months[k][type].push({id:"i-"+nid+"-"+k,name,amount:amountForRule(nr,k),ruleId:nid})}else{const nid="r-new-"+Date.now();data.rules[nid]={id:nid,type,name,start:k,end:null,skip:[],schedule:{kind:"monthly"},amount};a[idx]={id:"i-"+nid+"-"+k,name,amount,ruleId:nid}}}pendingEdit=null;$("editModal").classList.remove("open");save();setTimeout(()=>openDetail(lastDetail),0)}
+function openEdit(type,item){pendingEdit={type,item};$("editTitle").textContent=item.name;$("editMonth").textContent="MESE: "+label().toUpperCase();$("editCategory").textContent=type==="income"?"ENTRATA":type==="fixed"?"USCITA FISSA":type==="policies"?"POLIZZA":"FABBISOGNO";$("editName").value=item.name;$("editAmount").value=item.amount;$("editModal").classList.add("open")}
+function applyEdit(mode){if(!pendingEdit)return;const {type,item}=pendingEdit,k=key(),name=$("editName").value.trim(),amount=Number($("editAmount").value);if(!name||amount<=0)return alert("Dati non validi");const a=data.months[k][type],idx=a.findIndex(x=>x.id===item.id);if(idx<0)return;if(mode==="month"){if(item.ruleId){const r=data.rules[item.ruleId];if(r&&!r.skip.includes(k))r.skip.push(k);a[idx]={id:"edit-"+Date.now(),name,amount}}else a[idx]={...a[idx],name,amount}}else{if(item.ruleId){const old=data.rules[item.ruleId];if(old)old.end=prev(k);Object.keys(data.months).forEach(m=>{if(cmp(m,k)>=0)data.months[m][type]=data.months[m][type].filter(x=>x.ruleId!==item.ruleId)});const nid="r-edit-"+Date.now(),nr={...old,id:nid,name,amount,start:k,end:null,skip:[]};if(nr.schedule?.kind==="selectedYearly"||nr.schedule?.kind==="selectedOneYear"){const {m}=split(k);if(nr.schedule.amounts&&nr.schedule.amounts[m]!=null)nr.schedule={...nr.schedule,amounts:{...nr.schedule.amounts,[m]:amount}}}data.rules[nid]=nr;if(cmp(k,realKey)<=0&&ruleActive(nr,k))data.months[k][type].push({id:"i-"+nid+"-"+k,name,amount:amountForRule(nr,k),ruleId:nid})}else{const nid="r-new-"+Date.now();data.rules[nid]={id:nid,type,name,start:k,end:null,skip:[],schedule:{kind:"monthly"},amount};a[idx]={id:"i-"+nid+"-"+k,name,amount,ruleId:nid}}}pendingEdit=null;$("editModal").classList.remove("open");save()}
 $("editOnly").onclick=()=>applyEdit("month");
 $("editForever").onclick=()=>applyEdit("forever");
 $("editDelete").onclick=()=>{
@@ -329,9 +329,9 @@ $("editDelete").onclick=()=>{
   openDelete(type,item);
 };
 
-function openDelete(type,item){pendingDelete={type,item};$("deleteLabel").textContent=item.name+" · "+label();$("detailModal").classList.remove("open");$("deleteForever").style.display=item.ruleId?"block":"none";$("deleteOnly").textContent=item.ruleId?"🗓️ Elimina solo questo mese":"🗑️ Elimina questa voce";$("deleteModal").classList.add("open")}
-$("deleteOnly").onclick=()=>{const {type,item}=pendingDelete,k=key();data.months[k][type]=data.months[k][type].filter(x=>x.id!==item.id);if(item.ruleId){const r=data.rules[item.ruleId];if(r&&!r.skip.includes(k))r.skip.push(k)}$("deleteModal").classList.remove("open");save();setTimeout(()=>openDetail(lastDetail),0)};
-$("deleteForever").onclick=()=>{const {type,item}=pendingDelete,k=key(),r=data.rules[item.ruleId];if(r)r.end=prev(k);Object.keys(data.months).forEach(m=>{if(cmp(m,k)>=0)data.months[m][type]=data.months[m][type].filter(x=>x.ruleId!==item.ruleId)});$("deleteModal").classList.remove("open");save();setTimeout(()=>openDetail(lastDetail),0)};
+function openDelete(type,item){pendingDelete={type,item};$("deleteLabel").textContent=item.name+" · "+label();$("deleteForever").style.display=item.ruleId?"block":"none";$("deleteOnly").textContent=item.ruleId?"🗓️ Elimina solo questo mese":"🗑️ Elimina questa voce";$("deleteModal").classList.add("open")}
+$("deleteOnly").onclick=()=>{const {type,item}=pendingDelete,k=key();data.months[k][type]=data.months[k][type].filter(x=>x.id!==item.id);if(item.ruleId){const r=data.rules[item.ruleId];if(r&&!r.skip.includes(k))r.skip.push(k)}$("deleteModal").classList.remove("open");save()};
+$("deleteForever").onclick=()=>{const {type,item}=pendingDelete,k=key(),r=data.rules[item.ruleId];if(r)r.end=prev(k);Object.keys(data.months).forEach(m=>{if(cmp(m,k)>=0)data.months[m][type]=data.months[m][type].filter(x=>x.ruleId!==item.ruleId)});$("deleteModal").classList.remove("open");save()};
 
 document.querySelectorAll("[data-close]").forEach(b=>b.onclick=()=>$(b.dataset.close).classList.remove("open"));document.querySelectorAll(".modal").forEach(m=>m.onclick=e=>{if(e.target===m)m.classList.remove("open")});
 function dailyBackup(){const d=new Date(),day=d.toISOString().slice(0,10);let b=[];try{b=JSON.parse(localStorage.getItem(BACKUP_KEY)||"[]")}catch(e){}const s={date:day,createdAt:new Date().toISOString(),data:JSON.parse(JSON.stringify(data))},i=b.findIndex(x=>x.date===day);if(i>=0)b[i]=s;else b.push(s);if(b.length>60)b=b.slice(-60);localStorage.setItem(BACKUP_KEY,JSON.stringify(b))}
