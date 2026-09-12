@@ -1,23 +1,16 @@
-Spese Famiglia - Versione 10
+Spese Famiglia - Versione 11
 
-UI rifatta per aderire molto più fedelmente al mockup approvato:
-- logo/icona in alto a sinistra
-- titolo Bilancio Mensile Famiglia
-- mese centrato con frecce
-- Entrate compatte
-- Uscite con 3 colonne allineate Fisse / Polizze / Fabbisogno
-- card Totale Uscite e Utile/Risparmi
-- card Gestione scadenze
-- barra di navigazione fissa in basso
+Modifiche:
+- Eliminata completamente la barra inferiore Home / Entrate / Uscite / Calendario / Impostazioni.
+- Non c'è più nessuna barra di navigazione in basso.
+- Resta il + a destra delle Entrate.
+- Resta un + sotto ciascuna delle tre colonne Uscite: Fisse, Polizze, Fabbisogno.
+- Toccando direttamente una singola voce (es. Garage Perrone, Stipendio, Sky, Cibo) si apre la modifica SOLO di quella voce.
+- Nella modifica puoi scegliere:
+  - Modifica solo questo mese
+  - Modifica da questo mese in poi
+  - Elimina quella voce
+- Tutte le logiche precedenti su ricorrenze, annuali, mesi scelti, backup e mesi futuri restano attive.
 
-Mantiene:
-- solo questo mese
-- ogni mese
-- annuale
-- mesi scelti ogni anno
-- mesi scelti solo in un anno
-- importi diversi per mese
-- modifica solo mese o da quel mese in poi
-- elimina solo mese o da quel mese in poi
-- ricorrenze future non visibili prima del mese
-- backup locale giornaliero
+Per aggiornare GitHub Pages:
+sostituisci TUTTI i file del repository con quelli di questo pacchetto, incluso sw.js.
