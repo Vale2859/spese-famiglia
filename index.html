@@ -196,14 +196,52 @@ input,select{width:100%;border:2px solid var(--line);border-radius:11px;padding:
 
 <div class="modal" id="editModal">
   <div class="sheet">
-    <div class="sheetHead"><div class="sheetTitle" id="editTitle">Modifica voce</div><button class="close" data-close="editModal">✕</button></div>
-    <div class="badge" id="editMonth"></div><div class="badge" id="editCategory" style="background:#f7f9fb;color:#5f6f82"></div>
+    <div class="sheetHead">
+      <div class="sheetTitle" id="editTitle">Modifica voce</div>
+      <button class="close" data-close="editModal">✕</button>
+    </div>
+    <div class="badge" id="editMonth"></div>
+    <div class="badge" id="editCategory" style="background:#f7f9fb;color:#5f6f82"></div>
+
     <div class="form">
-      <div><div class="label">Nome voce</div><input id="editName"></div>
-      <div><div class="label">Importo €</div><input id="editAmount" type="number" step="0.01" min="0"></div>
+      <div>
+        <div class="label">Nome voce</div>
+        <input id="editName">
+      </div>
+      <div>
+        <div class="label">Importo €</div>
+        <input id="editAmount" type="number" step="0.01" min="0">
+      </div>
+
+      <div>
+        <div class="label">Frequenza</div>
+        <select id="editFrequency">
+          <option value="once">Solo questo mese</option>
+          <option value="monthly">Ogni mese</option>
+          <option value="annual">Una volta all'anno</option>
+          <option value="selectedYearly">Mesi scelti ogni anno</option>
+          <option value="selectedOneYear">Mesi scelti solo in un anno</option>
+        </select>
+      </div>
+
+      <div id="editAnnualBox" class="hidden">
+        <div class="label">Mese annuale</div>
+        <select id="editAnnualMonth"></select>
+      </div>
+
+      <div id="editYearBox" class="hidden">
+        <div class="label">Anno</div>
+        <select id="editTargetYear"></select>
+      </div>
+
+      <div id="editSelectedMonthsBox" class="hidden">
+        <div class="label">Mesi e importi</div>
+        <div class="monthPickerGrid" id="editMonthPickerGrid"></div>
+      </div>
+
       <div class="choice">
-        <button class="soft" id="editOnly">🗓️ Modifica solo questo mese</button>
-        <button class="primary" id="editForever">♾️ Modifica da questo mese in poi</button>
+        <button class="soft" id="editOnly">🗓️ Salva solo questo mese</button>
+        <button class="primary" id="editForever">♾️ Salva da questo mese in poi</button>
         <button class="danger" id="editDelete">🗑️ Elimina questa voce</button>
       </div>
     </div>
@@ -225,8 +263,8 @@ input,select{width:100%;border:2px solid var(--line);border-radius:11px;padding:
 (function(){
 "use strict";
 const $=id=>document.getElementById(id);
-const KEY="bilancioFamigliaPWA_v12";
-const BACKUP_KEY="bilancioFamigliaPWA_dailyBackups_v12";
+const KEY="bilancioFamigliaPWA_v13";
+const BACKUP_KEY="bilancioFamigliaPWA_dailyBackups_v13";
 const START="2026-01",BASE="2026-09";
 const ML=["Gennaio","Febbraio","Marzo","Aprile","Maggio","Giugno","Luglio","Agosto","Settembre","Ottobre","Novembre","Dicembre"];
 const euro=n=>new Intl.NumberFormat("it-IT",{style:"currency",currency:"EUR",minimumFractionDigits:2}).format(Number(n||0));
@@ -310,6 +348,85 @@ $("incomeCard").onclick=e=>{if(e.target.closest("[data-add]")||e.target.closest(
 
 function buildSelectors(){$("annualMonth").innerHTML=ML.map((x,i)=>'<option value="'+i+'">'+x+"</option>").join("");$("targetYear").innerHTML=Array.from({length:75},(_,i)=>2026+i).map(y=>'<option value="'+y+'">'+y+"</option>").join("");const g=$("monthPickerGrid");g.innerHTML="";ML.forEach((name,i)=>{const b=document.createElement("div");b.className="mp";b.dataset.m=i;b.innerHTML='<div>'+name.slice(0,3)+'</div><input class="hidden" type="number" min="0" step="0.01" placeholder="€">';b.onclick=e=>{if(e.target.tagName==="INPUT")return;b.classList.toggle("sel");b.querySelector("input").classList.toggle("hidden",!b.classList.contains("sel"))};g.appendChild(b)})}
 buildSelectors();
+function buildEditSelectors(){
+  $("editAnnualMonth").innerHTML=ML.map((x,i)=>'<option value="'+i+'">'+x+"</option>").join("");
+  $("editTargetYear").innerHTML=Array.from({length:75},(_,i)=>2026+i).map(y=>'<option value="'+y+'">'+y+"</option>").join("");
+  const g=$("editMonthPickerGrid");g.innerHTML="";
+  ML.forEach((name,i)=>{
+    const b=document.createElement("div");
+    b.className="mp";b.dataset.m=i;
+    b.innerHTML='<div>'+name.slice(0,3)+'</div><input class="hidden" type="number" min="0" step="0.01" placeholder="€">';
+    b.onclick=e=>{
+      if(e.target.tagName==="INPUT")return;
+      b.classList.toggle("sel");
+      b.querySelector("input").classList.toggle("hidden",!b.classList.contains("sel"));
+    };
+    g.appendChild(b);
+  });
+}
+function updateEditFreq(){
+  const f=$("editFrequency").value;
+  $("editAnnualBox").classList.toggle("hidden",f!=="annual");
+  $("editSelectedMonthsBox").classList.toggle("hidden",!(f==="selectedYearly"||f==="selectedOneYear"));
+  $("editYearBox").classList.toggle("hidden",f!=="selectedOneYear");
+}
+function fillEditFrequency(item){
+  document.querySelectorAll("#editMonthPickerGrid .mp").forEach(x=>{
+    x.classList.remove("sel");
+    x.querySelector("input").classList.add("hidden");
+    x.querySelector("input").value="";
+  });
+
+  if(!item.ruleId || !data.rules[item.ruleId]){
+    $("editFrequency").value="once";
+    updateEditFreq();
+    return;
+  }
+  const r=data.rules[item.ruleId];
+  const s=r.schedule||{kind:"monthly"};
+  $("editFrequency").value=s.kind||"monthly";
+  if(s.kind==="annual") $("editAnnualMonth").value=s.month;
+  if(s.kind==="selectedOneYear") $("editTargetYear").value=s.year;
+  if(s.kind==="selectedYearly"||s.kind==="selectedOneYear"){
+    Object.entries(s.amounts||{}).forEach(([m,v])=>{
+      const mp=document.querySelector('#editMonthPickerGrid .mp[data-m="'+m+'"]');
+      if(mp){
+        mp.classList.add("sel");
+        const inp=mp.querySelector("input");
+        inp.classList.remove("hidden");
+        inp.value=v;
+      }
+    });
+  }
+  updateEditFreq();
+}
+function collectEditMonthAmounts(baseAmount){
+  const out={};
+  document.querySelectorAll("#editMonthPickerGrid .mp.sel").forEach(mp=>{
+    const m=Number(mp.dataset.m);
+    out[m]=Number(mp.querySelector("input").value||baseAmount);
+  });
+  return out;
+}
+function scheduleFromEdit(baseAmount){
+  const f=$("editFrequency").value;
+  if(f==="once") return null;
+  if(f==="monthly") return {kind:"monthly"};
+  if(f==="annual") return {kind:"annual",month:Number($("editAnnualMonth").value)};
+  if(f==="selectedYearly"){
+    const amounts=collectEditMonthAmounts(baseAmount);
+    if(!Object.keys(amounts).length) throw new Error("Seleziona almeno un mese.");
+    return {kind:"selectedYearly",amounts};
+  }
+  if(f==="selectedOneYear"){
+    const amounts=collectEditMonthAmounts(baseAmount);
+    if(!Object.keys(amounts).length) throw new Error("Seleziona almeno un mese.");
+    return {kind:"selectedOneYear",year:Number($("editTargetYear").value),amounts};
+  }
+}
+buildEditSelectors();
+$("editFrequency").onchange=updateEditFreq;
+
 function updateFreq(){const f=$("frequency").value;$("annualBox").classList.toggle("hidden",f!=="annual");$("selectedMonthsBox").classList.toggle("hidden",!(f==="selectedYearly"||f==="selectedOneYear"));$("yearBox").classList.toggle("hidden",f!=="selectedOneYear")}
 $("frequency").onchange=updateFreq;
 function openAdd(type){$("addMonth").textContent="STAI REGISTRANDO SU: "+label().toUpperCase();$("newType").value=type||"fixed";$("newName").value="";$("newAmount").value="";$("frequency").value="once";$("targetYear").value=cy;updateFreq();document.querySelectorAll(".mp").forEach(x=>{x.classList.remove("sel");x.querySelector("input").classList.add("hidden");x.querySelector("input").value=""});$("addModal").classList.add("open")}
@@ -318,8 +435,86 @@ document.querySelectorAll("[data-add]").forEach(b=>b.onclick=e=>{e.stopPropagati
 function collectMonthAmounts(baseAmount){const out={};document.querySelectorAll(".mp.sel").forEach(mp=>{const m=Number(mp.dataset.m),v=Number(mp.querySelector("input").value||baseAmount);out[m]=v});return out}
 $("addBtn").onclick=()=>{const type=$("newType").value,name=$("newName").value.trim(),amount=Number($("newAmount").value),f=$("frequency").value,k=key();if(!name||amount<=0)return alert("Inserisci nome e importo.");ensure(k);if(f==="once"){data.months[k][type].push({id:"o-"+Date.now(),name,amount})}else{const id="r-"+Date.now()+"-"+Math.random().toString(16).slice(2);let schedule;if(f==="monthly")schedule={kind:"monthly"};if(f==="annual")schedule={kind:"annual",month:Number($("annualMonth").value)};if(f==="selectedYearly"){const amounts=collectMonthAmounts(amount);if(!Object.keys(amounts).length)return alert("Seleziona almeno un mese.");schedule={kind:"selectedYearly",amounts}}if(f==="selectedOneYear"){const amounts=collectMonthAmounts(amount);if(!Object.keys(amounts).length)return alert("Seleziona almeno un mese.");schedule={kind:"selectedOneYear",year:Number($("targetYear").value),amounts}}data.rules[id]={id,type,name,start:k,end:null,skip:[],schedule,amount};if(cmp(k,realKey)<=0&&ruleActive(data.rules[id],k)){const a=amountForRule(data.rules[id],k);data.months[k][type].push({id:"i-"+id+"-"+k,name,amount:a,ruleId:id})}}$("addModal").classList.remove("open");save()};
 
-function openEdit(type,item){pendingEdit={type,item};$("editTitle").textContent=item.name;$("editMonth").textContent="MESE: "+label().toUpperCase();$("editCategory").textContent=type==="income"?"ENTRATA":type==="fixed"?"USCITA FISSA":type==="policies"?"POLIZZA":"FABBISOGNO";$("editName").value=item.name;$("editAmount").value=item.amount;$("editModal").classList.add("open")}
-function applyEdit(mode){if(!pendingEdit)return;const {type,item}=pendingEdit,k=key(),name=$("editName").value.trim(),amount=Number($("editAmount").value);if(!name||amount<=0)return alert("Dati non validi");const a=data.months[k][type],idx=a.findIndex(x=>x.id===item.id);if(idx<0)return;if(mode==="month"){if(item.ruleId){const r=data.rules[item.ruleId];if(r&&!r.skip.includes(k))r.skip.push(k);a[idx]={id:"edit-"+Date.now(),name,amount}}else a[idx]={...a[idx],name,amount}}else{if(item.ruleId){const old=data.rules[item.ruleId];if(old)old.end=prev(k);Object.keys(data.months).forEach(m=>{if(cmp(m,k)>=0)data.months[m][type]=data.months[m][type].filter(x=>x.ruleId!==item.ruleId)});const nid="r-edit-"+Date.now(),nr={...old,id:nid,name,amount,start:k,end:null,skip:[]};if(nr.schedule?.kind==="selectedYearly"||nr.schedule?.kind==="selectedOneYear"){const {m}=split(k);if(nr.schedule.amounts&&nr.schedule.amounts[m]!=null)nr.schedule={...nr.schedule,amounts:{...nr.schedule.amounts,[m]:amount}}}data.rules[nid]=nr;if(cmp(k,realKey)<=0&&ruleActive(nr,k))data.months[k][type].push({id:"i-"+nid+"-"+k,name,amount:amountForRule(nr,k),ruleId:nid})}else{const nid="r-new-"+Date.now();data.rules[nid]={id:nid,type,name,start:k,end:null,skip:[],schedule:{kind:"monthly"},amount};a[idx]={id:"i-"+nid+"-"+k,name,amount,ruleId:nid}}}pendingEdit=null;$("editModal").classList.remove("open");save()}
+function openEdit(type,item){
+  pendingEdit={type,item};
+  $("editTitle").textContent=item.name;
+  $("editMonth").textContent="MESE: "+label().toUpperCase();
+  $("editCategory").textContent=type==="income"?"ENTRATA":type==="fixed"?"USCITA FISSA":type==="policies"?"POLIZZA":"FABBISOGNO";
+  $("editName").value=item.name;
+  $("editAmount").value=item.amount;
+  $("editTargetYear").value=cy;
+  fillEditFrequency(item);
+  $("detailModal").classList.remove("open");
+  $("deleteModal").classList.remove("open");
+  $("editModal").classList.add("open");
+};$("editTitle").textContent=item.name;$("editMonth").textContent="MESE: "+label().toUpperCase();$("editCategory").textContent=type==="income"?"ENTRATA":type==="fixed"?"USCITA FISSA":type==="policies"?"POLIZZA":"FABBISOGNO";$("editName").value=item.name;$("editAmount").value=item.amount;$("editModal").classList.add("open")}
+function applyEdit(mode){
+  if(!pendingEdit)return;
+  const {type,item}=pendingEdit;
+  const k=key();
+  const name=$("editName").value.trim();
+  const amount=Number($("editAmount").value);
+  if(!name||amount<=0)return alert("Inserisci nome e importo.");
+
+  let newSchedule;
+  try{ newSchedule=scheduleFromEdit(amount); }
+  catch(e){ return alert(e.message); }
+
+  ensure(k);
+  const a=data.months[k][type];
+  const idx=a.findIndex(x=>x.id===item.id);
+  if(idx<0)return;
+
+  if(mode==="month"){
+    // SOLO questo mese: salva una eccezione mensile.
+    if(item.ruleId){
+      const old=data.rules[item.ruleId];
+      if(old){
+        if(!old.skip)old.skip=[];
+        if(!old.skip.includes(k))old.skip.push(k);
+      }
+    }
+    if(newSchedule===null){
+      a[idx]={id:"edit-"+Date.now(),name,amount};
+    }else{
+      // Se l'utente sceglie una frequenza nel salvataggio mensile,
+      // questa voce resta comunque soltanto un'eccezione del mese corrente.
+      a[idx]={id:"edit-"+Date.now(),name,amount,frequencyLabel:$("editFrequency").value};
+    }
+  }else{
+    // DA QUESTO MESE IN POI: chiude la vecchia regola e crea la nuova frequenza.
+    if(item.ruleId && data.rules[item.ruleId]){
+      data.rules[item.ruleId].end=prev(k);
+      Object.keys(data.months).forEach(m=>{
+        if(cmp(m,k)>=0){
+          data.months[m][type]=data.months[m][type].filter(x=>x.ruleId!==item.ruleId);
+        }
+      });
+    }else{
+      a.splice(idx,1);
+    }
+
+    if(newSchedule===null){
+      // "Solo questo mese" scelto anche con pulsante permanente:
+      // rimane solo nel mese corrente, nessuna ricorrenza futura.
+      data.months[k][type].push({id:"o-"+Date.now(),name,amount});
+    }else{
+      const nid="r-edit-"+Date.now()+"-"+Math.random().toString(16).slice(2);
+      const nr={id:nid,type,name,amount,start:k,end:null,skip:[],schedule:newSchedule};
+      data.rules[nid]=nr;
+      if(cmp(k,realKey)<=0&&ruleActive(nr,k)){
+        data.months[k][type].push({id:"i-"+nid+"-"+k,name,amount:amountForRule(nr,k),ruleId:nid});
+      }
+    }
+  }
+
+  pendingEdit=null;
+  $("editModal").classList.remove("open");
+  $("detailModal").classList.remove("open");
+  $("deleteModal").classList.remove("open");
+  save();
+  window.scrollTo({top:0,behavior:"smooth"});
+}
 $("editOnly").onclick=()=>applyEdit("month");
 $("editForever").onclick=()=>applyEdit("forever");
 $("editDelete").onclick=()=>{
@@ -330,8 +525,8 @@ $("editDelete").onclick=()=>{
 };
 
 function openDelete(type,item){pendingDelete={type,item};$("deleteLabel").textContent=item.name+" · "+label();$("deleteForever").style.display=item.ruleId?"block":"none";$("deleteOnly").textContent=item.ruleId?"🗓️ Elimina solo questo mese":"🗑️ Elimina questa voce";$("deleteModal").classList.add("open")}
-$("deleteOnly").onclick=()=>{const {type,item}=pendingDelete,k=key();data.months[k][type]=data.months[k][type].filter(x=>x.id!==item.id);if(item.ruleId){const r=data.rules[item.ruleId];if(r&&!r.skip.includes(k))r.skip.push(k)}$("deleteModal").classList.remove("open");save()};
-$("deleteForever").onclick=()=>{const {type,item}=pendingDelete,k=key(),r=data.rules[item.ruleId];if(r)r.end=prev(k);Object.keys(data.months).forEach(m=>{if(cmp(m,k)>=0)data.months[m][type]=data.months[m][type].filter(x=>x.ruleId!==item.ruleId)});$("deleteModal").classList.remove("open");save()};
+$("deleteOnly").onclick=()=>{const {type,item}=pendingDelete,k=key();data.months[k][type]=data.months[k][type].filter(x=>x.id!==item.id);if(item.ruleId){const r=data.rules[item.ruleId];if(r&&!r.skip.includes(k))r.skip.push(k)}$("deleteModal").classList.remove("open");$("detailModal").classList.remove("open");$("editModal").classList.remove("open");save();window.scrollTo({top:0,behavior:"smooth"})};
+$("deleteForever").onclick=()=>{const {type,item}=pendingDelete,k=key(),r=data.rules[item.ruleId];if(r)r.end=prev(k);Object.keys(data.months).forEach(m=>{if(cmp(m,k)>=0)data.months[m][type]=data.months[m][type].filter(x=>x.ruleId!==item.ruleId)});$("deleteModal").classList.remove("open");$("detailModal").classList.remove("open");$("editModal").classList.remove("open");save();window.scrollTo({top:0,behavior:"smooth"})};
 
 document.querySelectorAll("[data-close]").forEach(b=>b.onclick=()=>$(b.dataset.close).classList.remove("open"));document.querySelectorAll(".modal").forEach(m=>m.onclick=e=>{if(e.target===m)m.classList.remove("open")});
 function dailyBackup(){const d=new Date(),day=d.toISOString().slice(0,10);let b=[];try{b=JSON.parse(localStorage.getItem(BACKUP_KEY)||"[]")}catch(e){}const s={date:day,createdAt:new Date().toISOString(),data:JSON.parse(JSON.stringify(data))},i=b.findIndex(x=>x.date===day);if(i>=0)b[i]=s;else b.push(s);if(b.length>60)b=b.slice(-60);localStorage.setItem(BACKUP_KEY,JSON.stringify(b))}
