@@ -9,7 +9,7 @@
 <meta name="apple-mobile-web-app-title" content="Spese Famiglia">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-192.png">
-<title>Bilancio Mensile Famiglia</title>
+<title>Bilancio Mensile Famiglia v14</title>
 <style>
 :root{
   --ink:#10243f;--muted:#718096;--line:#dfe7ef;
@@ -263,8 +263,8 @@ input,select{width:100%;border:2px solid var(--line);border-radius:11px;padding:
 (function(){
 "use strict";
 const $=id=>document.getElementById(id);
-const KEY="bilancioFamigliaPWA_v13";
-const BACKUP_KEY="bilancioFamigliaPWA_dailyBackups_v13";
+const KEY="bilancioFamigliaPWA_v14";
+const BACKUP_KEY="bilancioFamigliaPWA_dailyBackups_v14";
 const START="2026-01",BASE="2026-09";
 const ML=["Gennaio","Febbraio","Marzo","Aprile","Maggio","Giugno","Luglio","Agosto","Settembre","Ottobre","Novembre","Dicembre"];
 const euro=n=>new Intl.NumberFormat("it-IT",{style:"currency",currency:"EUR",minimumFractionDigits:2}).format(Number(n||0));
@@ -447,7 +447,7 @@ function openEdit(type,item){
   $("detailModal").classList.remove("open");
   $("deleteModal").classList.remove("open");
   $("editModal").classList.add("open");
-};$("editTitle").textContent=item.name;$("editMonth").textContent="MESE: "+label().toUpperCase();$("editCategory").textContent=type==="income"?"ENTRATA":type==="fixed"?"USCITA FISSA":type==="policies"?"POLIZZA":"FABBISOGNO";$("editName").value=item.name;$("editAmount").value=item.amount;$("editModal").classList.add("open")}
+}
 function applyEdit(mode){
   if(!pendingEdit)return;
   const {type,item}=pendingEdit;

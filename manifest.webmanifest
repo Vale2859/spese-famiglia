@@ -1,5 +1,5 @@
 {
-  "name": "Spese Famiglia v13",
+  "name": "Spese Famiglia v14",
   "short_name": "Spese Famiglia",
   "start_url": "./",
   "display": "standalone",
@@ -17,5 +17,6 @@
       "sizes": "512x512",
       "type": "image/png"
     }
-  ]
+  ],
+  "scope": "./"
 }
