@@ -12,104 +12,120 @@
 <title>Bilancio Mensile Famiglia</title>
 <style>
 :root{
-  --ink:#0f2744;--muted:#66758a;--bg:#f7fafc;--line:#dfe7ef;
-  --green:#ddf5e7;--green2:#0a7b46;--red:#ffe4e4;--red2:#c32626;
-  --blue:#ddecff;--blue2:#165da6;--violet:#eee5ff;--violet2:#6540a8;
-  --orange:#ffe7d2;--orange2:#c24d16;--cyan:#dfeeff;--cyan2:#1263b8;
-  --shadow:0 12px 30px rgba(30,55,80,.10)
+  --ink:#10243f;--muted:#718096;--line:#dfe7ef;
+  --green:#e3f8ec;--green2:#0a7b46;
+  --red:#ffe9e9;--red2:#c52b2b;
+  --blue:#e8f3ff;--blue2:#1a5d9e;
+  --violet:#f0e9ff;--violet2:#6544a8;
+  --orange:#fff0e4;--orange2:#c4541d;
+  --cyan:#e1efff;--cyan2:#155fa6;
+  --save:#e7f7e7;--save2:#117548;
+  --shadow:0 8px 22px rgba(16,36,63,.09);
 }
 *{box-sizing:border-box}
 html,body{margin:0;min-height:100%}
-body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;background:#f7fafc;color:var(--ink)}
+body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",Roboto,Arial,sans-serif;background:#f8fafc;color:var(--ink)}
 button,input,select{font:inherit}
 button{touch-action:manipulation}
-.app{width:min(100%,780px);margin:0 auto;padding:12px 12px calc(92px + env(safe-area-inset-bottom))}
-.hero{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center}
-.logoMini{font-size:40px}
-.heroTitle{font-size:28px;font-weight:1000;line-height:1}.heroTitle span{color:#0a8f50}
-.heroSub{font-size:12px;color:var(--muted);font-weight:800;margin-top:3px}
-.gear{border:0;background:transparent;font-size:24px}
-.monthControl{display:flex;align-items:center;justify-content:center;gap:8px;background:#eaf2ff;border-radius:16px;padding:10px 12px;min-width:170px;font-weight:950}
-.monthArrow{border:0;background:transparent;font-size:25px;color:var(--ink)}
-.monthText{text-align:center;min-width:95px}
-.monthText b{display:block;font-size:16px}.monthText small{font-size:12px}
-.future{display:none;margin:10px 0;background:#fff3d8;color:#7a5700;border-radius:12px;padding:9px 10px;font-size:11px;font-weight:850}
-.card{border-radius:20px;box-shadow:var(--shadow);overflow:hidden}
-.incomeCard{margin-top:12px;background:linear-gradient(90deg,#dff6e8,#e9faef);padding:13px}
-.incomeTop{display:flex;justify-content:space-between;align-items:center;gap:10px}
-.sectionLabel{font-size:15px;font-weight:1000}
-.incomeTop .sectionLabel{color:var(--green2)}
-.bigMoney{font-size:34px;font-weight:1000;line-height:1;color:var(--green2);margin-top:3px}
-.roundAdd{width:42px;height:42px;border:0;border-radius:50%;color:#fff;background:#23a25f;font-size:26px;box-shadow:0 8px 16px rgba(20,130,80,.22)}
-.incomeRows{margin-top:10px;background:#fff;border-radius:14px;padding:8px 10px}
-.row{display:flex;justify-content:space-between;gap:8px;padding:6px 0;border-bottom:1px solid var(--line);align-items:flex-start}
-.row:last-child{border-bottom:0}.rowName{font-size:12px;font-weight:950}.rowMeta{font-size:10px;color:var(--muted);font-weight:750;margin-top:2px}.rowAmt{font-size:13px;font-weight:1000;white-space:nowrap}
-.expenseCard{margin-top:12px;background:#ffe8e8;padding:12px}
-.expenseHeader{display:flex;justify-content:space-between;align-items:center;gap:10px;color:var(--red2)}
-.expenseTitle{font-size:17px;font-weight:1000}.expenseTotal{font-size:23px;font-weight:1000}
-.cols{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
-.col{border-radius:16px;overflow:hidden;display:flex;flex-direction:column;min-width:0}
-.col.fixed{background:#edf5ff}.col.policies{background:#f3edff}.col.needs{background:#fff0e6}
-.colHead{padding:10px}
+.app{width:min(100%,430px);margin:0 auto;padding:8px 9px calc(78px + env(safe-area-inset-bottom))}
+.header{display:grid;grid-template-columns:66px 1fr 38px;gap:8px;align-items:center;margin:2px 0 6px}
+.headerIcon{width:62px;height:62px;border-radius:18px;object-fit:cover}
+.headerTitle{font-size:24px;font-weight:1000;line-height:.92;letter-spacing:-.03em}
+.headerTitle .family{display:block;color:#0c9250;font-size:24px}
+.headerSub{font-size:11px;color:#64748b;font-weight:800;margin-top:5px;white-space:nowrap}
+.gear{border:0;background:transparent;font-size:23px;padding:4px}
+.monthCard{display:flex;align-items:center;justify-content:center;gap:8px;background:#e9f2ff;border-radius:16px;padding:8px 10px;margin:7px 0 9px}
+.monthArrow{border:0;background:transparent;color:var(--ink);font-size:28px;font-weight:900;padding:0 8px}
+.monthText{min-width:110px;text-align:center;font-weight:1000;line-height:1}
+.monthText .m{font-size:17px}.monthText .y{font-size:13px;margin-top:3px}
+.future{display:none;background:#fff2d6;color:#795500;border-radius:12px;padding:8px 9px;font-size:10px;font-weight:850;margin-bottom:8px}
+.card{border-radius:19px;box-shadow:var(--shadow)}
+.incomeCard{background:linear-gradient(90deg,#e5f9ed,#ecfbf1);padding:11px;margin-bottom:9px}
+.incomeHeader{display:grid;grid-template-columns:48px 1fr 46px;align-items:center;gap:8px}
+.visualIcon{font-size:35px;text-align:center}
+.blockLabel{font-size:15px;font-weight:1000;color:var(--green2)}
+.blockMoney{font-size:31px;font-weight:1000;color:var(--green2);line-height:1;margin-top:3px;letter-spacing:-.03em}
+.roundAdd{width:44px;height:44px;border:0;border-radius:50%;background:#28a660;color:#fff;font-size:29px;line-height:1;box-shadow:0 7px 15px rgba(20,120,70,.18)}
+.incomeList{background:#fff;border-radius:13px;padding:8px 10px;margin-top:9px}
+.incomeRow{display:grid;grid-template-columns:1fr auto 16px;gap:6px;align-items:center}
+.name{font-size:12px;font-weight:950;line-height:1.05}.meta{font-size:9px;color:#65748a;font-weight:800;margin-top:2px}.amt{font-size:12px;font-weight:1000;white-space:nowrap}
+.dots{color:#65748a;font-size:18px;line-height:1}
+.expenseCard{background:#ffe9e9;padding:10px}
+.expenseHead{display:grid;grid-template-columns:32px 1fr auto 44px;align-items:center;gap:7px;color:var(--red2);margin-bottom:9px}
+.expenseIcon{font-size:25px}.expenseLabel{font-size:17px;font-weight:1000}.expenseAmount{font-size:22px;font-weight:1000}.expenseAdd{background:#e74a4a}
+.cols{display:grid;grid-template-columns:1.16fr 1fr 1fr;gap:6px}
+.col{border-radius:14px;overflow:hidden;display:flex;flex-direction:column;min-width:0;background:#fff}
+.colHead{padding:8px 8px 7px}
 .col.fixed .colHead{background:#cfe4ff;color:var(--blue2)}
-.col.policies .colHead{background:#e0d2ff;color:var(--violet2)}
+.col.policies .colHead{background:#e1d3ff;color:var(--violet2)}
 .col.needs .colHead{background:#ffd9bd;color:var(--orange2)}
-.colTitle{font-size:11px;font-weight:1000}.colTotal{font-size:18px;font-weight:1000;margin-top:3px}
-.colList{padding:7px 8px;flex:1}
-.colRow{padding:6px 0;border-bottom:1px solid rgba(0,0,0,.07)}.colRow:last-child{border-bottom:0}
-.colRowTop{display:flex;justify-content:space-between;gap:5px;font-size:10px;font-weight:950}.colRowMeta{font-size:8px;color:var(--muted);margin-top:1px}
-.colAdd{border:0;margin:8px;border-radius:12px;padding:9px;font-size:10px;font-weight:950}
-.col.fixed .colAdd{background:#dcecff;color:#155da5}.col.policies .colAdd{background:#eadfff;color:#6b42aa}.col.needs .colAdd{background:#ffe2ce;color:#b44718}
-.bottomKPIs{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
-.kpi{border-radius:18px;padding:13px 14px;box-shadow:var(--shadow)}
-.kpi.total{background:#dfeeff}.kpi.saving{background:#e8f7e9}
-.kpiLabel{font-size:11px;font-weight:1000}.kpiValue{font-size:25px;font-weight:1000;margin-top:4px}
-.kpi.total .kpiValue{color:#0f5fac}.kpi.saving .kpiValue{color:#0e7b49}.kpiNote{font-size:10px;color:var(--muted);font-weight:800;margin-top:2px}
-.scheduleCard{margin-top:12px;background:#eaf4ff;border-radius:18px;padding:12px 13px;display:flex;justify-content:space-between;align-items:center;box-shadow:var(--shadow)}
-.scheduleLeft{display:flex;gap:10px;align-items:center}.scheduleIcon{font-size:26px}.scheduleTitle{font-size:12px;font-weight:1000;color:#155da5}.scheduleSub{font-size:10px;color:var(--muted);margin-top:2px}.scheduleArrow{font-size:25px;color:#155da5}
-.bottomNav{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--line);padding:8px 12px calc(8px + env(safe-area-inset-bottom));display:flex;justify-content:space-around;z-index:20}
-.navItem{border:0;background:transparent;color:#65748a;font-size:10px;font-weight:850;display:flex;flex-direction:column;gap:3px;align-items:center}.navItem span{font-size:21px}.navItem.active{color:#1465c0}
-.modal{position:fixed;inset:0;background:rgba(10,20,32,.48);display:none;align-items:flex-end;justify-content:center;z-index:60}.modal.open{display:flex}
-.sheet{width:min(100%,780px);max-height:92vh;overflow:auto;background:#fff;border-radius:26px 26px 0 0;padding:16px 14px calc(22px + env(safe-area-inset-bottom))}
-.sheetHead{display:flex;justify-content:space-between;align-items:center;gap:10px}.sheetTitle{font-size:25px;font-weight:1000}.close{width:44px;height:44px;border:0;border-radius:13px;background:#edf2f6;font-size:21px}
-.bigTotal{font-size:38px;font-weight:1000;margin:7px 0 12px}.detailSection{font-size:16px;font-weight:1000;margin:16px 0 5px}
-.item{display:grid;grid-template-columns:1fr auto;gap:7px;padding:10px 0;border-bottom:1px solid var(--line)}.itemName{font-weight:950;font-size:15px}.itemMeta{color:var(--muted);font-size:11px;font-weight:800;margin-top:2px}.itemAmount{font-weight:1000}
+.colTitle{font-size:9px;font-weight:1000;line-height:1.05;display:flex;align-items:center;gap:3px}
+.colTotal{font-size:16px;font-weight:1000;margin-top:3px;white-space:nowrap}
+.colList{padding:6px 7px;flex:1;min-height:238px}
+.colItem{padding:5px 0;border-bottom:1px solid #e7edf3}
+.colItem:last-child{border-bottom:0}
+.colTop{display:grid;grid-template-columns:1fr auto 10px;gap:3px;align-items:start}
+.colName{font-size:9px;font-weight:950;line-height:1.08;overflow:hidden}
+.colAmt{font-size:9px;font-weight:1000;white-space:nowrap}
+.colMeta{font-size:7px;color:#718096;margin-top:2px;line-height:1.05}
+.colDots{font-size:12px;color:#718096}
+.colAdd{border:0;margin:6px;border-radius:11px;padding:8px 4px;font-size:9px;font-weight:1000}
+.col.fixed .colAdd{background:#ddecff;color:#145ea7}.col.policies .colAdd{background:#eadfff;color:#6541a6}.col.needs .colAdd{background:#ffe1cc;color:#b84718}
+.kpis{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:8px}
+.kpi{border-radius:15px;padding:10px 11px;box-shadow:var(--shadow)}
+.kpi.total{background:var(--cyan)}.kpi.save{background:var(--save)}
+.kpiLabel{font-size:9px;font-weight:1000}.kpiValue{font-size:21px;font-weight:1000;margin-top:3px}
+.kpi.total .kpiValue{color:var(--cyan2)}.kpi.save .kpiValue{color:var(--save2)}
+.kpiNote{font-size:8px;color:#607086;font-weight:800;margin-top:1px}
+.schedule{display:grid;grid-template-columns:32px 1fr 20px;gap:8px;align-items:center;background:#eaf4ff;border-radius:15px;padding:10px 11px;margin-top:8px;box-shadow:var(--shadow)}
+.scheduleIcon{font-size:23px}.scheduleTitle{font-size:11px;font-weight:1000;color:#155da5}.scheduleSub{font-size:8px;color:#718096;margin-top:1px}.arrow{font-size:22px;color:#155da5}
+.bottomNav{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--line);padding:7px 6px calc(6px + env(safe-area-inset-bottom));display:flex;justify-content:space-around;z-index:30}
+.nav{border:0;background:transparent;color:#6a7890;font-size:9px;font-weight:850;display:flex;flex-direction:column;gap:2px;align-items:center}.nav span{font-size:20px}.nav.active{color:#1565c0}
+.modal{position:fixed;inset:0;background:rgba(10,20,32,.48);display:none;align-items:flex-end;justify-content:center;z-index:80}.modal.open{display:flex}
+.sheet{width:min(100%,430px);max-height:92vh;overflow:auto;background:#fff;border-radius:24px 24px 0 0;padding:15px 13px calc(20px + env(safe-area-inset-bottom))}
+.sheetHead{display:flex;justify-content:space-between;align-items:center;gap:10px}.sheetTitle{font-size:24px;font-weight:1000}.close{width:42px;height:42px;border:0;border-radius:13px;background:#edf2f6;font-size:20px}
+.bigTotal{font-size:36px;font-weight:1000;margin:6px 0 10px}.detailSection{font-size:15px;font-weight:1000;margin:14px 0 4px}
+.item{display:grid;grid-template-columns:1fr auto;gap:6px;padding:9px 0;border-bottom:1px solid var(--line)}.itemName{font-weight:950;font-size:14px}.itemMeta{color:#718096;font-size:10px;font-weight:800;margin-top:2px}.itemAmount{font-weight:1000}
 .actions{grid-column:1/-1;display:flex;gap:6px}.actions button{flex:1;border:0;border-radius:10px;padding:8px;font-weight:950}.edit{background:#e7f1ff;color:#195c99}.del{background:#fde7e7;color:#a82e2e}
-.badge{background:#eef3f7;border-radius:12px;padding:10px;text-align:center;font-weight:1000;margin:10px 0}.form{display:grid;gap:9px}.two{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-input,select{width:100%;border:2px solid var(--line);border-radius:12px;padding:12px;background:#fff;font-size:16px}.label{font-size:11px;font-weight:900;color:var(--muted);margin:2px 0 4px}
-.primary{border:0;border-radius:13px;padding:13px;background:var(--ink);color:#fff;font-weight:1000}.choice{display:grid;gap:8px}.choice button{border:0;border-radius:13px;padding:13px;text-align:left;font-weight:1000}.soft{background:#edf3f8;color:var(--ink)}.danger{background:#fde7e7;color:#a82e2e}
-.monthPickerGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:7px}.mp{border:2px solid var(--line);border-radius:12px;padding:8px;background:#fff;font-weight:900;font-size:12px}.mp.sel{border-color:#16784b;background:#e6f5ed;color:#0d7547}.mp input{margin-top:5px;padding:7px;border-width:1px;font-size:13px}.hidden{display:none!important}
-@media(max-width:420px){.app{padding-left:8px;padding-right:8px}.heroTitle{font-size:24px}.monthControl{min-width:150px;padding:8px}.cols{gap:5px}.colHead{padding:8px}.colTitle{font-size:10px}.colTotal{font-size:16px}.colRowTop{font-size:9px}.colRowMeta{font-size:7px}}
+.badge{background:#eef3f7;border-radius:12px;padding:9px;text-align:center;font-weight:1000;margin:9px 0}.form{display:grid;gap:8px}.two{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+input,select{width:100%;border:2px solid var(--line);border-radius:11px;padding:11px;background:#fff;font-size:15px}.label{font-size:10px;font-weight:900;color:#718096;margin:2px 0 3px}
+.primary{border:0;border-radius:12px;padding:12px;background:var(--ink);color:#fff;font-weight:1000}.choice{display:grid;gap:7px}.choice button{border:0;border-radius:12px;padding:12px;text-align:left;font-weight:1000}.soft{background:#edf3f8;color:var(--ink)}.danger{background:#fde7e7;color:#a82e2e}
+.monthPickerGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin-top:6px}.mp{border:2px solid var(--line);border-radius:11px;padding:7px;background:#fff;font-weight:900;font-size:11px}.mp.sel{border-color:#16784b;background:#e6f5ed;color:#0d7547}.mp input{margin-top:4px;padding:6px;border-width:1px;font-size:12px}.hidden{display:none!important}
 </style>
 </head>
 <body>
 <div class="app">
-  <div class="hero">
-    <div class="logoMini">🏠💶</div>
-    <div><div class="heroTitle">Bilancio Mensile <span>Famiglia</span></div><div class="heroSub">Controlla oggi, vivi meglio domani</div></div>
+  <div class="header">
+    <img class="headerIcon" src="icon-192.png" alt="">
+    <div>
+      <div class="headerTitle">Bilancio Mensile<span class="family">Famiglia</span></div>
+      <div class="headerSub">Controlla oggi, vivi meglio domani</div>
+    </div>
     <button class="gear">⚙️</button>
   </div>
 
-  <div class="monthControl">
+  <div class="monthCard">
     <button class="monthArrow" id="prevMonth">‹</button>
-    <div class="monthText"><b id="monthName">Settembre</b><small id="monthYear">2026</small></div>
+    <div class="monthText"><div class="m" id="monthName">Settembre</div><div class="y" id="monthYear">2026</div></div>
     <button class="monthArrow" id="nextMonth">›</button>
   </div>
-  <div class="future" id="futureBanner">Mese futuro: vedrai solo le voci inserite manualmente in anticipo. Le ricorrenze appariranno quando il mese arriverà.</div>
+  <div class="future" id="futureBanner">Mese futuro: vedrai solo le voci inserite manualmente. Le ricorrenze appariranno quando il mese arriverà.</div>
 
   <div class="card incomeCard" id="incomeCard">
-    <div class="incomeTop">
-      <div><div class="sectionLabel">ENTRATE</div><div class="bigMoney" id="incomeTotal">€ 0</div></div>
+    <div class="incomeHeader">
+      <div class="visualIcon">🪙</div>
+      <div><div class="blockLabel">ENTRATE</div><div class="blockMoney" id="incomeTotal">€ 0</div></div>
       <button class="roundAdd" data-add="income">+</button>
     </div>
-    <div class="incomeRows" id="incomeRows"></div>
+    <div class="incomeList" id="incomeRows"></div>
   </div>
 
   <div class="card expenseCard">
-    <div class="expenseHeader">
-      <div class="expenseTitle">USCITE</div>
-      <div class="expenseTotal" id="expenseTotal">€ 0</div>
-      <button class="roundAdd" data-add="fixed" style="background:#e64949">+</button>
+    <div class="expenseHead">
+      <div class="expenseIcon">💸</div>
+      <div class="expenseLabel">USCITE</div>
+      <div class="expenseAmount" id="expenseTotal">€ 0</div>
+      <button class="roundAdd expenseAdd" data-add="fixed">+</button>
     </div>
 
     <div class="cols">
@@ -133,23 +149,24 @@ input,select{width:100%;border:2px solid var(--line);border-radius:12px;padding:
     </div>
   </div>
 
-  <div class="bottomKPIs">
+  <div class="kpis">
     <div class="kpi total"><div class="kpiLabel">TOTALE USCITE</div><div class="kpiValue" id="allExpenses">€ 0</div></div>
-    <div class="kpi saving"><div class="kpiLabel">UTILE / RISPARMI</div><div class="kpiValue" id="savingTotal">€ 0</div><div class="kpiNote">Vacanze / Extra / Risparmi</div></div>
+    <div class="kpi save"><div class="kpiLabel">UTILE / RISPARMI</div><div class="kpiValue" id="savingTotal">€ 0</div><div class="kpiNote">Vacanze / Extra / Risparmi</div></div>
   </div>
 
-  <div class="scheduleCard" id="scheduleCard">
-    <div class="scheduleLeft"><div class="scheduleIcon">🗓️</div><div><div class="scheduleTitle">Gestione scadenze personalizzate</div><div class="scheduleSub">Mensili · Annuali · Mesi scelti · Solo un anno</div></div></div>
-    <div class="scheduleArrow">›</div>
+  <div class="schedule" id="scheduleCard">
+    <div class="scheduleIcon">🗓️</div>
+    <div><div class="scheduleTitle">Gestione scadenze personalizzate</div><div class="scheduleSub">Mensili · Annuali · Mesi scelti · Solo un anno</div></div>
+    <div class="arrow">›</div>
   </div>
 </div>
 
 <div class="bottomNav">
-  <button class="navItem active"><span>🏠</span>Home</button>
-  <button class="navItem" id="navIncome"><span>☷</span>Entrate</button>
-  <button class="navItem" id="navExpenses"><span>💳</span>Uscite</button>
-  <button class="navItem" id="navCalendar"><span>🗓️</span>Calendario</button>
-  <button class="navItem"><span>⚙️</span>Impostazioni</button>
+  <button class="nav active"><span>🏠</span>Home</button>
+  <button class="nav" id="navIncome"><span>☷</span>Entrate</button>
+  <button class="nav" id="navExpenses"><span>💳</span>Uscite</button>
+  <button class="nav" id="navCalendar"><span>🗓️</span>Calendario</button>
+  <button class="nav"><span>⚙️</span>Impostazioni</button>
 </div>
 
 <div class="modal" id="detailModal">
@@ -217,10 +234,9 @@ input,select{width:100%;border:2px solid var(--line);border-radius:12px;padding:
 (function(){
 "use strict";
 const $=id=>document.getElementById(id);
-const KEY="bilancioFamigliaPWA_v9";
-const BACKUP_KEY="bilancioFamigliaPWA_dailyBackups_v9";
+const KEY="bilancioFamigliaPWA_v10";
+const BACKUP_KEY="bilancioFamigliaPWA_dailyBackups_v10";
 const START="2026-01",BASE="2026-09";
-const M=["Gen","Feb","Mar","Apr","Mag","Giu","Lug","Ago","Set","Ott","Nov","Dic"];
 const ML=["Gennaio","Febbraio","Marzo","Aprile","Maggio","Giugno","Luglio","Agosto","Settembre","Ottobre","Novembre","Dicembre"];
 const euro=n=>new Intl.NumberFormat("it-IT",{style:"currency",currency:"EUR",minimumFractionDigits:2}).format(Number(n||0));
 
@@ -244,7 +260,7 @@ function future(k=key()){return cmp(k,realKey)>0}
 function seedRule(type,name,amount){const id="seed-"+type+"-"+Math.random().toString(16).slice(2);data.rules[id]={id,type,name,start:BASE,end:null,skip:[],schedule:{kind:"monthly"},amount};return id}
 function seed(){ensure(BASE);[
 ["income","Stipendio",3900],
-["fixed","Garage Perrone",116],["fixed","Condominio",80],["fixed","Sky",40],["fixed","Fastweb",30],["fixed","Acqua / Luce / Gas",300],["fixed","Emanuela",500],["fixed","Suzuki Ignis finanziamento",374.40],
+["fixed","Garage Perrone",116],["fixed","Condominio",80],["fixed","Sky",40],["fixed","Fastweb",30],["fixed","Acqua/Luce/Gas",300],["fixed","Emanuela",500],["fixed","Suzuki Ignis finanziamento",374.40],
 ["policies","Polizza EY54591",38],["policies","Polizza Ignis",55],["policies","Polizza Honda SH",41],
 ["needs","Cibo",200],["needs","Benzina",200]
 ].forEach(([t,n,a])=>{const r=seedRule(t,n,a);data.months[BASE][t].push({id:"i-"+r+"-"+BASE,name:n,amount:a,ruleId:r})})}
@@ -257,24 +273,24 @@ function sum(type){return items(type).reduce((s,x)=>s+Number(x.amount||0),0)}
 function expenses(){return sum("fixed")+sum("policies")+sum("needs")}
 function save(){localStorage.setItem(KEY,JSON.stringify(data));dailyBackup();render()}
 
-function renderIncome(){const el=$("incomeRows"),a=items("income");el.innerHTML="";if(!a.length){el.innerHTML='<div class="row"><div class="rowName">Nessuna entrata</div><div class="rowAmt">—</div></div>';return}a.forEach(x=>{const r=document.createElement("div");r.className="row";r.innerHTML='<div><div class="rowName"></div><div class="rowMeta"></div></div><div class="rowAmt"></div>';r.querySelector(".rowName").textContent=x.name;r.querySelector(".rowMeta").textContent=meta(x);r.querySelector(".rowAmt").textContent=euro(x.amount);el.appendChild(r)})}
-function renderCol(type,id){const el=$(id),a=items(type);el.innerHTML="";if(!a.length){el.innerHTML='<div class="colRow"><div class="colRowTop"><span>—</span><span></span></div></div>';return}a.slice(0,7).forEach(x=>{const r=document.createElement("div");r.className="colRow";r.innerHTML='<div class="colRowTop"><span></span><span></span></div><div class="colRowMeta"></div>';r.querySelectorAll("span")[0].textContent=x.name;r.querySelectorAll("span")[1].textContent=euro(x.amount);r.querySelector(".colRowMeta").textContent=meta(x);el.appendChild(r)})}
+function meta(item){if(!item.ruleId)return"Solo questo mese";const r=data.rules[item.ruleId];if(!r)return"Ricorrente";const s=r.schedule||{kind:"monthly"};if(s.kind==="monthly")return"Ogni mese";if(s.kind==="annual")return"Ogni "+ML[s.month];if(s.kind==="selectedYearly")return"Mesi scelti ogni anno";if(s.kind==="selectedOneYear")return"Mesi scelti solo "+s.year;return"Ricorrente"}
+
+function renderIncome(){const el=$("incomeRows"),a=items("income");el.innerHTML="";if(!a.length){el.innerHTML='<div class="incomeRow"><div class="name">Nessuna entrata</div><div class="amt">—</div><div></div></div>';return}a.slice(0,2).forEach(x=>{const r=document.createElement("div");r.className="incomeRow";r.innerHTML='<div><div class="name"></div><div class="meta"></div></div><div class="amt"></div><div class="dots">⋮</div>';r.querySelector(".name").textContent=x.name;r.querySelector(".meta").textContent=meta(x);r.querySelector(".amt").textContent=euro(x.amount);el.appendChild(r)})}
+function renderCol(type,id){const el=$(id),a=items(type);el.innerHTML="";if(!a.length){el.innerHTML='<div class="colItem"><div class="colTop"><div class="colName">—</div><div class="colAmt"></div><div></div></div></div>';return}a.slice(0,7).forEach(x=>{const r=document.createElement("div");r.className="colItem";r.innerHTML='<div class="colTop"><div class="colName"></div><div class="colAmt"></div><div class="colDots">⋮</div></div><div class="colMeta"></div>';r.querySelector(".colName").textContent=x.name;r.querySelector(".colAmt").textContent=euro(x.amount);r.querySelector(".colMeta").textContent=meta(x);el.appendChild(r)})}
 function render(){$("monthName").textContent=ML[cm];$("monthYear").textContent=cy;$("futureBanner").style.display=future()?"block":"none";$("incomeTotal").textContent=euro(sum("income"));renderIncome();$("fixedTotal").textContent=euro(sum("fixed"));renderCol("fixed","fixedRows");$("policiesTotal").textContent=euro(sum("policies"));renderCol("policies","policiesRows");$("needsTotal").textContent=euro(sum("needs"));renderCol("needs","needsRows");$("expenseTotal").textContent=euro(expenses());$("allExpenses").textContent=euro(expenses());$("savingTotal").textContent=euro(sum("income")-expenses())}
 $("prevMonth").onclick=()=>{const d=new Date(cy,cm-1,1);if(d.getFullYear()<2026)return;cy=d.getFullYear();cm=d.getMonth();render()};
 $("nextMonth").onclick=()=>{const d=new Date(cy,cm+1,1);if(d.getFullYear()>2100)return;cy=d.getFullYear();cm=d.getMonth();render()};
 
-function meta(item){if(!item.ruleId)return"Solo questo mese";const r=data.rules[item.ruleId];if(!r)return"Ricorrente";const s=r.schedule||{kind:"monthly"};if(s.kind==="monthly")return"Ogni mese";if(s.kind==="annual")return"Ogni "+ML[s.month];if(s.kind==="selectedYearly")return"Mesi scelti ogni anno";if(s.kind==="selectedOneYear")return"Mesi scelti solo "+s.year;return"Ricorrente"}
 function itemNode(type,item){const d=document.createElement("div");d.className="item";d.innerHTML='<div><div class="itemName"></div><div class="itemMeta"></div></div><div class="itemAmount"></div><div class="actions"><button class="edit">Modifica</button><button class="del">Elimina</button></div>';d.querySelector(".itemName").textContent=item.name;d.querySelector(".itemMeta").textContent=meta(item);d.querySelector(".itemAmount").textContent=euro(item.amount);d.querySelector(".edit").onclick=()=>openEdit(type,item);d.querySelector(".del").onclick=()=>openDelete(type,item);return d}
 function openDetail(which){lastDetail=which;const c=$("detailContent");c.innerHTML="";if(which==="income"){$("detailTitle").textContent="Entrate · "+label();$("detailTotal").textContent=euro(sum("income"));items("income").forEach(x=>c.appendChild(itemNode("income",x)));if(!items("income").length)c.innerHTML='<div class="itemMeta">Nessuna entrata</div>'}else{$("detailTitle").textContent="Uscite · "+label();$("detailTotal").textContent=euro(expenses());[["FISSE","fixed"],["POLIZZE","policies"],["FABBISOGNO","needs"]].forEach(([n,t])=>{const h=document.createElement("div");h.className="detailSection";h.textContent=n+" · "+euro(sum(t));c.appendChild(h);items(t).forEach(x=>c.appendChild(itemNode(t,x)))})}$("detailModal").classList.add("open")}
-$("incomeCard").onclick=()=>openDetail("income");document.querySelectorAll(".col").forEach(el=>el.onclick=e=>{if(e.target.closest(".colAdd"))return;openDetail("expenses")});$("navIncome").onclick=()=>openDetail("income");$("navExpenses").onclick=()=>openDetail("expenses");
+$("incomeCard").onclick=e=>{if(e.target.closest("[data-add]"))return;openDetail("income")};document.querySelectorAll(".col").forEach(el=>el.onclick=e=>{if(e.target.closest(".colAdd"))return;openDetail("expenses")});$("navIncome").onclick=()=>openDetail("income");$("navExpenses").onclick=()=>openDetail("expenses");
 
 function buildSelectors(){$("annualMonth").innerHTML=ML.map((x,i)=>'<option value="'+i+'">'+x+"</option>").join("");$("targetYear").innerHTML=Array.from({length:75},(_,i)=>2026+i).map(y=>'<option value="'+y+'">'+y+"</option>").join("");const g=$("monthPickerGrid");g.innerHTML="";ML.forEach((name,i)=>{const b=document.createElement("div");b.className="mp";b.dataset.m=i;b.innerHTML='<div>'+name.slice(0,3)+'</div><input class="hidden" type="number" min="0" step="0.01" placeholder="€">';b.onclick=e=>{if(e.target.tagName==="INPUT")return;b.classList.toggle("sel");b.querySelector("input").classList.toggle("hidden",!b.classList.contains("sel"))};g.appendChild(b)})}
 buildSelectors();
 function updateFreq(){const f=$("frequency").value;$("annualBox").classList.toggle("hidden",f!=="annual");$("selectedMonthsBox").classList.toggle("hidden",!(f==="selectedYearly"||f==="selectedOneYear"));$("yearBox").classList.toggle("hidden",f!=="selectedOneYear")}
 $("frequency").onchange=updateFreq;
 function openAdd(type){$("addMonth").textContent="STAI REGISTRANDO SU: "+label().toUpperCase();$("newType").value=type||"fixed";$("newName").value="";$("newAmount").value="";$("frequency").value="once";$("targetYear").value=cy;updateFreq();document.querySelectorAll(".mp").forEach(x=>{x.classList.remove("sel");x.querySelector("input").classList.add("hidden");x.querySelector("input").value=""});$("addModal").classList.add("open")}
-document.querySelectorAll("[data-add]").forEach(b=>b.onclick=e=>{e.stopPropagation();openAdd(b.dataset.add)});
-$("scheduleCard").onclick=()=>openAdd("fixed");$("navCalendar").onclick=()=>openAdd("fixed");
+document.querySelectorAll("[data-add]").forEach(b=>b.onclick=e=>{e.stopPropagation();openAdd(b.dataset.add)});$("scheduleCard").onclick=()=>openAdd("fixed");$("navCalendar").onclick=()=>openAdd("fixed");
 
 function collectMonthAmounts(baseAmount){const out={};document.querySelectorAll(".mp.sel").forEach(mp=>{const m=Number(mp.dataset.m),v=Number(mp.querySelector("input").value||baseAmount);out[m]=v});return out}
 $("addBtn").onclick=()=>{const type=$("newType").value,name=$("newName").value.trim(),amount=Number($("newAmount").value),f=$("frequency").value,k=key();if(!name||amount<=0)return alert("Inserisci nome e importo.");ensure(k);if(f==="once"){data.months[k][type].push({id:"o-"+Date.now(),name,amount})}else{const id="r-"+Date.now()+"-"+Math.random().toString(16).slice(2);let schedule;if(f==="monthly")schedule={kind:"monthly"};if(f==="annual")schedule={kind:"annual",month:Number($("annualMonth").value)};if(f==="selectedYearly"){const amounts=collectMonthAmounts(amount);if(!Object.keys(amounts).length)return alert("Seleziona almeno un mese.");schedule={kind:"selectedYearly",amounts}}if(f==="selectedOneYear"){const amounts=collectMonthAmounts(amount);if(!Object.keys(amounts).length)return alert("Seleziona almeno un mese.");schedule={kind:"selectedOneYear",year:Number($("targetYear").value),amounts}}data.rules[id]={id,type,name,start:k,end:null,skip:[],schedule,amount};if(cmp(k,realKey)<=0&&ruleActive(data.rules[id],k)){const a=amountForRule(data.rules[id],k);data.months[k][type].push({id:"i-"+id+"-"+k,name,amount:a,ruleId:id})}}$("addModal").classList.remove("open");save()};

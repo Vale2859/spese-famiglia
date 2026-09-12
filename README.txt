@@ -1,22 +1,23 @@
-Spese Famiglia - Versione 9
+Spese Famiglia - Versione 10
 
-Questa versione replica la schermata approvata:
-- intestazione Bilancio Mensile Famiglia
-- mese con frecce
-- card Entrate
-- card Uscite con tre colonne Fisse / Polizze / Fabbisogno
-- Totale Uscite e Utile/Risparmi
-- Gestione scadenze personalizzate
-- barra di navigazione in basso
+UI rifatta per aderire molto più fedelmente al mockup approvato:
+- logo/icona in alto a sinistra
+- titolo Bilancio Mensile Famiglia
+- mese centrato con frecce
+- Entrate compatte
+- Uscite con 3 colonne allineate Fisse / Polizze / Fabbisogno
+- card Totale Uscite e Utile/Risparmi
+- card Gestione scadenze
+- barra di navigazione fissa in basso
 
-Mantiene tutte le funzioni sviluppate:
+Mantiene:
 - solo questo mese
 - ogni mese
-- una volta all'anno
+- annuale
 - mesi scelti ogni anno
 - mesi scelti solo in un anno
-- importi diversi per mesi selezionati
+- importi diversi per mese
 - modifica solo mese o da quel mese in poi
-- eliminazione solo mese o definitiva
-- mesi futuri senza ricorrenze finché non arrivano
+- elimina solo mese o da quel mese in poi
+- ricorrenze future non visibili prima del mese
 - backup locale giornaliero
