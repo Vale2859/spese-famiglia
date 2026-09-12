@@ -41,3 +41,18 @@ Su iOS viene aggiornato quando l'app viene aperta/usata.
 IMPORTANTE:
 Questa versione usa cache e archivio dati nuovi. In alto deve comparire:
 "Versione 5 · avvio da settembre 2026"
+
+
+PUBBLICAZIONE SU GITHUB PAGES
+1. Crea un nuovo repository su GitHub.
+2. Carica TUTTI i file contenuti in questa cartella nella root del repository.
+3. Vai in Settings > Pages.
+4. In "Build and deployment" scegli "Deploy from a branch".
+5. Seleziona branch "main" e cartella "/ (root)".
+6. Salva e attendi la pubblicazione.
+7. Apri il link HTTPS generato da GitHub Pages in Safari su iPhone.
+8. Condividi > Aggiungi alla schermata Home.
+
+ICONE APP
+- icon-192.png = 192 x 192
+- icon-512.png = 512 x 512
