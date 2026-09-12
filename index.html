@@ -1,461 +1,393 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="it">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>Claudio Quiz</title>
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#08111c">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<style>
-:root{
-  --bg1:#07111d; --bg2:#0c1c2e; --panel:rgba(12,22,36,.78); --panel-border:rgba(255,255,255,.08);
-  --text:#eef5fb; --muted:#9cb0c5; --green:#29c777; --green2:#7ff4b6; --gold:#f2c96d; --danger:#ff5b72;
-  --shadow:0 18px 50px rgba(0,0,0,.32)
-}
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-body{
-  margin:0;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",Roboto,Arial,sans-serif;color:var(--text);
-  background:
-    radial-gradient(circle at top right, rgba(41,199,119,.16), transparent 28%),
-    radial-gradient(circle at bottom left, rgba(127,244,182,.09), transparent 24%),
-    linear-gradient(160deg,var(--bg1),var(--bg2));
-}
-.app{min-height:100vh;padding:calc(env(safe-area-inset-top) + 12px) 16px calc(env(safe-area-inset-bottom) + 16px);max-width:520px;margin:0 auto}
-.screen{display:none;animation:fadeIn .35s ease}.screen.active{display:block}
-@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
-.hero,.card{border:1px solid var(--panel-border);background:linear-gradient(180deg, rgba(18,33,51,.92), rgba(10,17,29,.84));border-radius:28px;box-shadow:var(--shadow);overflow:hidden}
-.hero{padding:18px}
-.brandRow{display:flex;align-items:center;justify-content:space-between;gap:12px}
-.logoBubble{width:56px;height:56px;border-radius:18px;background:linear-gradient(180deg, rgba(41,199,119,.26), rgba(127,244,182,.08));border:1px solid rgba(127,244,182,.22);display:flex;align-items:center;justify-content:center;font-size:26px}
-.title{font-size:32px;margin:16px 0 6px;font-weight:800;letter-spacing:-.03em}
-.subtitle{color:var(--muted);line-height:1.45;margin:0}
-.mathArt{margin-top:16px;border-radius:22px;overflow:hidden;border:1px solid rgba(255,255,255,.06);background:#0a1321}
-.statsGrid{margin-top:14px;display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
-.statCard{padding:14px}.statLabel{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}.statValue{font-size:22px;font-weight:800;margin-top:6px}
-.xpWrap{margin-top:14px;padding:16px}
-.rankBadge{display:inline-flex;gap:8px;align-items:center;padding:10px 14px;border-radius:999px;background:rgba(255,255,255,.04);border:1px solid rgba(127,244,182,.18);font-size:13px;font-weight:700;color:#dff5e3}
-.xpBarOuter{height:12px;margin-top:14px;border-radius:999px;overflow:hidden;background:#142233;border:1px solid rgba(255,255,255,.05)}
-.xpBar{height:100%;width:0%;background:linear-gradient(90deg,var(--green),var(--green2));border-radius:999px;transition:width .35s ease;box-shadow:0 0 24px rgba(41,199,119,.35)}
-.xpMeta{display:flex;justify-content:space-between;margin-top:10px;color:var(--muted);font-size:13px}
-.button{width:100%;border:none;cursor:pointer;border-radius:18px;padding:17px 18px;font-size:16px;font-weight:800;transition:transform .12s ease}
-.button:active{transform:scale(.985)}
-.buttonPrimary{color:#04110b;background:linear-gradient(90deg,var(--green2),var(--green));box-shadow:0 14px 30px rgba(41,199,119,.23)}
-.buttonGhost{color:var(--text);background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08)}
-.buttonsCol{display:flex;flex-direction:column;gap:12px;margin-top:16px}
-.topbar{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:10px 0 14px}
-.pill{padding:10px 14px;border-radius:999px;font-size:13px;font-weight:800;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08)}
-.quizCard{padding:18px}
-.quizHead{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:12px}
-.quizTitle{font-size:14px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
-.bossMark{color:var(--gold);font-weight:900;letter-spacing:.06em;font-size:13px}
-.question{margin:10px 0 18px;font-size:31px;line-height:1.16;font-weight:900;letter-spacing:-.04em}
-.answer{width:100%;text-align:left;padding:16px;margin:10px 0 0;border-radius:18px;background:linear-gradient(180deg, rgba(255,255,255,.045), rgba(255,255,255,.03));color:var(--text);border:1px solid rgba(255,255,255,.06);font-size:17px;font-weight:700}
-.answer.correct{background:linear-gradient(180deg, rgba(41,199,119,.26), rgba(41,199,119,.14));border-color:rgba(127,244,182,.36)}
-.answer.wrong{background:linear-gradient(180deg, rgba(255,91,114,.24), rgba(255,91,114,.1));border-color:rgba(255,91,114,.33)}
-.helper,.small,.footerNote,.finalText{color:var(--muted)}
-.badgesWrap{padding:18px}.badge{padding:14px 16px;border-radius:18px;margin-top:10px;border:1px solid rgba(127,244,182,.16);background:linear-gradient(180deg, rgba(41,199,119,.11), rgba(255,255,255,.03));text-align:left;font-weight:700}
-.finalHero{padding:22px 18px;text-align:center}.finalTitle{font-size:32px;font-weight:900;margin:10px 0 6px}
-.sectionTitle{font-size:14px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:18px 0 10px}
-.quoteText{font-size:22px;font-weight:800;line-height:1.4;margin-bottom:15px;text-align:center}
-.quoteAuthor{color:#9cb0c5;margin-bottom:20px;font-style:italic;text-align:center}
-.quoteBook{text-align:center;color:#7ff4b6;font-weight:700;margin-bottom:20px}
-</style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#14233a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Bilancio Famiglia">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <title>Bilancio Mensile Generale</title>
+  <style>
+    :root{
+      --bg:#f3f6f9; --ink:#14233a; --muted:#6b7a8d; --green:#dff3e7; --green-ink:#0e7b49;
+      --red:#fde7e7; --red-ink:#b33131; --purple:#eee5fb; --purple-ink:#6f49a8;
+      --line:#dde5ed; --shadow:0 16px 38px rgba(20,35,58,.11);
+    }
+    *{box-sizing:border-box}
+    html,body{min-height:100%;margin:0}
+    body{
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+      background:linear-gradient(180deg,#f9fbfd 0%,#edf2f6 100%);
+      color:var(--ink)
+    }
+    button,input,select{font:inherit}
+    button{touch-action:manipulation}
+    .app{width:min(100%,760px);margin:0 auto;min-height:100vh;padding:14px 14px calc(100px + env(safe-area-inset-bottom))}
+    .header{text-align:center;padding:12px 8px 8px}
+    .header h1{margin:0;font-size:clamp(32px,8vw,52px);line-height:1.02;font-weight:1000;letter-spacing:-.035em}
+    .months-wrap{margin:12px 0 18px;background:#fff;border-radius:18px;box-shadow:var(--shadow);padding:10px}
+    .months{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+    .months::-webkit-scrollbar{display:none}
+    .month-btn{flex:0 0 auto;min-width:110px;border:0;border-radius:14px;padding:11px 13px;background:#eef2f6;color:var(--ink);font-weight:950}
+    .month-btn.active{background:#14233a;color:#fff}
+    .month-year{display:block;font-size:12px;opacity:.75;margin-top:2px}
+    .stack{display:grid;grid-template-columns:1fr;gap:18px}
+    .big-card{
+      border:0;border-radius:26px;padding:28px 22px;box-shadow:var(--shadow);min-height:180px;
+      cursor:pointer;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center
+    }
+    .big-card.income{background:var(--green);color:var(--green-ink)}
+    .big-card.expense{background:var(--red);color:var(--red-ink)}
+    .big-card.saving{background:var(--purple);color:var(--purple-ink)}
+    .card-label{font-size:clamp(28px,6vw,42px);line-height:1;font-weight:1000}
+    .card-value{margin-top:18px;font-size:clamp(46px,11vw,78px);line-height:.95;font-weight:1000;letter-spacing:-.04em}
+    .card-note{margin-top:10px;font-weight:800;font-size:14px;opacity:.75}
+    .fab{
+      position:fixed;right:18px;bottom:calc(18px + env(safe-area-inset-bottom));width:68px;height:68px;border-radius:50%;
+      border:0;background:#14233a;color:white;font-size:38px;line-height:1;box-shadow:0 16px 34px rgba(20,35,58,.3);z-index:30
+    }
+    .modal{position:fixed;inset:0;background:rgba(10,20,32,.48);display:none;align-items:flex-end;justify-content:center;z-index:50}
+    .modal.open{display:flex}
+    .sheet{
+      width:min(100%,760px);max-height:90vh;overflow:auto;background:#fff;border-radius:28px 28px 0 0;
+      padding:20px 18px calc(28px + env(safe-area-inset-bottom));box-shadow:0 -20px 50px rgba(0,0,0,.22)
+    }
+    .sheet-head{display:flex;justify-content:space-between;gap:12px;align-items:center}
+    .sheet-title{font-size:30px;font-weight:1000}
+    .close{width:48px;height:48px;border:0;border-radius:14px;background:#eef2f6;font-size:22px}
+    .detail-total{font-size:46px;font-weight:1000;margin:10px 0 16px;letter-spacing:-.04em}
+    .section-title{font-size:18px;font-weight:1000;margin:18px 0 8px}
+    .detail-row{display:grid;grid-template-columns:1fr auto auto;gap:10px;align-items:center;padding:14px 0;border-bottom:1px solid var(--line)}
+    .detail-name{font-weight:900}.detail-amount{font-weight:1000}
+    .del{border:0;border-radius:10px;background:#fee8e8;color:#a92c2c;padding:8px 10px;font-weight:900}
+    .form{display:grid;grid-template-columns:1.2fr .8fr;gap:10px;margin-top:14px}
+    .form .full{grid-column:1/-1}
+    input,select{width:100%;border:2px solid var(--line);border-radius:13px;padding:14px 13px;background:#fff;font-size:18px}
+    .add{width:100%;border:0;border-radius:14px;background:#14233a;color:#fff;padding:15px;font-weight:1000}
+    .empty{text-align:center;color:var(--muted);padding:20px 0;font-weight:800}
+    .install-note{
+      margin:14px 0 0;padding:12px 14px;border-radius:14px;background:#fff7d8;color:#715500;
+      font-size:14px;font-weight:800;display:none
+    }
+    @media(max-width:520px){
+      .app{padding:10px 10px calc(90px + env(safe-area-inset-bottom))}
+      .big-card{min-height:165px;padding:24px 16px}.stack{gap:14px}
+      .months-wrap{margin-bottom:14px}.month-btn{min-width:100px}
+      .fab{right:14px;bottom:calc(14px + env(safe-area-inset-bottom));width:62px;height:62px}
+      .form{grid-template-columns:1fr}.form .full{grid-column:auto}
+    }
+  </style>
 </head>
 <body>
 <div class="app">
-<section id="home" class="screen active">
-<div class="hero">
-<div class="brandRow"><div class="logoBubble">🧠</div><div class="rankBadge" id="rankHomeBadge">Rank: Principiante</div></div>
-<div class="title">Claudio Quiz</div>
-<p class="subtitle">Un percorso matematico premium con 10.000 livelli, boss periodici, badge, frasi ispirazionali e suggerimenti di lettura.</p>
-<div class="mathArt">
-<svg viewBox="0 0 800 380" xmlns="http://www.w3.org/2000/svg">
-<defs><linearGradient id="g1" x1="0" x2="1"><stop offset="0%" stop-color="#16324c"/><stop offset="100%" stop-color="#0d1a2a"/></linearGradient><linearGradient id="g2" x1="0" x2="1"><stop offset="0%" stop-color="#29c777"/><stop offset="100%" stop-color="#7ff4b6"/></linearGradient></defs>
-<rect width="800" height="380" fill="url(#g1)"/><circle cx="650" cy="70" r="86" fill="rgba(127,244,182,.08)"/>
-<path d="M0 275 C120 210, 220 330, 360 260 S610 170, 800 240" fill="none" stroke="url(#g2)" stroke-width="6" stroke-linecap="round"/>
-<path d="M0 310 C110 250, 220 352, 370 290 S620 198, 800 270" fill="none" stroke="rgba(127,244,182,.25)" stroke-width="2.5" stroke-linecap="round"/>
-<g fill="#eef5fb" font-family="Arial, sans-serif" font-weight="700"><text x="70" y="78" font-size="34">f(x)=x²+3x−2</text><text x="78" y="254" font-size="24" opacity=".82">sequenze · logica · calcolo · filosofia</text><text x="476" y="110" font-size="78" fill="url(#g2)">∑</text><text x="470" y="332" font-size="58" fill="url(#g2)">π</text><text x="622" y="300" font-size="46">∞</text></g>
-</svg></div></div>
-<div class="statsGrid">
-<div class="card statCard"><div class="statLabel">Livello attuale</div><div class="statValue" id="livelloHome">1 / 10000</div></div>
-<div class="card statCard"><div class="statLabel">Boss battuti</div><div class="statValue" id="bossHome">0</div></div>
-</div>
-<div class="card xpWrap"><div class="rankBadge" id="rankHome">Rank: Principiante</div><div class="xpBarOuter"><div class="xpBar" id="xpBarHome"></div></div><div class="xpMeta"><span>Esperienza</span><span id="xpTextHome">0 / 100 XP</span></div></div>
-<div class="buttonsCol">
-<button class="button buttonPrimary" onclick="startGame()">Continua</button>
-<button class="button buttonGhost" onclick="showBadges()">Badge</button>
-<button class="button buttonGhost" onclick="restartAll()">Ricomincia da zero</button>
-</div>
-<div class="footerNote">Ogni 10 quiz completati compare una frase e un libro consigliato.</div>
-</section>
-
-<section id="game" class="screen">
-<div class="topbar"><div class="pill" id="pillLevel">Livello 1</div><div class="pill" id="pillLives">❤️ 3</div><div class="pill" id="pillTimer">10s</div></div>
-<div class="card xpWrap" style="margin-top:0"><div class="rankBadge" id="rankGame">Rank: Principiante</div><div class="xpBarOuter"><div class="xpBar" id="xpBarGame"></div></div><div class="xpMeta"><span>Esperienza</span><span id="xpTextGame">0 / 100 XP</span></div></div>
-<div class="card quizCard"><div class="quizHead"><div class="quizTitle">Sfida corrente</div><div class="bossMark" id="bossMark"></div></div><div class="question" id="question">2 + 2</div><div id="answers"></div><div class="helper">I boss compaiono ogni 25 livelli. Il percorso arriva fino a 10.000.</div></div>
-</section>
-
-<section id="quoteScreen" class="screen">
-  <div class="card finalHero">
-    <div style="font-size:40px;margin-bottom:10px;">🧠</div>
-    <div id="quoteText" class="quoteText"></div>
-    <div id="quoteAuthor" class="quoteAuthor"></div>
-    <div style="font-size:14px;margin-bottom:10px;">📘 Consigliato</div>
-    <div id="quoteBook" class="quoteBook"></div>
-    <button class="button buttonPrimary" onclick="continuaDopoFrase()">Continua</button>
+  <div class="header">
+    <h1>BILANCIO MENSILE<br>GENERALE</h1>
   </div>
-</section>
 
-<section id="gameover" class="screen">
-<div class="card finalHero"><div class="logoBubble" style="margin:0 auto">∑</div><div class="finalTitle">Game Over</div><p class="finalText" id="gameOverText"></p><div class="buttonsCol"><button class="button buttonPrimary" onclick="goHome()">Torna alla home</button><button class="button buttonGhost" onclick="restartAll()">Ricomincia da zero</button></div></div>
-</section>
+  <div class="months-wrap">
+    <div class="months" id="monthsBar"></div>
+  </div>
 
-<section id="badgesScreen" class="screen">
-<div class="card badgesWrap"><div class="sectionTitle">Badge sbloccati</div><div id="badgeList"></div><div class="buttonsCol"><button class="button buttonPrimary" onclick="goHome()">Torna alla home</button></div></div>
-</section>
+  <div class="install-note" id="installNote">
+    Su iPhone: apri questa pagina in Safari → Condividi → “Aggiungi alla schermata Home”.
+  </div>
 
-<section id="victory" class="screen">
-<div class="card finalHero"><div class="logoBubble" style="margin:0 auto;background:linear-gradient(180deg, rgba(242,201,109,.26), rgba(242,201,109,.08));border-color:rgba(242,201,109,.25)">🏆</div><div class="finalTitle">Claudio Supremo</div><p class="finalText">Hai raggiunto il livello 10.000. Hai completato l'intero percorso premium di Claudio Quiz.</p><div class="buttonsCol"><button class="button buttonPrimary" onclick="goHome()">Torna alla home</button></div></div>
-</section>
+  <div class="stack">
+    <button id="incomeCard" class="big-card income" type="button">
+      <div class="card-label">ENTRATE</div>
+      <div class="card-value" id="incomeValue">€ 0</div>
+      <div class="card-note">Tocca per vedere il dettaglio</div>
+    </button>
+
+    <button id="expenseCard" class="big-card expense" type="button">
+      <div class="card-label">USCITE</div>
+      <div class="card-value" id="expenseValue">€ 0</div>
+      <div class="card-note">Tocca per vedere tutte le spese</div>
+    </button>
+
+    <button id="savingCard" class="big-card saving" type="button">
+      <div class="card-label">UTILE / RISPARMI</div>
+      <div class="card-value" id="savingValue">€ 0</div>
+      <div class="card-note">Disponibile per vacanze, extra e risparmio</div>
+    </button>
+  </div>
+</div>
+
+<button id="fab" class="fab" type="button" aria-label="Aggiungi voce">+</button>
+
+<div class="modal" id="detailModal" aria-hidden="true">
+  <div class="sheet">
+    <div class="sheet-head">
+      <div class="sheet-title" id="detailTitle"></div>
+      <button id="closeDetailBtn" class="close" type="button">✕</button>
+    </div>
+    <div class="detail-total" id="detailTotal"></div>
+    <div id="detailContent"></div>
+  </div>
+</div>
+
+<div class="modal" id="addModal" aria-hidden="true">
+  <div class="sheet">
+    <div class="sheet-head">
+      <div class="sheet-title">Aggiungi voce</div>
+      <button id="closeAddBtn" class="close" type="button">✕</button>
+    </div>
+    <div class="form">
+      <select id="newType">
+        <option value="income">Entrata</option>
+        <option value="fixed">Uscita fissa</option>
+        <option value="policies">Uscita polizza</option>
+        <option value="needs">Fabbisogno mensile</option>
+      </select>
+      <input id="newAmount" inputmode="decimal" type="number" min="0" step="0.01" placeholder="Importo €">
+      <input class="full" id="newName" placeholder="Nome voce">
+      <button id="addBtn" class="add full" type="button">Aggiungi</button>
+    </div>
+  </div>
 </div>
 
 <script>
-const MAX_LEVEL = 10000;
-let livello = parseInt(localStorage.getItem("livello") || "1");
-let vite = 3;
-let corrette = parseInt(localStorage.getItem("corretteRun") || "0");
-let totali = parseInt(localStorage.getItem("totaliRun") || "0");
-let streak = parseInt(localStorage.getItem("streak") || "0");
-let xp = parseInt(localStorage.getItem("xp") || "0");
-let xpMassima = parseInt(localStorage.getItem("xpMassima") || "100");
-let rank = localStorage.getItem("rank") || "Principiante";
-let badgeSbloccati = JSON.parse(localStorage.getItem("badgeSbloccati") || "[]");
-let bossBattuti = parseInt(localStorage.getItem("bossBattuti") || "0");
-let rispostaCorretta = null;
-let timerInt = null;
-let tempo = 10;
-let bossCorrente = false;
+(function(){
+  "use strict";
 
-const frasiMatematiche = [
-  {testo:"La matematica possiede non solo verità, ma suprema bellezza.", autore:"Bertrand Russell", libro:"I problemi della filosofia"},
-  {testo:"La cosa più incomprensibile dell'universo è che sia comprensibile.", autore:"Albert Einstein", libro:"Il mondo come io lo vedo"},
-  {testo:"La matematica è il linguaggio con cui è scritto l'universo.", autore:"Galileo Galilei", libro:"Dialogo sopra i due massimi sistemi"},
-  {testo:"Dio ha creato i numeri interi, tutto il resto è opera dell'uomo.", autore:"Leopold Kronecker", libro:"Scritti matematici"},
-  {testo:"La matematica è la regina delle scienze.", autore:"Carl Friedrich Gauss", libro:"Disquisitiones Arithmeticae"},
-  {testo:"Non c'è ramo della matematica, per astratto che sia, che non possa un giorno essere applicato.", autore:"Nikolaj Lobacevskij", libro:"Pangeometria"},
-  {testo:"L'essenza della matematica sta nella sua libertà.", autore:"Georg Cantor", libro:"Contributi alla fondazione della teoria degli insiemi"}
-];
+  const $ = (id) => document.getElementById(id);
+  const KEY = 'bilancioFamigliaPWA_v1';
+  const MONTHS = ['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno','Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre'];
+  const euro = (n) => new Intl.NumberFormat('it-IT',{style:'currency',currency:'EUR',minimumFractionDigits:2}).format(Number(n||0));
 
-function qs(id){ return document.getElementById(id); }
-function show(screenId){ ["home","game","quoteScreen","gameover","badgesScreen","victory"].forEach(id=>qs(id).classList.remove("active")); qs(screenId).classList.add("active"); }
-function rand(min,max){ return Math.floor(Math.random()*(max-min+1))+min; }
-
-function tempoPerLivello(l){
-  if(l <= 100) return 10;
-  if(l <= 500) return 20;
-  if(l <= 1500) return 25;
-  if(l <= 3000) return 30;
-  if(l <= 5000) return 35;
-  if(l <= 7000) return 40;
-  if(l <= 9000) return 45;
-  return 50;
-}
-
-function aggiornaRank(){
-  if(livello >= 10000) rank = "Claudio Supremo";
-  else if(livello >= 9000) rank = "Leggenda Matematica";
-  else if(livello >= 7000) rank = "Maestro del Calcolo";
-  else if(livello >= 5000) rank = "Genio";
-  else if(livello >= 3000) rank = "Analista";
-  else if(livello >= 1500) rank = "Mente Rapida";
-  else if(livello >= 700) rank = "Stratega";
-  else if(livello >= 300) rank = "Esperto";
-  else if(livello >= 100) rank = "Allenato";
-  else rank = "Principiante";
-  localStorage.setItem("rank", rank);
-}
-function aggiornaHome(){
-  aggiornaRank();
-  qs("livelloHome").textContent = `${livello} / ${MAX_LEVEL}`;
-  qs("bossHome").textContent = bossBattuti;
-  qs("rankHome").textContent = `Rank: ${rank}`;
-  qs("rankHomeBadge").textContent = `Rank: ${rank}`;
-  qs("rankGame").textContent = `Rank: ${rank}`;
-  const perc = Math.min(100, Math.round((xp/xpMassima)*100));
-  qs("xpBarHome").style.width = perc + "%";
-  qs("xpBarGame").style.width = perc + "%";
-  qs("xpTextHome").textContent = `${xp} / ${xpMassima} XP`;
-  qs("xpTextGame").textContent = `${xp} / ${xpMassima} XP`;
-}
-function aggiungiXP(q){
-  xp += q;
-  while(xp >= xpMassima){ xp -= xpMassima; xpMassima += 25; }
-  localStorage.setItem("xp", xp);
-  localStorage.setItem("xpMassima", xpMassima);
-  aggiornaHome();
-}
-function sbloccaBadge(nome){
-  if(!badgeSbloccati.includes(nome)){
-    badgeSbloccati.push(nome);
-    localStorage.setItem("badgeSbloccati", JSON.stringify(badgeSbloccati));
-  }
-}
-function controllaBadge(){
-  const precisione = Math.round((corrette / Math.max(1, totali)) * 100) || 0;
-  if(livello >= 5) sbloccaBadge("Primo Passo");
-  if(streak >= 5) sbloccaBadge("Mente Rapida");
-  if(bossBattuti >= 1) sbloccaBadge("Boss Killer");
-  if(precisione === 100 && totali >= 5) sbloccaBadge("Precisione Assoluta");
-  if(livello >= 50) sbloccaBadge("Matematico Pro");
-  if(livello >= 500) sbloccaBadge("Maratoneta Mentale");
-}
-function renderBadgeList(){
-  const box = qs("badgeList"); box.innerHTML = "";
-  if(!badgeSbloccati.length){ box.innerHTML = '<div class="small">Nessun badge sbloccato per ora.</div>'; return; }
-  badgeSbloccati.forEach(b => {
-    const d = document.createElement("div");
-    d.className = "badge";
-    d.textContent = "🏅 " + b;
-    box.appendChild(d);
-  });
-}
-function showBadges(){ renderBadgeList(); show("badgesScreen"); }
-function goHome(){ clearInterval(timerInt); aggiornaHome(); show("home"); }
-function startGame(){ if(livello >= MAX_LEVEL){ show("victory"); return; } vite = 3; aggiornaHome(); show("game"); generaQuiz(); }
-function finishRun(msg){
-  clearInterval(timerInt);
-  const precisione = Math.round((corrette / Math.max(1, totali)) * 100) || 0;
-  qs("gameOverText").textContent = `${msg} Livello raggiunto: ${livello}. Precisione: ${precisione}%. Rank attuale: ${rank}.`;
-  show("gameover");
-}
-function victoryFinale(){ clearInterval(timerInt); aggiornaHome(); show("victory"); }
-
-function mostraFrase(){
-  const f = frasiMatematiche[Math.floor(Math.random() * frasiMatematiche.length)];
-  qs("quoteText").textContent = "“" + f.testo + "”";
-  qs("quoteAuthor").textContent = "— " + f.autore;
-  qs("quoteBook").textContent = f.libro;
-  show("quoteScreen");
-}
-function continuaDopoFrase(){
-  show("game");
-  generaQuiz();
-}
-
-function getFamiliesByLevel(l){
-  const all = ["add","sub","mul","div","percent","fraction","power","sequence","logic","equation","problem","multiple","mean","geometry"];
-  if(l <= 100) return all;
-  if(l <= 500) return all;
-  if(l <= 1500) return all;
-  return all;
-}
-
-function generaQuiz(){
-  if(livello >= MAX_LEVEL){ victoryFinale(); return; }
-  bossCorrente = livello % 25 === 0;
-  tempo = tempoPerLivello(livello) + (bossCorrente ? 5 : 0);
-  qs("pillLevel").textContent = `Livello ${livello}`;
-  qs("pillLives").textContent = `❤️ ${vite}`;
-  qs("pillTimer").textContent = `${tempo}s`;
-  qs("bossMark").textContent = bossCorrente ? "LIVELLO BOSS" : "";
-
-  clearInterval(timerInt);
-  timerInt = setInterval(()=>{
-    tempo--;
-    qs("pillTimer").textContent = `${tempo}s`;
-    if(tempo <= 0) perdiVita();
-  },1000);
-
-  const families = getFamiliesByLevel(livello);
-  const kind = bossCorrente ? "boss" : families[Math.floor(Math.random() * families.length)];
-  let domanda = "";
-  let opzioni = [];
-
-  if(kind === "boss"){
-    const a = rand(15,35), b = rand(3,8), c = rand(8,24);
-    rispostaCorretta = (a*b)-c;
-    domanda = `Quanto fa (${a} × ${b}) − ${c} ?`;
-    opzioni = buildNumericOptions(rispostaCorretta, 18);
-  }
-  else if(kind === "add"){
-    const a = livello < 200 ? rand(2,20) : rand(20,120);
-    const b = livello < 200 ? rand(2,20) : rand(20,120);
-    rispostaCorretta = a + b; domanda = `${a} + ${b}`; opzioni = buildNumericOptions(rispostaCorretta, 12);
-  }
-  else if(kind === "sub"){
-    let a = livello < 200 ? rand(10,30) : rand(50,200);
-    let b = livello < 200 ? rand(1,10) : rand(10,120);
-    if(b > a){ let t=a; a=b; b=t; }
-    rispostaCorretta = a - b; domanda = `${a} − ${b}`; opzioni = buildNumericOptions(rispostaCorretta, 12);
-  }
-  else if(kind === "mul"){
-    const a = livello < 200 ? rand(2,12) : rand(6,25);
-    const b = livello < 200 ? rand(2,10) : rand(4,18);
-    rispostaCorretta = a * b; domanda = `${a} × ${b}`; opzioni = buildNumericOptions(rispostaCorretta, 25);
-  }
-  else if(kind === "div"){
-    const b = livello < 300 ? rand(2,10) : rand(2,15);
-    const res = livello < 300 ? rand(2,12) : rand(5,20);
-    const a = b * res;
-    rispostaCorretta = res; domanda = `${a} ÷ ${b}`; opzioni = buildNumericOptions(rispostaCorretta, 10);
-  }
-  else if(kind === "percent"){
-    const base = livello < 300 ? rand(10,100) : rand(50,400);
-    const p = [10,20,25,50,75][rand(0,4)];
-    rispostaCorretta = base * p / 100;
-    domanda = `${p}% di ${base}`; opzioni = buildNumericOptions(rispostaCorretta, 20);
-  }
-  else if(kind === "fraction"){
-    const den = [2,3,4,5][rand(0,3)];
-    const num = rand(1, den-1);
-    const base = den * rand(2,20);
-    rispostaCorretta = base * num / den;
-    domanda = `${num}/${den} di ${base}`; opzioni = buildNumericOptions(rispostaCorretta, 16);
-  }
-  else if(kind === "power"){
-    const a = livello < 500 ? rand(2,5) : rand(2,8);
-    const e = livello < 500 ? rand(2,3) : rand(2,4);
-    rispostaCorretta = a ** e; domanda = `${a}^${e}`; opzioni = buildNumericOptions(rispostaCorretta, 20);
-  }
-  else if(kind === "sequence"){
-    if(rand(0,1) === 0){
-      const start = rand(2,20), step = rand(2,12);
-      rispostaCorretta = start + step*4;
-      domanda = `${start}, ${start+step}, ${start+step*2}, ${start+step*3}, ?`;
-      opzioni = buildNumericOptions(rispostaCorretta, 18);
-    } else {
-      const start = rand(2,10), ratio = rand(2,4);
-      rispostaCorretta = start * ratio**4;
-      domanda = `${start}, ${start*ratio}, ${start*ratio**2}, ${start*ratio**3}, ?`;
-      opzioni = buildNumericOptions(rispostaCorretta, 30);
-    }
-  }
-  else if(kind === "logic"){
-    const n = rand(10,99);
-    rispostaCorretta = n % 2 === 0 ? "Sì" : "No";
-    domanda = `${n} è divisibile per 2?`; opzioni = ["Sì","No"];
-  }
-  else if(kind === "equation"){
-    const x = rand(2,18);
-    const k = livello < 1000 ? 2 : rand(2,5);
-    const m = rand(2,15);
-    const tot = x*k + m;
-    rispostaCorretta = x;
-    domanda = `${k}x + ${m} = ${tot}. Quanto vale x?`; opzioni = buildNumericOptions(rispostaCorretta, 10);
-  }
-  else if(kind === "problem"){
-    const x = rand(2,18);
-    const risultato = x*2 + 4;
-    rispostaCorretta = x;
-    domanda = `Se raddoppio un numero e aggiungo 4 ottengo ${risultato}. Qual è il numero?`; opzioni = buildNumericOptions(rispostaCorretta, 10);
-  }
-  else if(kind === "multiple"){
-    const base = rand(2,12), n = rand(2,10);
-    rispostaCorretta = base*n;
-    domanda = `Qual è un multiplo di ${base} tra queste opzioni?`; opzioni = buildMultipleOptions(base, rispostaCorretta);
-  }
-  else if(kind === "mean"){
-    const a = rand(2,20), b = rand(2,20), c = rand(2,20);
-    rispostaCorretta = (a+b+c)/3;
-    domanda = `Media tra ${a}, ${b}, ${c}`; opzioni = buildNumericOptions(rispostaCorretta, 6);
-  }
-  else if(kind === "geometry"){
-    if(rand(0,1) === 0){
-      const b = rand(2,20), h = rand(2,20);
-      rispostaCorretta = b*h;
-      domanda = `Area rettangolo base ${b} e altezza ${h}`; opzioni = buildNumericOptions(rispostaCorretta, 20);
-    } else {
-      const l = rand(2,20), w = rand(2,20);
-      rispostaCorretta = 2*(l+w);
-      domanda = `Perimetro rettangolo lati ${l} e ${w}`; opzioni = buildNumericOptions(rispostaCorretta, 18);
-    }
+  let data;
+  try {
+    data = JSON.parse(localStorage.getItem(KEY) || 'null') || {months:{}};
+  } catch(e) {
+    data = {months:{}};
   }
 
-  qs("question").textContent = domanda;
-  renderOpzioni(opzioni.sort(()=>Math.random()-0.5));
-}
+  const now = new Date();
+  let currentYear = now.getFullYear();
+  let currentMonth = now.getMonth();
 
-function buildNumericOptions(correct, delta){
-  const opts = [correct];
-  while(opts.length < 4){
-    let f = correct + rand(-delta, delta);
-    if(f !== correct && !opts.includes(f)) opts.push(f);
+  function monthKey(){
+    return currentYear + '-' + String(currentMonth + 1).padStart(2,'0');
   }
-  return opts;
-}
-function buildMultipleOptions(base, correct){
-  const opts = [correct];
-  while(opts.length < 4){
-    let c = rand(5,120);
-    if(c % base !== 0 && !opts.includes(c)) opts.push(c);
-  }
-  return opts;
-}
 
-function renderOpzioni(opzioni){
-  const box = qs("answers"); box.innerHTML = "";
-  opzioni.forEach(v=>{
-    const btn = document.createElement("button");
-    btn.className = "answer";
-    btn.textContent = v;
-    btn.onclick = ()=>{
-      clearInterval(timerInt);
-      totali++;
-      localStorage.setItem("totaliRun", totali);
-
-      if(v === rispostaCorretta){
-        btn.classList.add("correct");
-        corrette++;
-        streak++;
-        localStorage.setItem("corretteRun", corrette);
-        localStorage.setItem("streak", streak);
-
-        if(bossCorrente){
-          bossBattuti++;
-          localStorage.setItem("bossBattuti", bossBattuti);
-          aggiungiXP(25);
-        } else {
-          aggiungiXP(10);
-        }
-
-        if(livello < MAX_LEVEL){
-          livello = Math.min(MAX_LEVEL, livello + 1);
-          localStorage.setItem("livello", livello);
-        }
-
-        controllaBadge();
-        aggiornaHome();
-
-        setTimeout(()=>{
-          if(livello >= MAX_LEVEL) victoryFinale();
-          else if(totali % 10 === 0) mostraFrase();
-          else generaQuiz();
-        }, 380);
-      } else {
-        btn.classList.add("wrong");
-        streak = 0;
-        localStorage.setItem("streak", streak);
-        setTimeout(()=>perdiVita(), 320);
-      }
+  function defaultMonth(){
+    return {
+      income:[{id:1,name:'Stipendio',amount:3900}],
+      fixed:[
+        {id:2,name:'Garage Perrone',amount:116},
+        {id:3,name:'Condominio',amount:80},
+        {id:4,name:'Sky',amount:40},
+        {id:5,name:'Fastweb',amount:30},
+        {id:6,name:'Acqua / Luce / Gas',amount:300},
+        {id:7,name:'Emanuela',amount:500},
+        {id:8,name:'Suzuki Ignis finanziamento',amount:374.40}
+      ],
+      policies:[
+        {id:9,name:'Polizza EY54591',amount:38},
+        {id:10,name:'Polizza Ignis',amount:55},
+        {id:11,name:'Polizza Honda SH',amount:41}
+      ],
+      needs:[
+        {id:12,name:'Cibo',amount:200},
+        {id:13,name:'Benzina',amount:200}
+      ]
     };
-    box.appendChild(btn);
-  });
-}
-function perdiVita(){
-  clearInterval(timerInt);
-  vite--;
-  qs("pillLives").textContent = `❤️ ${vite}`;
-  if(vite <= 0) finishRun("Hai finito le vite.");
-  else generaQuiz();
-}
-function restartAll(){
-  ["livello","xp","xpMassima","rank","badgeSbloccati","bossBattuti","corretteRun","totaliRun","streak"].forEach(k=>localStorage.removeItem(k));
-  livello=1; xp=0; xpMassima=100; rank="Principiante"; badgeSbloccati=[]; bossBattuti=0; corrette=0; totali=0; streak=0;
-  aggiornaHome(); goHome();
-}
-aggiornaHome();
+  }
+
+  function ensureMonth(){
+    const k = monthKey();
+    if(!data.months[k]){
+      data.months[k] = defaultMonth();
+    }
+  }
+
+  function save(){
+    localStorage.setItem(KEY, JSON.stringify(data));
+    render();
+  }
+
+  function sum(type){
+    return data.months[monthKey()][type].reduce((s,x)=>s+Number(x.amount||0),0);
+  }
+
+  function allExpenses(){
+    return sum('fixed') + sum('policies') + sum('needs');
+  }
+
+  function renderMonths(){
+    const bar = $('monthsBar');
+    bar.innerHTML = '';
+    const items = [];
+    for(let offset=-12; offset<=24; offset++){
+      const d = new Date(now.getFullYear(), now.getMonth()+offset, 1);
+      items.push({y:d.getFullYear(),m:d.getMonth()});
+    }
+    items.forEach((x)=>{
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'month-btn' + (x.y===currentYear && x.m===currentMonth ? ' active' : '');
+      b.innerHTML = MONTHS[x.m] + '<span class="month-year">' + x.y + '</span>';
+      b.addEventListener('click', ()=>{
+        currentYear = x.y;
+        currentMonth = x.m;
+        ensureMonth();
+        render();
+      });
+      bar.appendChild(b);
+    });
+    setTimeout(()=>{
+      const active = bar.querySelector('.active');
+      if(active) active.scrollIntoView({inline:'center',block:'nearest',behavior:'smooth'});
+    }, 0);
+  }
+
+  function render(){
+    ensureMonth();
+    renderMonths();
+    $('incomeValue').textContent = euro(sum('income'));
+    $('expenseValue').textContent = euro(allExpenses());
+    $('savingValue').textContent = euro(sum('income') - allExpenses());
+  }
+
+  function rowHtml(type, x){
+    const row = document.createElement('div');
+    row.className = 'detail-row';
+
+    const name = document.createElement('div');
+    name.className = 'detail-name';
+    name.textContent = x.name;
+
+    const amount = document.createElement('div');
+    amount.className = 'detail-amount';
+    amount.textContent = euro(x.amount);
+
+    const del = document.createElement('button');
+    del.type = 'button';
+    del.className = 'del';
+    del.textContent = 'Elimina';
+    del.addEventListener('click', ()=>{
+      if(!confirm('Eliminare questa voce?')) return;
+      data.months[monthKey()][type] = data.months[monthKey()][type].filter(i=>i.id!==x.id);
+      save();
+      if(type==='income') openIncome(); else openExpenses();
+    });
+
+    row.append(name, amount, del);
+    return row;
+  }
+
+  function openIncome(){
+    $('detailTitle').textContent = 'Entrate · ' + MONTHS[currentMonth] + ' ' + currentYear;
+    $('detailTotal').textContent = euro(sum('income'));
+    const c = $('detailContent');
+    c.innerHTML = '';
+    const items = data.months[monthKey()].income;
+    if(!items.length){
+      c.innerHTML = '<div class="empty">Nessuna entrata.</div>';
+    } else {
+      items.forEach(x=>c.appendChild(rowHtml('income',x)));
+    }
+    $('detailModal').classList.add('open');
+    $('detailModal').setAttribute('aria-hidden','false');
+  }
+
+  function openExpenses(){
+    $('detailTitle').textContent = 'Uscite · ' + MONTHS[currentMonth] + ' ' + currentYear;
+    $('detailTotal').textContent = euro(allExpenses());
+    const c = $('detailContent');
+    c.innerHTML = '';
+
+    [['USCITE FISSE','fixed'],['USCITE POLIZZE','policies'],['FABBISOGNO MENSILE','needs']].forEach(([label,type])=>{
+      const h = document.createElement('div');
+      h.className = 'section-title';
+      h.textContent = label + ' · ' + euro(sum(type));
+      c.appendChild(h);
+
+      const items = data.months[monthKey()][type];
+      if(!items.length){
+        const e = document.createElement('div');
+        e.className = 'empty';
+        e.textContent = 'Nessuna voce.';
+        c.appendChild(e);
+      } else {
+        items.forEach(x=>c.appendChild(rowHtml(type,x)));
+      }
+    });
+    $('detailModal').classList.add('open');
+    $('detailModal').setAttribute('aria-hidden','false');
+  }
+
+  function openSavings(){
+    const inc = sum('income');
+    const exp = allExpenses();
+    $('detailTitle').textContent = 'Utile / Risparmi · ' + MONTHS[currentMonth] + ' ' + currentYear;
+    $('detailTotal').textContent = euro(inc-exp);
+    $('detailContent').innerHTML =
+      '<div class="detail-row"><div class="detail-name">Entrate totali</div><div class="detail-amount">'+euro(inc)+'</div><div></div></div>'+
+      '<div class="detail-row"><div class="detail-name">Uscite totali</div><div class="detail-amount">'+euro(exp)+'</div><div></div></div>'+
+      '<div class="detail-row"><div class="detail-name">Disponibile</div><div class="detail-amount">'+euro(inc-exp)+'</div><div></div></div>';
+    $('detailModal').classList.add('open');
+    $('detailModal').setAttribute('aria-hidden','false');
+  }
+
+  function closeDetail(){
+    $('detailModal').classList.remove('open');
+    $('detailModal').setAttribute('aria-hidden','true');
+  }
+
+  function openAdd(){
+    $('addModal').classList.add('open');
+    $('addModal').setAttribute('aria-hidden','false');
+    setTimeout(()=>$('newName').focus(),100);
+  }
+
+  function closeAdd(){
+    $('addModal').classList.remove('open');
+    $('addModal').setAttribute('aria-hidden','true');
+  }
+
+  function addItem(){
+    const type = $('newType').value;
+    const name = $('newName').value.trim();
+    const amount = Number($('newAmount').value);
+    if(!name || amount<=0){
+      alert('Inserisci nome e importo.');
+      return;
+    }
+    data.months[monthKey()][type].push({id:Date.now(),name,amount});
+    $('newName').value='';
+    $('newAmount').value='';
+    closeAdd();
+    save();
+  }
+
+  $('incomeCard').addEventListener('click', openIncome);
+  $('expenseCard').addEventListener('click', openExpenses);
+  $('savingCard').addEventListener('click', openSavings);
+  $('fab').addEventListener('click', openAdd);
+  $('closeDetailBtn').addEventListener('click', closeDetail);
+  $('closeAddBtn').addEventListener('click', closeAdd);
+  $('addBtn').addEventListener('click', addItem);
+
+  $('detailModal').addEventListener('click', (e)=>{ if(e.target === $('detailModal')) closeDetail(); });
+  $('addModal').addEventListener('click', (e)=>{ if(e.target === $('addModal')) closeAdd(); });
+
+  if('serviceWorker' in navigator){
+    window.addEventListener('load', ()=>{
+      navigator.serviceWorker.register('./sw.js').catch(()=>{});
+    });
+  }
+
+  const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+  if(!isStandalone){
+    $('installNote').style.display='block';
+  }
+
+  render();
+})();
 </script>
 </body>
 </html>
