@@ -1,24 +1,43 @@
-BILANCIO FAMIGLIA PWA - VERSIONE 3
+BILANCIO FAMIGLIA PWA - VERSIONE 5
 
-LOGICA RICORRENZE:
-- Calendario da gennaio 2026 a dicembre 2100.
-- I mesi futuri restano vuoti: nessuna voce viene precompilata prima che il mese arrivi.
-- Quando inserisci una voce puoi scegliere:
-  1) Solo questo mese
-  2) Ripeti ogni mese
-- Le voci ricorrenti vengono riportate automaticamente nei mesi successivi SOLO quando quei mesi diventano correnti/passati.
-- Vale per Entrate, Uscite fisse, Polizze e Fabbisogno.
-- Per una voce ricorrente puoi scegliere:
-  - Elimina solo per questo mese
-  - Elimina da questo mese in poi
-- Le voci di un solo mese si eliminano normalmente.
-- Backup automatico locale giornaliero: conserva le ultime 60 copie.
+LOGICA CORRETTA DA SETTEMBRE 2026
 
-NOTA BACKUP:
-iOS non permette a una PWA chiusa di eseguire codice liberamente in background ogni giorno.
-Il backup giornaliero viene aggiornato automaticamente quando l'app viene aperta/usata.
-Per un backup cloud realmente autonomo serve un backend/cloud (es. Firebase).
+1. GENNAIO-AGOSTO 2026
+- Restano vuoti.
+- Non vengono inseriti dati retroattivamente.
 
-INSTALLAZIONE:
-Pubblica l'intera cartella su un hosting HTTPS, poi apri il link con Safari su iPhone e usa:
-Condividi > Aggiungi alla schermata Home.
+2. SETTEMBRE 2026
+Viene inizializzato con i dati mostrati nel file originale:
+- Entrata: Stipendio €3.900
+- Uscite fisse: Garage Perrone 116, Condominio 80, Sky 40, Fastweb 30,
+  Acqua/Luce/Gas 300, Emanuela 500, Suzuki Ignis finanziamento 374,40
+- Polizze: 38, 55, 41
+- Fabbisogno: Cibo 200, Benzina 200
+Queste voci sono impostate come ricorrenti da settembre 2026.
+
+3. MESI FUTURI (es. ottobre quando siamo ancora a settembre)
+- Le ricorrenze NON si vedono ancora.
+- Si vedono solo eventuali voci inserite manualmente in anticipo per quel mese.
+- Puoi quindi entrare in ottobre e registrare manualmente una spesa/entrata futura.
+
+4. QUANDO ARRIVA IL NUOVO MESE
+- Il 1° ottobre, aprendo/usando l'app, tutte le ricorrenze attive vengono riportate automaticamente in ottobre.
+- Lo stesso succede mese dopo mese.
+
+5. NUOVE VOCI
+Per Entrate, Uscite fisse, Polizze e Fabbisogno puoi scegliere:
+- Ripeti ogni mese
+- Solo questo mese
+
+6. ELIMINAZIONE DI UNA RICORRENZA
+Puoi scegliere:
+- Elimina solo per questo mese
+- Elimina da questo mese in poi
+
+7. BACKUP
+Backup automatico locale giornaliero con conservazione delle ultime 60 copie.
+Su iOS viene aggiornato quando l'app viene aperta/usata.
+
+IMPORTANTE:
+Questa versione usa cache e archivio dati nuovi. In alto deve comparire:
+"Versione 5 · avvio da settembre 2026"

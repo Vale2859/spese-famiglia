@@ -14,24 +14,23 @@
     :root{
       --bg:#f3f6f9;--ink:#14233a;--muted:#6b7a8d;--green:#dff3e7;--greenInk:#0e7b49;
       --red:#fde7e7;--redInk:#b33131;--purple:#eee5fb;--purpleInk:#6f49a8;--line:#dde5ed;
-      --blue:#dceafa;--blueInk:#1b5c9c;--gold:#fff2cf;--goldInk:#7a5a00;
-      --shadow:0 16px 38px rgba(20,35,58,.11)
+      --gold:#fff1c9;--goldInk:#765200;--shadow:0 16px 38px rgba(20,35,58,.11)
     }
     *{box-sizing:border-box}
     html,body{margin:0;min-height:100%}
     body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;background:linear-gradient(180deg,#f9fbfd,#edf2f6);color:var(--ink)}
-    button,input,select{font:inherit}
-    button{touch-action:manipulation}
+    button,input,select{font:inherit} button{touch-action:manipulation}
     .app{width:min(100%,760px);margin:0 auto;min-height:100vh;padding:14px 14px calc(105px + env(safe-area-inset-bottom))}
-    .header{text-align:center;padding:10px 6px 6px}
+    .header{text-align:center;padding:10px 6px 4px}
     .header h1{margin:0;font-size:clamp(32px,8vw,52px);line-height:1.02;font-weight:1000;letter-spacing:-.035em}
+    .version{margin-top:7px;color:var(--muted);font-size:13px;font-weight:900}
     .months-wrap{margin:12px 0 10px;background:#fff;border-radius:18px;box-shadow:var(--shadow);padding:10px}
     .months{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
     .months::-webkit-scrollbar{display:none}
     .month-btn{flex:0 0 auto;min-width:108px;border:0;border-radius:14px;padding:11px 13px;background:#eef2f6;color:var(--ink);font-weight:950}
     .month-btn.active{background:#14233a;color:#fff}
     .month-year{display:block;font-size:12px;opacity:.75;margin-top:2px}
-    .selected{font-size:18px;font-weight:1000;text-align:center;margin:9px 0 14px}
+    .selected{font-size:18px;font-weight:1000;text-align:center;margin:9px 0 12px}
     .future-banner{display:none;background:var(--gold);color:var(--goldInk);padding:12px 14px;border-radius:14px;font-weight:900;text-align:center;margin-bottom:14px}
     .stack{display:grid;gap:16px}
     .big-card{border:0;border-radius:26px;padding:26px 20px;min-height:170px;box-shadow:var(--shadow);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
@@ -41,7 +40,6 @@
     .card-note{font-size:14px;font-weight:850;opacity:.76;margin-top:10px}
     .backup{margin-top:14px;background:#eaf5ff;color:#175485;border-radius:14px;padding:11px 13px;font-size:13px;font-weight:850;text-align:center}
     .fab{position:fixed;right:18px;bottom:calc(18px + env(safe-area-inset-bottom));width:68px;height:68px;border:0;border-radius:50%;background:#14233a;color:#fff;font-size:38px;box-shadow:0 16px 34px rgba(20,35,58,.3);z-index:30}
-    .fab:disabled{opacity:.35}
     .modal{position:fixed;inset:0;background:rgba(10,20,32,.48);display:none;align-items:flex-end;justify-content:center;z-index:60}
     .modal.open{display:flex}
     .sheet{width:min(100%,760px);max-height:91vh;overflow:auto;background:#fff;border-radius:28px 28px 0 0;padding:20px 18px calc(28px + env(safe-area-inset-bottom));box-shadow:0 -20px 50px rgba(0,0,0,.22)}
@@ -55,35 +53,34 @@
     .trash{border:0;border-radius:10px;background:#fee8e8;color:#a92c2c;padding:8px 10px;font-weight:900}
     .empty{text-align:center;color:var(--muted);padding:20px 0;font-weight:850}
     .month-badge{padding:13px 14px;border-radius:14px;background:#eef3f7;font-weight:1000;text-align:center;margin:14px 0}
-    .form{display:grid;grid-template-columns:1.2fr .8fr;gap:10px}
-    .full{grid-column:1/-1}
+    .form{display:grid;grid-template-columns:1.2fr .8fr;gap:10px}.full{grid-column:1/-1}
     input,select{width:100%;border:2px solid var(--line);border-radius:13px;padding:14px 13px;background:#fff;font-size:18px}
     .togglebox{display:flex;align-items:center;justify-content:space-between;gap:12px;background:#f6f8fa;border-radius:14px;padding:14px;font-weight:900}
     .switch{width:58px;height:34px;border-radius:17px;background:#cfd8e2;padding:4px;cursor:pointer;transition:.2s}
-    .switch.on{background:#177a4d}
-    .knob{width:26px;height:26px;border-radius:50%;background:#fff;transition:.2s}
-    .switch.on .knob{transform:translateX(24px)}
+    .switch.on{background:#177a4d}.knob{width:26px;height:26px;border-radius:50%;background:#fff;transition:.2s}.switch.on .knob{transform:translateX(24px)}
     .repeat-note{font-size:13px;color:var(--muted);font-weight:800;margin-top:8px}
     .add{width:100%;border:0;border-radius:14px;background:#14233a;color:#fff;padding:15px;font-weight:1000}
-    .choice{display:grid;gap:10px;margin-top:16px}
-    .choice button{border:0;border-radius:15px;padding:15px;font-weight:1000;text-align:left}
+    .choice{display:grid;gap:10px;margin-top:16px}.choice button{border:0;border-radius:15px;padding:15px;font-weight:1000;text-align:left}
     .only{background:#eef3f7;color:#14233a}.forever{background:#fee8e8;color:#a92c2c}.cancel{background:#f5f5f5;color:#555}
     @media(max-width:520px){
-      .app{padding:10px 10px calc(95px + env(safe-area-inset-bottom))}
-      .big-card{min-height:160px;padding:22px 16px}.stack{gap:13px}.month-btn{min-width:98px}
-      .fab{right:14px;bottom:calc(14px + env(safe-area-inset-bottom));width:62px;height:62px}
-      .form{grid-template-columns:1fr}.full{grid-column:auto}
+      .app{padding:10px 10px calc(95px + env(safe-area-inset-bottom))}.big-card{min-height:160px;padding:22px 16px}.stack{gap:13px}.month-btn{min-width:98px}
+      .fab{right:14px;bottom:calc(14px + env(safe-area-inset-bottom));width:62px;height:62px}.form{grid-template-columns:1fr}.full{grid-column:auto}
       .detail-row{grid-template-columns:1fr auto}.trash{grid-column:1/-1}
     }
   </style>
 </head>
 <body>
 <div class="app">
-  <div class="header"><h1>BILANCIO MENSILE<br>GENERALE</h1></div>
+  <div class="header">
+    <h1>BILANCIO MENSILE<br>GENERALE</h1>
+    <div class="version">Versione 5 · avvio da settembre 2026</div>
+  </div>
 
   <div class="months-wrap"><div class="months" id="monthsBar"></div></div>
   <div class="selected" id="selectedLabel"></div>
-  <div class="future-banner" id="futureBanner">Questo è un mese futuro. I dati ricorrenti compariranno automaticamente quando arriverà questo mese.</div>
+  <div class="future-banner" id="futureBanner">
+    MESE FUTURO: le ricorrenze non sono ancora visibili. Qui vedrai solo eventuali voci inserite manualmente in anticipo.
+  </div>
 
   <div class="stack">
     <button id="incomeCard" class="big-card income" type="button">
@@ -126,7 +123,7 @@
       <div class="togglebox full">
         <div>
           <div>Ripeti ogni mese</div>
-          <div class="repeat-note" id="repeatText">La voce verrà riportata automaticamente nei mesi successivi quando arriveranno.</div>
+          <div class="repeat-note" id="repeatText"></div>
         </div>
         <div class="switch on" id="repeatSwitch"><div class="knob"></div></div>
       </div>
@@ -151,34 +148,65 @@
 (function(){
   "use strict";
   const $=id=>document.getElementById(id);
-  const KEY='bilancioFamigliaPWA_v3';
-  const BACKUP_KEY='bilancioFamigliaPWA_dailyBackups_v3';
+  const KEY='bilancioFamigliaPWA_v5';
+  const BACKUP_KEY='bilancioFamigliaPWA_dailyBackups_v5';
   const START='2026-01';
+  const BASELINE='2026-09';
   const END='2100-12';
   const MONTHS=['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno','Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre'];
   const euro=n=>new Intl.NumberFormat('it-IT',{style:'currency',currency:'EUR',minimumFractionDigits:2}).format(Number(n||0));
 
   let data;
-  try{data=JSON.parse(localStorage.getItem(KEY)||'null')||{months:{},rules:{}}}catch(e){data={months:{},rules:{}}}
+  try{data=JSON.parse(localStorage.getItem(KEY)||'null')||null}catch(e){data=null}
+  if(!data){
+    data={months:{},rules:{},initialized:true};
+    seedSeptember2026();
+    localStorage.setItem(KEY,JSON.stringify(data));
+  }
   if(!data.months)data.months={};
   if(!data.rules)data.rules={};
+
+  function addSeedRule(type,name,amount){
+    const id='seed-'+type+'-'+Math.random().toString(16).slice(2);
+    data.rules[id]={id,type,name,amount,start:BASELINE,end:null,skipMonths:[]};
+    return id;
+  }
+
+  function seedSeptember2026(){
+    data.months[BASELINE]={income:[],fixed:[],policies:[],needs:[]};
+
+    const seed = [
+      ['income','Stipendio',3900],
+      ['fixed','Garage Perrone',116],
+      ['fixed','Condominio',80],
+      ['fixed','Sky',40],
+      ['fixed','Fastweb',30],
+      ['fixed','Acqua / Luce / Gas',300],
+      ['fixed','Emanuela',500],
+      ['fixed','Suzuki Ignis finanziamento',374.40],
+      ['policies','Polizza EY54591',38],
+      ['policies','Polizza Ignis',55],
+      ['policies','Polizza Honda SH',41],
+      ['needs','Cibo',200],
+      ['needs','Benzina',200]
+    ];
+    seed.forEach(([type,name,amount])=>{
+      const rid=addSeedRule(type,name,amount);
+      data.months[BASELINE][type].push({id:'i-'+rid+'-'+BASELINE,name,amount,ruleId:rid});
+    });
+  }
 
   const now=new Date();
   const realCurrentKey=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0');
   let currentYear=Math.max(2026,now.getFullYear());
   let currentMonth=(currentYear===now.getFullYear()?now.getMonth():0);
-  let repeatMonthly=true;
-  let pendingDelete=null;
-  let lastDetail='';
 
   function mk(y=currentYear,m=currentMonth){return y+'-'+String(m+1).padStart(2,'0')}
   function splitKey(k){const [y,m]=k.split('-').map(Number);return {y,m:m-1}}
   function compareKey(a,b){return a.localeCompare(b)}
-  function prevKey(k){
-    const {y,m}=splitKey(k);const d=new Date(y,m-1,1);
-    return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')
-  }
+  function prevKey(k){const {y,m}=splitKey(k);const d=new Date(y,m-1,1);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')}
   function blank(){return {income:[],fixed:[],policies:[],needs:[]}}
+  function monthLabel(k=mk()){const {y,m}=splitKey(k);return MONTHS[m]+' '+y}
   function isFuture(k=mk()){return compareKey(k,realCurrentKey)>0}
 
   function ruleActive(rule,k){
@@ -188,36 +216,39 @@
     return true
   }
 
-  function ensureMonthByKey(k){
-    if(compareKey(k,START)<0 || compareKey(k,END)>0)return;
-    if(isFuture(k))return; // nessun dato nei mesi futuri
+  function ensureMonthContainer(k){
     if(!data.months[k])data.months[k]=blank();
+  }
 
+  function materializeRecurringIfDue(k){
+    if(compareKey(k,BASELINE)<0)return;      // gennaio-agosto 2026 restano vuoti
+    if(compareKey(k,realCurrentKey)>0)return; // mesi futuri: niente ricorrenze in anticipo
+    ensureMonthContainer(k);
     Object.values(data.rules).forEach(rule=>{
       if(!ruleActive(rule,k))return;
-      const arr=data.months[k][rule.type];
-      if(!arr.some(x=>x.ruleId===rule.id)){
-        arr.push({id:'i-'+rule.id+'-'+k,name:rule.name,amount:rule.amount,ruleId:rule.id});
+      const a=data.months[k][rule.type];
+      if(!a.some(x=>x.ruleId===rule.id)){
+        a.push({id:'i-'+rule.id+'-'+k,name:rule.name,amount:rule.amount,ruleId:rule.id});
       }
     });
   }
 
-  function ensureSelected(){ensureMonthByKey(mk())}
+  function getItems(type,k=mk()){
+    if(compareKey(k,BASELINE)>=0 && compareKey(k,realCurrentKey)<=0){
+      materializeRecurringIfDue(k);
+    }else{
+      ensureMonthContainer(k); // permette voci manuali anche nei mesi futuri
+    }
+    return data.months[k][type]||[];
+  }
 
   function save(){
     localStorage.setItem(KEY,JSON.stringify(data));
     dailyBackup();
     render();
   }
-
-  function arr(type){
-    if(isFuture())return [];
-    ensureSelected();
-    return data.months[mk()][type]||[];
-  }
-  function sum(type){return arr(type).reduce((s,x)=>s+Number(x.amount||0),0)}
+  function sum(type){return getItems(type).reduce((s,x)=>s+Number(x.amount||0),0)}
   function allExpenses(){return sum('fixed')+sum('policies')+sum('needs')}
-  function monthLabel(k=mk()){const {y,m}=splitKey(k);return MONTHS[m]+' '+y}
 
   function renderMonths(){
     const bar=$('monthsBar');bar.innerHTML='';
@@ -228,7 +259,7 @@
         const b=document.createElement('button');
         b.type='button';b.className='month-btn'+(y===currentYear&&m===currentMonth?' active':'');
         b.innerHTML=MONTHS[m]+'<span class="month-year">'+y+'</span>';
-        b.addEventListener('click',()=>{currentYear=y;currentMonth=m;ensureSelected();render()});
+        b.addEventListener('click',()=>{currentYear=y;currentMonth=m;render()});
         bar.appendChild(b);
       }
     }
@@ -236,12 +267,12 @@
   }
 
   function render(){
+    if(compareKey(mk(),BASELINE)>=0 && compareKey(mk(),realCurrentKey)<=0)materializeRecurringIfDue(mk());
+    else ensureMonthContainer(mk());
+
     renderMonths();
     $('selectedLabel').textContent='MESE SELEZIONATO: '+monthLabel().toUpperCase();
-    const future=isFuture();
-    $('futureBanner').style.display=future?'block':'none';
-    $('fab').disabled=future;
-    if(!future)ensureSelected();
+    $('futureBanner').style.display=isFuture()?'block':'none';
     $('incomeValue').textContent=euro(sum('income'));
     $('expenseValue').textContent=euro(allExpenses());
     $('savingValue').textContent=euro(sum('income')-allExpenses());
@@ -266,7 +297,7 @@
     $('detailTitle').textContent='Entrate · '+monthLabel();
     $('detailTotal').textContent=euro(sum('income'));
     const c=$('detailContent');c.innerHTML='';
-    const items=arr('income');
+    const items=getItems('income');
     if(!items.length)c.innerHTML='<div class="empty">Nessuna entrata.</div>';else items.forEach(x=>c.appendChild(makeRow('income',x)));
     $('detailModal').classList.add('open')
   }
@@ -278,7 +309,7 @@
     const c=$('detailContent');c.innerHTML='';
     [['USCITE FISSE','fixed'],['USCITE POLIZZE','policies'],['FABBISOGNO MENSILE','needs']].forEach(([label,type])=>{
       const h=document.createElement('div');h.className='section-title';h.textContent=label+' · '+euro(sum(type));c.appendChild(h);
-      const items=arr(type);
+      const items=getItems(type);
       if(!items.length){const e=document.createElement('div');e.className='empty';e.textContent='Nessuna voce.';c.appendChild(e)}
       else items.forEach(x=>c.appendChild(makeRow(type,x)))
     });
@@ -297,40 +328,41 @@
     $('detailModal').classList.add('open')
   }
 
+  let repeatMonthly=true,pendingDelete=null,lastDetail='';
+
   function reopenDetail(){if(lastDetail==='income')openIncome();else if(lastDetail==='expenses')openExpenses();else if(lastDetail==='savings')openSavings()}
 
   function openAdd(){
-    if(isFuture())return;
     repeatMonthly=true;updateRepeatUI();
     $('addMonthLabel').textContent='STAI REGISTRANDO SU: '+monthLabel().toUpperCase();
     $('addModal').classList.add('open')
   }
   function updateRepeatUI(){
     $('repeatSwitch').classList.toggle('on',repeatMonthly);
-    $('repeatText').textContent=repeatMonthly
-      ?'La voce comparirà in questo mese e verrà riportata automaticamente nei mesi successivi quando arriveranno.'
-      :'La voce resterà soltanto in '+monthLabel()+'.'
+    if(repeatMonthly){
+      $('repeatText').textContent=isFuture()
+        ?'La ricorrenza partirà da '+monthLabel()+'. Non sarà mostrata prima che quel mese arrivi.'
+        :'La voce viene salvata in '+monthLabel()+' e si ripeterà automaticamente nei mesi successivi quando arriveranno.';
+    }else{
+      $('repeatText').textContent='La voce resterà soltanto in '+monthLabel()+'.';
+    }
   }
 
   function addItem(){
     const type=$('newType').value,name=$('newName').value.trim(),amount=Number($('newAmount').value);
     if(!name||amount<=0){alert('Inserisci nome e importo.');return}
-    ensureSelected();
+    const k=mk();ensureMonthContainer(k);
 
     if(repeatMonthly){
       const id='r-'+Date.now()+'-'+Math.random().toString(16).slice(2);
-      data.rules[id]={id,type,name,amount,start:mk(),end:null,skipMonths:[]};
-      // genera solo da mese scelto fino al mese reale corrente, mai nei futuri
-      let {y,m}=splitKey(mk());
-      while(true){
-        const k=y+'-'+String(m+1).padStart(2,'0');
-        if(compareKey(k,realCurrentKey)>0)break;
-        ensureMonthByKey(k);
-        if(k===realCurrentKey)break;
-        m++;if(m>11){m=0;y++}
+      data.rules[id]={id,type,name,amount,start:k,end:null,skipMonths:[]};
+      // Se il mese è già arrivato, mostra subito la prima occorrenza.
+      if(compareKey(k,realCurrentKey)<=0){
+        data.months[k][type].push({id:'i-'+id+'-'+k,name,amount,ruleId:id});
       }
+      // Se è futuro, resta invisibile finché non arriva quel mese.
     }else{
-      data.months[mk()][type].push({id:'o-'+Date.now(),name,amount});
+      data.months[k][type].push({id:'o-'+Date.now(),name,amount});
     }
 
     $('newName').value='';$('newAmount').value='';$('addModal').classList.remove('open');save()
@@ -341,10 +373,11 @@
     $('deleteLabel').textContent=item.name+' · '+monthLabel();
     $('detailModal').classList.remove('open');
     if(item.ruleId){
-      $('deleteOnly').style.display='block';$('deleteForever').style.display='block'
+      $('deleteOnly').style.display='block';$('deleteOnly').textContent='🗓️ Elimina solo per questo mese';
+      $('deleteForever').style.display='block';
     }else{
       $('deleteOnly').style.display='block';$('deleteOnly').textContent='🗑️ Elimina questa voce';
-      $('deleteForever').style.display='none'
+      $('deleteForever').style.display='none';
     }
     $('deleteModal').classList.add('open')
   }
@@ -355,9 +388,9 @@
     data.months[k][type]=data.months[k][type].filter(x=>x.id!==item.id);
     if(item.ruleId){
       const rule=data.rules[item.ruleId];
-      if(rule && !(rule.skipMonths||[]).includes(k)){
+      if(rule){
         if(!rule.skipMonths)rule.skipMonths=[];
-        rule.skipMonths.push(k)
+        if(!rule.skipMonths.includes(k))rule.skipMonths.push(k);
       }
     }
     finishDelete()
@@ -365,9 +398,9 @@
 
   function deleteForever(){
     if(!pendingDelete||!pendingDelete.item.ruleId)return;
-    const {type,item}=pendingDelete,k=mk(),rule=data.rules[pendingDelete.item.ruleId];
+    const {type,item}=pendingDelete,k=mk();
+    const rule=data.rules[item.ruleId];
     if(rule)rule.end=prevKey(k);
-
     Object.keys(data.months).forEach(month=>{
       if(compareKey(month,k)>=0){
         data.months[month][type]=data.months[month][type].filter(x=>x.ruleId!==item.ruleId)
@@ -402,7 +435,6 @@
   $('closeAdd').addEventListener('click',()=>$('addModal').classList.remove('open'));
   $('repeatSwitch').addEventListener('click',()=>{repeatMonthly=!repeatMonthly;updateRepeatUI()});
   $('addBtn').addEventListener('click',addItem);
-
   $('closeDelete').addEventListener('click',()=>{$('deleteModal').classList.remove('open');reopenDetail()});
   $('deleteCancel').addEventListener('click',()=>{$('deleteModal').classList.remove('open');reopenDetail()});
   $('deleteOnly').addEventListener('click',deleteOnly);
