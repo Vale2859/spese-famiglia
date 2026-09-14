@@ -61,16 +61,16 @@ button{touch-action:manipulation}
 .col.needs .colHead{background:#ffd9bd;color:var(--orange2)}
 .colTitle{font-size:9px;font-weight:1000;line-height:1.05;display:flex;align-items:center;gap:3px}
 .colTotal{font-size:16px;font-weight:1000;margin-top:3px;white-space:nowrap}
-.colList{padding:6px 7px;flex:1;min-height:238px}
-.colItem{padding:5px 0;border-bottom:1px solid #e7edf3;cursor:pointer}
+.colList{padding:6px 7px;flex:1;height:300px;max-height:300px;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;scrollbar-width:thin}
+.colItem{padding:7px 0;border-bottom:1px solid #e7edf3;cursor:pointer}
 .colItem:last-child{border-bottom:0}
-.colTop{display:grid;grid-template-columns:1fr auto 10px;gap:3px;align-items:start}
-.colName{font-size:9px;font-weight:950;line-height:1.08;overflow:hidden}
-.colAmt{font-size:9px;font-weight:1000;white-space:nowrap}
-.colMeta{font-size:7px;color:#718096;margin-top:2px;line-height:1.05}
+.colTop{display:grid;grid-template-columns:minmax(0,1fr) auto 10px;gap:4px;align-items:start}
+.colName{font-size:10.5px;font-weight:950;line-height:1.15;overflow:visible;overflow-wrap:anywhere}
+.colAmt{font-size:10px;font-weight:1000;white-space:nowrap}
+.colMeta{font-size:8.5px;color:#718096;margin-top:3px;line-height:1.15}
 .colDots{font-size:12px;color:#718096}
-.colAdd{border:0;margin:6px;border-radius:11px;padding:8px 4px;font-size:9px;font-weight:1000}
-.col.fixed .colAdd{background:#ddecff;color:#145ea7}.col.policies .colAdd{background:#eadfff;color:#6541a6}.col.needs .colAdd{background:#ffe1cc;color:#b84718}
+.colAdd{border:0;margin:6px;border-radius:11px;padding:9px 4px;font-size:9px;font-weight:1000;flex:0 0 auto}
+.col.fixed .colAdd{border:0;margin:6px;border-radius:11px;padding:9px 4px;font-size:9px;font-weight:1000;flex:0 0 auto}.col.policies .colAdd{border:0;margin:6px;border-radius:11px;padding:9px 4px;font-size:9px;font-weight:1000;flex:0 0 auto}.col.needs .colAdd{border:0;margin:6px;border-radius:11px;padding:9px 4px;font-size:9px;font-weight:1000;flex:0 0 auto}
 .kpis{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:8px}
 .kpi{border-radius:15px;padding:10px 11px;box-shadow:var(--shadow)}
 .kpi.total{background:var(--cyan)}.kpi.save{background:var(--save)}
@@ -89,6 +89,11 @@ button{touch-action:manipulation}
 input,select{width:100%;border:2px solid var(--line);border-radius:11px;padding:11px;background:#fff;font-size:15px}.label{font-size:10px;font-weight:900;color:#718096;margin:2px 0 3px}
 .primary{border:0;border-radius:12px;padding:12px;background:var(--ink);color:#fff;font-weight:1000}.choice{display:grid;gap:7px}.choice button{border:0;border-radius:12px;padding:12px;text-align:left;font-weight:1000}.soft{background:#edf3f8;color:var(--ink)}.danger{background:#fde7e7;color:#a82e2e}
 .monthPickerGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin-top:6px}.mp{border:2px solid var(--line);border-radius:11px;padding:7px;background:#fff;font-weight:900;font-size:11px}.mp.sel{border-color:#16784b;background:#e6f5ed;color:#0d7547}.mp input{margin-top:4px;padding:6px;border-width:1px;font-size:12px}.hidden{display:none!important}
+
+.colList::-webkit-scrollbar{width:4px}
+.colList::-webkit-scrollbar-thumb{background:rgba(16,36,63,.22);border-radius:10px}
+.colScrollHint{font-size:7px;color:#718096;text-align:center;font-weight:800;padding:2px 0 0}
+
 </style>
 </head>
 <body>
@@ -107,7 +112,7 @@ input,select{width:100%;border:2px solid var(--line);border-radius:11px;padding:
     <div class="monthText"><div class="m" id="monthName">Settembre</div><div class="y" id="monthYear">2026</div></div>
     <button class="monthArrow" id="nextMonth">›</button>
   </div>
-  <div class="future" id="futureBanner">Mese futuro: vedrai solo le voci inserite manualmente. Le ricorrenze appariranno quando il mese arriverà.</div>
+  <div class="future" id="futureBanner">PREVISIONE MESE FUTURO: vedi già tutte le voci ricorrenti previste e anche le voci inserite manualmente per questo mese.</div>
 
   <div class="card incomeCard" id="incomeCard">
     <div class="incomeHeader">
@@ -130,19 +135,19 @@ input,select{width:100%;border:2px solid var(--line);border-radius:11px;padding:
       <div class="col fixed" data-type="fixed">
         <div class="colHead"><div class="colTitle">🏠 USCITE FISSE</div><div class="colTotal" id="fixedTotal">€ 0</div></div>
         <div class="colList" id="fixedRows"></div>
-        <button class="colAdd" data-add="fixed">＋ Aggiungi voce</button>
+        <div class="colScrollHint">Scorri ↑↓ per vedere tutte le voci</div><button class="colAdd" data-add="fixed">＋ Aggiungi voce</button>
       </div>
 
       <div class="col policies" data-type="policies">
         <div class="colHead"><div class="colTitle">🛡️ POLIZZE</div><div class="colTotal" id="policiesTotal">€ 0</div></div>
         <div class="colList" id="policiesRows"></div>
-        <button class="colAdd" data-add="policies">＋ Aggiungi voce</button>
+        <div class="colScrollHint">Scorri ↑↓ per vedere tutte le voci</div><button class="colAdd" data-add="policies">＋ Aggiungi voce</button>
       </div>
 
       <div class="col needs" data-type="needs">
         <div class="colHead"><div class="colTitle">🛒 FABBISOGNO</div><div class="colTotal" id="needsTotal">€ 0</div></div>
         <div class="colList" id="needsRows"></div>
-        <button class="colAdd" data-add="needs">＋ Aggiungi voce</button>
+        <div class="colScrollHint">Scorri ↑↓ per vedere tutte le voci</div><button class="colAdd" data-add="needs">＋ Aggiungi voce</button>
       </div>
     </div>
   </div>
@@ -264,7 +269,7 @@ input,select{width:100%;border:2px solid var(--line);border-radius:11px;padding:
 "use strict";
 const $=id=>document.getElementById(id);
 const KEY="bilancioFamigliaPWA_v14";
-const BACKUP_KEY="bilancioFamigliaPWA_dailyBackups_v14";
+const BACKUP_KEY="bilancioFamigliaPWA_dailyBackups_v15";
 const START="2026-01",BASE="2026-09";
 const ML=["Gennaio","Febbraio","Marzo","Aprile","Maggio","Giugno","Luglio","Agosto","Settembre","Ottobre","Novembre","Dicembre"];
 const euro=n=>new Intl.NumberFormat("it-IT",{style:"currency",currency:"EUR",minimumFractionDigits:2}).format(Number(n||0));
@@ -296,8 +301,8 @@ function seed(){ensure(BASE);[
 
 function amountForRule(rule,k){const {y,m}=split(k),s=rule.schedule||{kind:"monthly"};if(s.kind==="monthly")return rule.amount;if(s.kind==="annual")return m===s.month?rule.amount:null;if(s.kind==="selectedYearly")return s.amounts&&s.amounts[m]!=null?Number(s.amounts[m]):null;if(s.kind==="selectedOneYear")return y===s.year&&s.amounts&&s.amounts[m]!=null?Number(s.amounts[m]):null;return null}
 function ruleActive(rule,k){if(cmp(k,rule.start)<0)return false;if(rule.end&&cmp(k,rule.end)>0)return false;if((rule.skip||[]).includes(k))return false;return amountForRule(rule,k)!=null}
-function materialize(k){if(cmp(k,BASE)<0||cmp(k,realKey)>0)return;ensure(k);Object.values(data.rules).forEach(rule=>{if(!ruleActive(rule,k))return;const amt=amountForRule(rule,k),a=data.months[k][rule.type];if(!a.some(x=>x.ruleId===rule.id))a.push({id:"i-"+rule.id+"-"+k,name:rule.name,amount:amt,ruleId:rule.id})})}
-function items(type,k=key()){ensure(k);if(cmp(k,BASE)>=0&&cmp(k,realKey)<=0)materialize(k);return data.months[k][type]}
+function materialize(k){if(cmp(k,BASE)<0)return;ensure(k);Object.values(data.rules).forEach(rule=>{if(!ruleActive(rule,k))return;const amt=amountForRule(rule,k),a=data.months[k][rule.type];if(!a.some(x=>x.ruleId===rule.id))a.push({id:"i-"+rule.id+"-"+k,name:rule.name,amount:amt,ruleId:rule.id})})}
+function items(type,k=key()){ensure(k);if(cmp(k,BASE)>=0)materialize(k);return data.months[k][type]}
 function sum(type){return items(type).reduce((s,x)=>s+Number(x.amount||0),0)}
 function expenses(){return sum("fixed")+sum("policies")+sum("needs")}
 function save(){localStorage.setItem(KEY,JSON.stringify(data));dailyBackup();render()}
@@ -327,7 +332,7 @@ function renderCol(type,id){
     el.innerHTML='<div class="colItem"><div class="colTop"><div class="colName">—</div><div class="colAmt"></div><div></div></div></div>';
     return;
   }
-  a.slice(0,7).forEach(x=>{
+  a.forEach(x=>{
     const r=document.createElement("div");
     r.className="colItem";
     r.innerHTML='<div class="colTop"><div class="colName"></div><div class="colAmt"></div><div class="colDots">⋮</div></div><div class="colMeta"></div>';
