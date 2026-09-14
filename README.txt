@@ -1,12 +1,8 @@
-Spese Famiglia - Versione 16
-
-CORREZIONE:
-- La schermata principale è ora bloccata orizzontalmente.
-- Non deve più muoversi a destra e sinistra.
-- Rimane solo lo scorrimento verticale della pagina.
-- Le tre colonne Uscite continuano a scorrere verticalmente in modo indipendente.
-- Mantiene tutte le funzioni della v15.
-- Usa la stessa chiave dati della v14/v15, quindi non azzera i dati già inseriti.
-
-NUOVO LINK:
-https://vale2859.github.io/v16/
+VERSIONE 17 - correzione Home iPhone
+- Schermo fisso: nessuno scorrimento destra/sinistra.
+- Le 3 colonne restano affiancate.
+- Nomi come Garage Perrone, Condominio, Polizza EY54591 e Benzina non vengono più spezzati lettera per lettera.
+- Importi restano leggibili sulla destra.
+- Le liste delle colonne continuano a scorrere verticalmente.
+- Nessuna modifica alla logica dei dati.
+Link previsto: https://vale2859.github.io/v17/
