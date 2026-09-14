@@ -1,20 +1,17 @@
-Spese Famiglia - Versione 19 - Backup
+Spese Famiglia - Versione 20 - FIX BACKUP
 
-Novità:
-- Al posto della rotella Impostazioni in alto c'è il pulsante 💾 Backup.
-- Backup automatico locale ogni volta che apri l'app.
-- Backup automatico locale ogni volta che salvi/modifichi i dati.
-- Conservazione fino a 90 copie giornaliere locali.
-- Pulsante "Esporta backup adesso" per creare un file JSON completo.
-- Pulsante "Ripristina da backup" per ricaricare un file JSON precedente.
+Correzioni:
+- La X della finestra Backup ora funziona.
+- "Esporta backup adesso" ora usa la condivisione nativa di iPhone quando disponibile:
+  puoi scegliere File, AirDrop, Mail, ecc.
+- Se la condivisione file non è disponibile, usa il download classico.
+- "Ripristina da backup" apre correttamente il selettore file.
+- Dopo aver scelto un file JSON valido, i dati vengono ripristinati e la Home si aggiorna.
+- Il backup automatico locale continua a essere eseguito ad ogni apertura e ad ogni salvataggio.
+- Mantiene gli stessi dati principali delle versioni precedenti.
 
-IMPORTANTE SU IPHONE:
-iOS/Safari non consente a una PWA di scrivere automaticamente, senza permesso,
-sempre nella stessa cartella dell'app File/iCloud Drive.
-Quindi:
-1. il backup automatico interno funziona sempre;
-2. per avere una copia visibile in File/iCloud devi usare "Esporta backup adesso"
-   e scegliere la cartella di destinazione.
+Nuovo link:
+https://vale2859.github.io/v20/
 
-Nuovo link previsto:
-https://vale2859.github.io/v19/
+Per evitare cache:
+carica la cartella v20 completa e apri direttamente il link /v20/.

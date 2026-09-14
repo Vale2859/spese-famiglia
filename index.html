@@ -509,6 +509,29 @@ input, select, button {
   </div>
 </div>
 
+<div class="modal" id="backupModal">
+  <div class="sheet">
+    <div class="sheetHead">
+      <div class="sheetTitle">Backup</div>
+      <button class="close" data-close="backupModal">✕</button>
+    </div>
+
+    <div class="badge" id="backupStatus">Backup automatico locale attivo · v20</div>
+
+    <div class="form">
+      <button class="primary" id="exportBackupBtn">💾 Esporta backup adesso</button>
+      <button class="soft" id="restoreBackupBtn">📥 Ripristina da backup</button>
+      <input id="restoreFileInput" class="hidden" type="file" accept="application/json,.json">
+    </div>
+
+    <div class="itemMeta" style="margin-top:12px;line-height:1.4">
+      L'app crea automaticamente una copia locale ogni volta che viene aperta e ogni volta che salvi una modifica.
+      Su iPhone, per motivi di sicurezza di iOS, una PWA non può scrivere in automatico sempre nella stessa cartella di File senza chiedere il permesso.
+      Il pulsante “Esporta backup” crea invece un file JSON completo che puoi salvare in File/iCloud Drive.
+    </div>
+  </div>
+</div>
+
 <script>
 (function(){
 "use strict";
@@ -807,22 +830,41 @@ function getBackupFileName(){
   return "Spese_Famiglia_Backup_"+stamp+".json";
 }
 
-function exportBackup(){
+async function exportBackup(){
   const payload={
     app:"Spese Famiglia",
-    version:"v19",
+    version:"v20",
     exportedAt:new Date().toISOString(),
     data:JSON.parse(JSON.stringify(data))
   };
-  const blob=new Blob([JSON.stringify(payload,null,2)],{type:"application/json"});
+
+  const text=JSON.stringify(payload,null,2);
+  const filename=getBackupFileName();
+  const file=new File([text],filename,{type:"application/json"});
+
+  try{
+    if(navigator.canShare && navigator.canShare({files:[file]}) && navigator.share){
+      await navigator.share({
+        title:"Backup Spese Famiglia",
+        text:"Backup completo dell'app Spese Famiglia",
+        files:[file]
+      });
+      return;
+    }
+  }catch(e){
+    if(e && e.name==="AbortError") return;
+  }
+
+  const blob=new Blob([text],{type:"application/json"});
   const url=URL.createObjectURL(blob);
   const a=document.createElement("a");
   a.href=url;
-  a.download=getBackupFileName();
+  a.download=filename;
+  a.style.display="none";
   document.body.appendChild(a);
   a.click();
   a.remove();
-  setTimeout(()=>URL.revokeObjectURL(url),1000);
+  setTimeout(()=>URL.revokeObjectURL(url),1500);
 }
 
 function restoreFromBackup(file){
@@ -854,13 +896,18 @@ function updateBackupBadge(){
     : "Backup automatico locale attivo";
 }
 
-$("backupBtn").onclick=()=>{
+
+$("backupModal").querySelector(".close").onclick=()=>{
+  $("backupModal").classList.remove("open");
+};
+
+if($("backupBtn")) $("backupBtn").onclick=()=>{
   updateBackupBadge();
   $("backupModal").classList.add("open");
 };
-$("exportBackupBtn").onclick=exportBackup;
-$("restoreBackupBtn").onclick=()=>$("restoreFileInput").click();
-$("restoreFileInput").onchange=e=>{
+if($("exportBackupBtn")) $("exportBackupBtn").onclick=async()=>{await exportBackup();updateBackupBadge();};
+if($("restoreBackupBtn")) $("restoreBackupBtn").onclick=()=>{const i=$("restoreFileInput");i.value="";i.click();};
+if($("restoreFileInput")) $("restoreFileInput").onchange=e=>{
   const f=e.target.files&&e.target.files[0];
   if(f) restoreFromBackup(f);
   e.target.value="";
@@ -870,29 +917,6 @@ dailyBackup();render();
 if("serviceWorker" in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}));
 })();
 </script>
-
-<div class="modal" id="backupModal">
-  <div class="sheet">
-    <div class="sheetHead">
-      <div class="sheetTitle">Backup</div>
-      <button class="close" data-close="backupModal">✕</button>
-    </div>
-
-    <div class="badge" id="backupStatus">Backup automatico locale attivo</div>
-
-    <div class="form">
-      <button class="primary" id="exportBackupBtn">💾 Esporta backup adesso</button>
-      <button class="soft" id="restoreBackupBtn">📥 Ripristina da backup</button>
-      <input id="restoreFileInput" class="hidden" type="file" accept="application/json,.json">
-    </div>
-
-    <div class="itemMeta" style="margin-top:12px;line-height:1.4">
-      L'app crea automaticamente una copia locale ogni volta che viene aperta e ogni volta che salvi una modifica.
-      Su iPhone, per motivi di sicurezza di iOS, una PWA non può scrivere in automatico sempre nella stessa cartella di File senza chiedere il permesso.
-      Il pulsante “Esporta backup” crea invece un file JSON completo che puoi salvare in File/iCloud Drive.
-    </div>
-  </div>
-</div>
 
 </body>
 </html>
