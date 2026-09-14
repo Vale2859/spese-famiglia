@@ -1,15 +1,20 @@
-Spese Famiglia - Versione 18
+Spese Famiglia - Versione 19 - Backup
 
-CORREZIONI HOME IPHONE
-- Nelle 3 colonne Uscite il nome della voce è su una riga/blocco separato.
-- L'importo è sotto il nome, quindi non si sovrappone più.
-- La frequenza è sotto l'importo.
-- Le parole non vengono più spezzate lettera per lettera.
-- Ogni colonna ha una propria area scorrevole verticale alta 330px.
-- Se ci sono molte voci, scorri su/giù direttamente dentro quella colonna.
-- Il pulsante Aggiungi voce resta sotto la colonna.
-- Lo schermo principale resta bloccato orizzontalmente.
-- Tutti i dati e le logiche della versione precedente restano invariati.
+Novità:
+- Al posto della rotella Impostazioni in alto c'è il pulsante 💾 Backup.
+- Backup automatico locale ogni volta che apri l'app.
+- Backup automatico locale ogni volta che salvi/modifichi i dati.
+- Conservazione fino a 90 copie giornaliere locali.
+- Pulsante "Esporta backup adesso" per creare un file JSON completo.
+- Pulsante "Ripristina da backup" per ricaricare un file JSON precedente.
+
+IMPORTANTE SU IPHONE:
+iOS/Safari non consente a una PWA di scrivere automaticamente, senza permesso,
+sempre nella stessa cartella dell'app File/iCloud Drive.
+Quindi:
+1. il backup automatico interno funziona sempre;
+2. per avere una copia visibile in File/iCloud devi usare "Esporta backup adesso"
+   e scegliere la cartella di destinazione.
 
 Nuovo link previsto:
-https://vale2859.github.io/v18/
+https://vale2859.github.io/v19/

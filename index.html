@@ -349,7 +349,7 @@ input, select, button {
       <div class="headerTitle">Bilancio Mensile<span class="family">Famiglia</span></div>
       <div class="headerSub">Controlla oggi, vivi meglio domani</div>
     </div>
-    <button class="gear">⚙️</button>
+    <button class="gear" id="backupBtn" aria-label="Backup">💾</button>
   </div>
 
   <div class="monthCard">
@@ -786,7 +786,7 @@ $("deleteOnly").onclick=()=>{const {type,item}=pendingDelete,k=key();data.months
 $("deleteForever").onclick=()=>{const {type,item}=pendingDelete,k=key(),r=data.rules[item.ruleId];if(r)r.end=prev(k);Object.keys(data.months).forEach(m=>{if(cmp(m,k)>=0)data.months[m][type]=data.months[m][type].filter(x=>x.ruleId!==item.ruleId)});$("deleteModal").classList.remove("open");$("detailModal").classList.remove("open");$("editModal").classList.remove("open");save();window.scrollTo({top:0,behavior:"smooth"})};
 
 document.querySelectorAll("[data-close]").forEach(b=>b.onclick=()=>$(b.dataset.close).classList.remove("open"));document.querySelectorAll(".modal").forEach(m=>m.onclick=e=>{if(e.target===m)m.classList.remove("open")});
-function dailyBackup(){const d=new Date(),day=d.toISOString().slice(0,10);let b=[];try{b=JSON.parse(localStorage.getItem(BACKUP_KEY)||"[]")}catch(e){}const s={date:day,createdAt:new Date().toISOString(),data:JSON.parse(JSON.stringify(data))},i=b.findIndex(x=>x.date===day);if(i>=0)b[i]=s;else b.push(s);if(b.length>60)b=b.slice(-60);localStorage.setItem(BACKUP_KEY,JSON.stringify(b))}
+function dailyBackup(){const d=new Date(),day=d.toISOString().slice(0,10);let b=[];try{b=JSON.parse(localStorage.getItem(BACKUP_KEY)||"[]")}catch(e){}const s={date:day,createdAt:new Date().toISOString(),data:JSON.parse(JSON.stringify(data))},i=b.findIndex(x=>x.date===day);if(i>=0)b[i]=s;else b.push(s);if(b.length>90)b=b.slice(-90);localStorage.setItem(BACKUP_KEY,JSON.stringify(b))}
 
 window.addEventListener("scroll", function(){
   if(window.scrollX !== 0){
@@ -799,9 +799,100 @@ window.addEventListener("scroll", function(){
   if(window.scrollX !== 0) window.scrollTo(0, window.scrollY);
 });
 
+
+function getBackupFileName(){
+  const d=new Date();
+  const stamp=d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")+
+    "_"+String(d.getHours()).padStart(2,"0")+"-"+String(d.getMinutes()).padStart(2,"0");
+  return "Spese_Famiglia_Backup_"+stamp+".json";
+}
+
+function exportBackup(){
+  const payload={
+    app:"Spese Famiglia",
+    version:"v19",
+    exportedAt:new Date().toISOString(),
+    data:JSON.parse(JSON.stringify(data))
+  };
+  const blob=new Blob([JSON.stringify(payload,null,2)],{type:"application/json"});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement("a");
+  a.href=url;
+  a.download=getBackupFileName();
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+
+function restoreFromBackup(file){
+  const reader=new FileReader();
+  reader.onload=()=>{
+    try{
+      const parsed=JSON.parse(reader.result);
+      const incoming=parsed.data||parsed;
+      if(!incoming || !incoming.months || !incoming.rules) throw new Error("Backup non valido");
+      data=incoming;
+      localStorage.setItem(KEY,JSON.stringify(data));
+      dailyBackup();
+      render();
+      $("backupModal").classList.remove("open");
+      alert("Backup ripristinato correttamente.");
+    }catch(e){
+      alert("Non riesco a leggere questo backup.");
+    }
+  };
+  reader.readAsText(file);
+}
+
+function updateBackupBadge(){
+  let b=[];
+  try{b=JSON.parse(localStorage.getItem(BACKUP_KEY)||"[]")}catch(e){}
+  const last=b[b.length-1];
+  $("backupStatus").textContent=last
+    ? "Backup automatico locale: ultimo "+last.date+" · "+b.length+" copie conservate"
+    : "Backup automatico locale attivo";
+}
+
+$("backupBtn").onclick=()=>{
+  updateBackupBadge();
+  $("backupModal").classList.add("open");
+};
+$("exportBackupBtn").onclick=exportBackup;
+$("restoreBackupBtn").onclick=()=>$("restoreFileInput").click();
+$("restoreFileInput").onchange=e=>{
+  const f=e.target.files&&e.target.files[0];
+  if(f) restoreFromBackup(f);
+  e.target.value="";
+};
+
 dailyBackup();render();
 if("serviceWorker" in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}));
 })();
 </script>
+
+<div class="modal" id="backupModal">
+  <div class="sheet">
+    <div class="sheetHead">
+      <div class="sheetTitle">Backup</div>
+      <button class="close" data-close="backupModal">✕</button>
+    </div>
+
+    <div class="badge" id="backupStatus">Backup automatico locale attivo</div>
+
+    <div class="form">
+      <button class="primary" id="exportBackupBtn">💾 Esporta backup adesso</button>
+      <button class="soft" id="restoreBackupBtn">📥 Ripristina da backup</button>
+      <input id="restoreFileInput" class="hidden" type="file" accept="application/json,.json">
+    </div>
+
+    <div class="itemMeta" style="margin-top:12px;line-height:1.4">
+      L'app crea automaticamente una copia locale ogni volta che viene aperta e ogni volta che salvi una modifica.
+      Su iPhone, per motivi di sicurezza di iOS, una PWA non può scrivere in automatico sempre nella stessa cartella di File senza chiedere il permesso.
+      Il pulsante “Esporta backup” crea invece un file JSON completo che puoi salvare in File/iCloud Drive.
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
