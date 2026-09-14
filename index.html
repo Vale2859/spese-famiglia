@@ -94,6 +94,88 @@ input,select{width:100%;border:2px solid var(--line);border-radius:11px;padding:
 .colList::-webkit-scrollbar-thumb{background:rgba(16,36,63,.22);border-radius:10px}
 .colScrollHint{font-size:7px;color:#718096;text-align:center;font-weight:800;padding:2px 0 0}
 
+
+html, body {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden !important;
+  overscroll-behavior-x: none;
+}
+
+body {
+  position: relative;
+}
+
+.app {
+  width: 100% !important;
+  max-width: 430px !important;
+  min-width: 0 !important;
+  overflow-x: hidden !important;
+}
+
+.header,
+.monthCard,
+.incomeCard,
+.expenseCard,
+.kpis,
+.schedule,
+.cols,
+.col,
+.colList,
+.incomeList {
+  min-width: 0 !important;
+  max-width: 100% !important;
+}
+
+.cols {
+  width: 100% !important;
+  overflow: hidden !important;
+}
+
+.col {
+  width: auto !important;
+  overflow: hidden !important;
+}
+
+.colHead,
+.colList,
+.colItem,
+.colTop {
+  min-width: 0 !important;
+}
+
+.colName,
+.rowName,
+.name {
+  min-width: 0 !important;
+  overflow-wrap: anywhere !important;
+  word-break: break-word !important;
+}
+
+.colAmt,
+.amt,
+.rowAmt {
+  max-width: 100% !important;
+}
+
+img, svg {
+  max-width: 100%;
+}
+
+.sheet {
+  width: 100% !important;
+  max-width: 430px !important;
+  overflow-x: hidden !important;
+}
+
+input, select, button {
+  max-width: 100%;
+}
+
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
 </style>
 </head>
 <body>
@@ -269,7 +351,7 @@ input,select{width:100%;border:2px solid var(--line);border-radius:11px;padding:
 "use strict";
 const $=id=>document.getElementById(id);
 const KEY="bilancioFamigliaPWA_v14";
-const BACKUP_KEY="bilancioFamigliaPWA_dailyBackups_v15";
+const BACKUP_KEY="bilancioFamigliaPWA_dailyBackups_v16";
 const START="2026-01",BASE="2026-09";
 const ML=["Gennaio","Febbraio","Marzo","Aprile","Maggio","Giugno","Luglio","Agosto","Settembre","Ottobre","Novembre","Dicembre"];
 const euro=n=>new Intl.NumberFormat("it-IT",{style:"currency",currency:"EUR",minimumFractionDigits:2}).format(Number(n||0));
@@ -535,6 +617,18 @@ $("deleteForever").onclick=()=>{const {type,item}=pendingDelete,k=key(),r=data.r
 
 document.querySelectorAll("[data-close]").forEach(b=>b.onclick=()=>$(b.dataset.close).classList.remove("open"));document.querySelectorAll(".modal").forEach(m=>m.onclick=e=>{if(e.target===m)m.classList.remove("open")});
 function dailyBackup(){const d=new Date(),day=d.toISOString().slice(0,10);let b=[];try{b=JSON.parse(localStorage.getItem(BACKUP_KEY)||"[]")}catch(e){}const s={date:day,createdAt:new Date().toISOString(),data:JSON.parse(JSON.stringify(data))},i=b.findIndex(x=>x.date===day);if(i>=0)b[i]=s;else b.push(s);if(b.length>60)b=b.slice(-60);localStorage.setItem(BACKUP_KEY,JSON.stringify(b))}
+
+document.addEventListener("touchmove", function(e){
+  if(e.target.closest(".colList")) return;
+  if(Math.abs(window.scrollX) > 0) window.scrollTo(0, window.scrollY);
+}, {passive:true});
+
+window.addEventListener("scroll", function(){
+  if(window.scrollX !== 0){
+    window.scrollTo(0, window.scrollY);
+  }
+});
+
 dailyBackup();render();
 if("serviceWorker" in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}));
 })();
