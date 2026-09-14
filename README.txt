@@ -1,8 +1,15 @@
-VERSIONE 17 - correzione Home iPhone
-- Schermo fisso: nessuno scorrimento destra/sinistra.
-- Le 3 colonne restano affiancate.
-- Nomi come Garage Perrone, Condominio, Polizza EY54591 e Benzina non vengono più spezzati lettera per lettera.
-- Importi restano leggibili sulla destra.
-- Le liste delle colonne continuano a scorrere verticalmente.
-- Nessuna modifica alla logica dei dati.
-Link previsto: https://vale2859.github.io/v17/
+Spese Famiglia - Versione 18
+
+CORREZIONI HOME IPHONE
+- Nelle 3 colonne Uscite il nome della voce è su una riga/blocco separato.
+- L'importo è sotto il nome, quindi non si sovrappone più.
+- La frequenza è sotto l'importo.
+- Le parole non vengono più spezzate lettera per lettera.
+- Ogni colonna ha una propria area scorrevole verticale alta 330px.
+- Se ci sono molte voci, scorri su/giù direttamente dentro quella colonna.
+- Il pulsante Aggiungi voce resta sotto la colonna.
+- Lo schermo principale resta bloccato orizzontalmente.
+- Tutti i dati e le logiche della versione precedente restano invariati.
+
+Nuovo link previsto:
+https://vale2859.github.io/v18/

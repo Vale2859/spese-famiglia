@@ -215,6 +215,130 @@ input, select, button {
   .dots { font-size: 18px !important; }
 }
 
+
+/* v18: colonne leggibili e realmente scorrevoli */
+@media (max-width: 600px) {
+  .cols{
+    grid-template-columns: repeat(3, minmax(0,1fr)) !important;
+    gap: 6px !important;
+    align-items: stretch !important;
+  }
+
+  .col{
+    min-width: 0 !important;
+    width: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    overflow: hidden !important;
+  }
+
+  .colHead{
+    min-height: 88px !important;
+    padding: 9px 7px !important;
+  }
+
+  .colTitle{
+    font-size: 11px !important;
+    line-height: 1.08 !important;
+    white-space: normal !important;
+    overflow-wrap: normal !important;
+    word-break: normal !important;
+  }
+
+  .colTotal{
+    font-size: 18px !important;
+    line-height: 1.05 !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: clip !important;
+  }
+
+  .colList{
+    height: 330px !important;
+    max-height: 330px !important;
+    min-height: 330px !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    -webkit-overflow-scrolling: touch !important;
+    touch-action: pan-y !important;
+    overscroll-behavior: contain !important;
+    padding: 6px !important;
+    scrollbar-width: thin !important;
+  }
+
+  .colItem{
+    display: block !important;
+    padding: 9px 3px !important;
+    min-width: 0 !important;
+    border-bottom: 1px solid #e4eaf1 !important;
+  }
+
+  .colTop{
+    display: block !important;
+    position: relative !important;
+    min-width: 0 !important;
+  }
+
+  .colName{
+    display: block !important;
+    padding-right: 17px !important;
+    font-size: 12px !important;
+    line-height: 1.14 !important;
+    font-weight: 950 !important;
+    overflow-wrap: normal !important;
+    word-break: normal !important;
+    hyphens: none !important;
+    white-space: normal !important;
+  }
+
+  .colAmt{
+    display: block !important;
+    margin-top: 4px !important;
+    font-size: 13px !important;
+    line-height: 1.05 !important;
+    font-weight: 1000 !important;
+    white-space: nowrap !important;
+  }
+
+  .colMeta{
+    display: block !important;
+    margin-top: 4px !important;
+    font-size: 9px !important;
+    line-height: 1.1 !important;
+    color: #718096 !important;
+    white-space: normal !important;
+  }
+
+  .colDots{
+    position: absolute !important;
+    top: -2px !important;
+    right: 0 !important;
+    font-size: 15px !important;
+    line-height: 1 !important;
+  }
+
+  .colAdd{
+    flex: 0 0 auto !important;
+    margin: 6px !important;
+    padding: 9px 3px !important;
+    font-size: 9px !important;
+  }
+
+  .colScrollHint{
+    flex: 0 0 auto !important;
+    font-size: 7px !important;
+    padding: 3px 2px 0 !important;
+  }
+}
+
+.colList::-webkit-scrollbar{
+  width: 4px;
+}
+.colList::-webkit-scrollbar-thumb{
+  background: rgba(16,36,63,.25);
+  border-radius: 8px;
+}
+
 </style>
 </head>
 <body>
@@ -448,21 +572,28 @@ function renderIncome(){
   })
 }
 function renderCol(type,id){
-  const el=$(id),a=items(type);el.innerHTML="";
+  const el=$(id),a=items(type);
+  el.innerHTML="";
   if(!a.length){
-    el.innerHTML='<div class="colItem"><div class="colTop"><div class="colName">—</div><div class="colAmt"></div><div></div></div></div>';
+    el.innerHTML='<div class="colItem"><div class="colTop"><div class="colName">—</div></div></div>';
     return;
   }
   a.forEach(x=>{
     const r=document.createElement("div");
     r.className="colItem";
-    r.innerHTML='<div class="colTop"><div class="colName"></div><div class="colAmt"></div><div class="colDots">⋮</div></div><div class="colMeta"></div>';
+    r.innerHTML=
+      '<div class="colTop">'+
+        '<div class="colName"></div>'+
+        '<div class="colAmt"></div>'+
+        '<div class="colDots">⋮</div>'+
+      '</div>'+
+      '<div class="colMeta"></div>';
     r.querySelector(".colName").textContent=x.name;
     r.querySelector(".colAmt").textContent=euro(x.amount);
     r.querySelector(".colMeta").textContent=meta(x);
     r.onclick=e=>{e.stopPropagation();openEdit(type,x)};
-    el.appendChild(r)
-  })
+    el.appendChild(r);
+  });
 }
 function render(){$("monthName").textContent=ML[cm];$("monthYear").textContent=cy;$("futureBanner").style.display=future()?"block":"none";$("incomeTotal").textContent=euro(sum("income"));renderIncome();$("fixedTotal").textContent=euro(sum("fixed"));renderCol("fixed","fixedRows");$("policiesTotal").textContent=euro(sum("policies"));renderCol("policies","policiesRows");$("needsTotal").textContent=euro(sum("needs"));renderCol("needs","needsRows");$("expenseTotal").textContent=euro(expenses());$("allExpenses").textContent=euro(expenses());$("savingTotal").textContent=euro(sum("income")-expenses())}
 $("prevMonth").onclick=()=>{const d=new Date(cy,cm-1,1);if(d.getFullYear()<2026)return;cy=d.getFullYear();cm=d.getMonth();render()};
@@ -657,15 +788,15 @@ $("deleteForever").onclick=()=>{const {type,item}=pendingDelete,k=key(),r=data.r
 document.querySelectorAll("[data-close]").forEach(b=>b.onclick=()=>$(b.dataset.close).classList.remove("open"));document.querySelectorAll(".modal").forEach(m=>m.onclick=e=>{if(e.target===m)m.classList.remove("open")});
 function dailyBackup(){const d=new Date(),day=d.toISOString().slice(0,10);let b=[];try{b=JSON.parse(localStorage.getItem(BACKUP_KEY)||"[]")}catch(e){}const s={date:day,createdAt:new Date().toISOString(),data:JSON.parse(JSON.stringify(data))},i=b.findIndex(x=>x.date===day);if(i>=0)b[i]=s;else b.push(s);if(b.length>60)b=b.slice(-60);localStorage.setItem(BACKUP_KEY,JSON.stringify(b))}
 
-document.addEventListener("touchmove", function(e){
-  if(e.target.closest(".colList")) return;
-  if(Math.abs(window.scrollX) > 0) window.scrollTo(0, window.scrollY);
-}, {passive:true});
-
 window.addEventListener("scroll", function(){
   if(window.scrollX !== 0){
     window.scrollTo(0, window.scrollY);
   }
+});
+
+
+window.addEventListener("scroll", function(){
+  if(window.scrollX !== 0) window.scrollTo(0, window.scrollY);
 });
 
 dailyBackup();render();
