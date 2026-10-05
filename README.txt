@@ -21,3 +21,6 @@ IMPORTANTE:
 Il saldo reale inserito e considerato il saldo del conto nel momento dell'aggiornamento. Per evitare di conteggiare due volte movimenti gia avvenuti, il mese corrente mostra quel saldo reale; la proiezione automatica applica entrate e uscite a partire dal mese successivo.
 
 Per aggiornare una installazione GitHub Pages, carica la cartella v21 completa.
+
+
+V22: entrate completamente scorribili; corretto calcolo saldo finale previsto: saldo attuale + netto del mese ancora, poi accumulo mese per mese.

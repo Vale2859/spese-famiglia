@@ -9,7 +9,7 @@
 <meta name="apple-mobile-web-app-title" content="Spese Famiglia">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-192.png">
-<title>Spese Famiglia v21</title>
+<title>Spese Famiglia v22</title>
 <style>
 :root{
   --ink:#10243f;--muted:#718096;--line:#dfe7ef;
@@ -46,7 +46,7 @@ button{touch-action:manipulation}
 .blockLabel{font-size:15px;font-weight:1000;color:var(--green2)}
 .blockMoney{font-size:31px;font-weight:1000;color:var(--green2);line-height:1;margin-top:3px;letter-spacing:-.03em}
 .roundAdd{width:44px;height:44px;border:0;border-radius:50%;background:#28a660;color:#fff;font-size:29px;line-height:1;box-shadow:0 7px 15px rgba(20,120,70,.18)}
-.incomeList{background:#fff;border-radius:13px;padding:8px 10px;margin-top:9px}
+.incomeList{background:#fff;border-radius:13px;padding:8px 10px;margin-top:9px;max-height:190px;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;touch-action:pan-y;overscroll-behavior:contain;scrollbar-width:thin}
 .incomeRow{display:grid;grid-template-columns:1fr auto 16px;gap:6px;align-items:center;cursor:pointer}
 .name{font-size:12px;font-weight:950;line-height:1.05}.meta{font-size:9px;color:#65748a;font-weight:800;margin-top:2px}.amt{font-size:12px;font-weight:1000;white-space:nowrap}
 .dots{color:#65748a;font-size:18px;line-height:1}
@@ -92,6 +92,8 @@ input,select{width:100%;border:2px solid var(--line);border-radius:11px;padding:
 
 .colList::-webkit-scrollbar{width:4px}
 .colList::-webkit-scrollbar-thumb{background:rgba(16,36,63,.22);border-radius:10px}
+.incomeList::-webkit-scrollbar{width:4px}
+.incomeList::-webkit-scrollbar-thumb{background:rgba(16,36,63,.22);border-radius:10px}
 .colScrollHint{font-size:7px;color:#718096;text-align:center;font-weight:800;padding:2px 0 0}
 
 
@@ -528,9 +530,9 @@ input, select, button {
       <button class="primary" id="saveBalanceBtn">💰 Aggiorna saldo reale</button>
       <button class="soft" id="clearBalanceBtn">Azzera impostazione saldo</button>
       <div class="balanceHint">
-        Inserisci il saldo che vedi realmente sul conto oggi. Questo valore diventa il nuovo punto di partenza.
-        Il mese corrente mostra il saldo reale inserito; i mesi successivi vengono calcolati automaticamente aggiungendo entrate e sottraendo uscite previste di ogni mese.
-        Puoi aggiornare il saldo reale in qualsiasi momento: tutte le previsioni future si ricalcolano da sole.
+        Inserisci il saldo che vedi realmente sul conto oggi. Questo valore è il punto di partenza della previsione.
+        Per il mese corrente l’app calcola il saldo finale previsto facendo: saldo attuale + tutte le entrate del mese − tutte le uscite del mese.
+        I mesi successivi partono dal saldo finale del mese precedente e continuano automaticamente. Puoi aggiornare il saldo reale in qualsiasi momento: tutte le previsioni future si ricalcolano da sole.
       </div>
     </div>
   </div>
@@ -543,7 +545,7 @@ input, select, button {
       <button class="close" data-close="backupModal">✕</button>
     </div>
 
-    <div class="badge" id="backupStatus">Backup automatico locale attivo · v21</div>
+    <div class="badge" id="backupStatus">Backup automatico locale attivo · v22</div>
 
     <div class="form">
       <button class="primary" id="exportBackupBtn">💾 Esporta backup adesso</button>
@@ -612,15 +614,18 @@ function balanceConfigured(){return !!(data.balance&&Number.isFinite(Number(data
 function projectedBalance(k=key()){
   if(!balanceConfigured())return null;
   const anchor=data.balance.anchorMonth;
-  let total=Number(data.balance.amount);
-  if(k===anchor)return total;
-  if(cmp(k,anchor)>0){
-    let cur=nextMonthKey(anchor),guard=0;
+  const base=Number(data.balance.amount);
+  if(cmp(k,anchor)>=0){
+    let total=base;
+    let cur=anchor,guard=0;
     while(cmp(cur,k)<=0&&guard++<1200){total+=netForMonth(cur);cur=nextMonthKey(cur)}
     return total;
   }
-  let cur=anchor,guard=0;
-  while(cmp(cur,k)>0&&guard++<1200){total-=netForMonth(cur);cur=previousMonthKey(cur)}
+  // Per i mesi precedenti mostriamo una stima retroattiva: togliamo i netti
+  // dall'ancora fino al mese successivo a quello visualizzato.
+  let total=base;
+  let cur=previousMonthKey(anchor),guard=0;
+  while(cmp(cur,k)>=0&&guard++<1200){total-=netForMonth(cur);cur=previousMonthKey(cur)}
   return total;
 }
 function save(){localStorage.setItem(KEY,JSON.stringify(data));dailyBackup();render()}
@@ -633,7 +638,7 @@ function renderIncome(){
     el.innerHTML='<div class="incomeRow"><div class="name">Nessuna entrata</div><div class="amt">—</div><div></div></div>';
     return;
   }
-  a.slice(0,2).forEach(x=>{
+  a.forEach(x=>{
     const r=document.createElement("div");
     r.className="incomeRow";
     r.innerHTML='<div><div class="name"></div><div class="meta"></div></div><div class="amt"></div><div class="dots">⋮</div>';
@@ -672,10 +677,10 @@ function renderBalance(){
   const k=key(),v=projectedBalance(k),title=$("balanceTitle"),value=$("balanceTotal"),sub=$("balanceSub");
   if(v===null){title.textContent="SALDO TOTALE";value.textContent="Imposta saldo";sub.textContent="Inserisci il saldo reale del conto per attivare le previsioni";return}
   const anchor=data.balance.anchorMonth;
-  title.textContent=k===anchor?"SALDO REALE":"SALDO PREVISTO";
+  title.textContent=k===anchor?"SALDO FINALE PREVISTO":"SALDO PREVISTO";
   value.textContent=euro(v);
   if(k===anchor){
-    sub.textContent="Aggiornato "+(data.balance.updatedLabel||"manualmente")+" · tocca per modificare";
+    sub.textContent="Saldo attuale "+euro(data.balance.amount)+" + utile mese "+euro(netForMonth(k))+" · tocca per aggiornare";
   }else if(cmp(k,anchor)>0){
     sub.textContent="Proiezione automatica da "+label(anchor)+" · utile mese "+euro(netForMonth(k));
   }else{
@@ -919,7 +924,7 @@ function getBackupFileName(){
 async function exportBackup(){
   const payload={
     app:"Spese Famiglia",
-    version:"v21",
+    version:"v22",
     exportedAt:new Date().toISOString(),
     data:JSON.parse(JSON.stringify(data))
   };
