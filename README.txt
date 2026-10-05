@@ -1,17 +1,23 @@
-Spese Famiglia - Versione 20 - FIX BACKUP
+Spese Famiglia - Versione 21 - SALDO TOTALE E PREVISIONE
 
-Correzioni:
-- La X della finestra Backup ora funziona.
-- "Esporta backup adesso" ora usa la condivisione nativa di iPhone quando disponibile:
-  puoi scegliere File, AirDrop, Mail, ecc.
-- Se la condivisione file non è disponibile, usa il download classico.
-- "Ripristina da backup" apre correttamente il selettore file.
-- Dopo aver scelto un file JSON valido, i dati vengono ripristinati e la Home si aggiorna.
-- Il backup automatico locale continua a essere eseguito ad ogni apertura e ad ogni salvataggio.
-- Mantiene gli stessi dati principali delle versioni precedenti.
+Novita principali:
+- La vecchia card "Gestione scadenze personalizzate" e stata rimossa dalla Home.
+- Al suo posto compare la card "Saldo totale".
+- Toccando la card puoi inserire o aggiornare manualmente il saldo reale attuale del conto.
+- Il mese in cui aggiorni il saldo mostra il SALDO REALE.
+- I mesi successivi mostrano il SALDO PREVISTO calcolato automaticamente mese per mese.
+- Formula futura: saldo precedente + entrate del mese - tutte le uscite del mese.
+- Se aggiorni nuovamente il saldo reale, tutte le previsioni future si ricalcolano dal nuovo valore.
+- Entrate, uscite, ricorrenze e tutte le funzioni esistenti restano operative.
 
-Nuovo link:
-https://vale2859.github.io/v20/
+COMPATIBILITA BACKUP V20:
+- I backup JSON delle versioni precedenti restano importabili.
+- Se il backup non contiene ancora il saldo, dopo il ripristino l'app chiede di inserire il saldo reale attuale del conto.
+- Quindi tuo padre puo: aprire la sua versione -> Esporta backup -> aprire v21 -> Ripristina da backup -> inserire il saldo reale del conto.
+- Da quel momento tutte le proiezioni vengono calcolate automaticamente.
+- I nuovi backup v21 includono anche il saldo conto.
 
-Per evitare cache:
-carica la cartella v20 completa e apri direttamente il link /v20/.
+IMPORTANTE:
+Il saldo reale inserito e considerato il saldo del conto nel momento dell'aggiornamento. Per evitare di conteggiare due volte movimenti gia avvenuti, il mese corrente mostra quel saldo reale; la proiezione automatica applica entrate e uscite a partire dal mese successivo.
+
+Per aggiornare una installazione GitHub Pages, carica la cartella v21 completa.

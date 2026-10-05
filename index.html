@@ -9,7 +9,7 @@
 <meta name="apple-mobile-web-app-title" content="Spese Famiglia">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-192.png">
-<title>Bilancio Mensile Famiglia v14</title>
+<title>Spese Famiglia v21</title>
 <style>
 :root{
   --ink:#10243f;--muted:#718096;--line:#dfe7ef;
@@ -77,8 +77,8 @@ button{touch-action:manipulation}
 .kpiLabel{font-size:9px;font-weight:1000}.kpiValue{font-size:21px;font-weight:1000;margin-top:3px}
 .kpi.total .kpiValue{color:var(--cyan2)}.kpi.save .kpiValue{color:var(--save2)}
 .kpiNote{font-size:8px;color:#607086;font-weight:800;margin-top:1px}
-.schedule{display:grid;grid-template-columns:32px 1fr 20px;gap:8px;align-items:center;background:#eaf4ff;border-radius:15px;padding:10px 11px;margin-top:8px;box-shadow:var(--shadow)}
-.scheduleIcon{font-size:23px}.scheduleTitle{font-size:11px;font-weight:1000;color:#155da5}.scheduleSub{font-size:8px;color:#718096;margin-top:1px}.arrow{font-size:22px;color:#155da5}
+.schedule{display:grid;grid-template-columns:38px 1fr 24px;gap:9px;align-items:center;background:linear-gradient(90deg,#e9f5ff,#edf9f0);border-radius:17px;padding:12px 12px;margin-top:8px;box-shadow:var(--shadow);cursor:pointer}
+.scheduleIcon{font-size:27px}.scheduleTitle{font-size:10px;font-weight:1000;color:#155da5;letter-spacing:.02em}.scheduleValue{font-size:25px;font-weight:1000;color:#087849;line-height:1.05;margin-top:2px}.scheduleSub{font-size:8px;color:#718096;margin-top:3px;font-weight:800}.arrow{font-size:22px;color:#155da5}.balanceHint{background:#f5f8fb;border-radius:12px;padding:10px;font-size:10px;color:#607086;line-height:1.4}.balanceState{display:flex;justify-content:space-between;gap:8px;align-items:center;background:#eef8f1;border-radius:12px;padding:10px 11px}.balanceState strong{font-size:18px;color:#087849}.balanceState span{font-size:9px;color:#607086;font-weight:850}
 .modal{position:fixed;inset:0;background:rgba(10,20,32,.48);display:none;align-items:flex-end;justify-content:center;z-index:80}.modal.open{display:flex}
 .sheet{width:min(100%,430px);max-height:92vh;overflow:auto;background:#fff;border-radius:24px 24px 0 0;padding:15px 13px calc(20px + env(safe-area-inset-bottom))}
 .sheetHead{display:flex;justify-content:space-between;align-items:center;gap:10px}.sheetTitle{font-size:24px;font-weight:1000}.close{width:42px;height:42px;border:0;border-radius:13px;background:#edf2f6;font-size:20px}
@@ -402,9 +402,13 @@ input, select, button {
     <div class="kpi save"><div class="kpiLabel">UTILE / RISPARMI</div><div class="kpiValue" id="savingTotal">€ 0</div><div class="kpiNote">Vacanze / Extra / Risparmi</div></div>
   </div>
 
-  <div class="schedule" id="scheduleCard">
-    <div class="scheduleIcon">🗓️</div>
-    <div><div class="scheduleTitle">Gestione scadenze personalizzate</div><div class="scheduleSub">Mensili · Annuali · Mesi scelti · Solo un anno</div></div>
+  <div class="schedule" id="balanceCard">
+    <div class="scheduleIcon">💰</div>
+    <div>
+      <div class="scheduleTitle" id="balanceTitle">SALDO TOTALE</div>
+      <div class="scheduleValue" id="balanceTotal">Imposta saldo</div>
+      <div class="scheduleSub" id="balanceSub">Inserisci il saldo reale del conto per attivare le previsioni</div>
+    </div>
     <div class="arrow">›</div>
   </div>
 </div>
@@ -509,6 +513,29 @@ input, select, button {
   </div>
 </div>
 
+<div class="modal" id="balanceModal">
+  <div class="sheet">
+    <div class="sheetHead">
+      <div class="sheetTitle">Saldo conto</div>
+      <button class="close" data-close="balanceModal">✕</button>
+    </div>
+    <div class="badge" id="balanceModalMonth"></div>
+    <div class="form">
+      <div>
+        <div class="label">Saldo reale attuale del conto €</div>
+        <input id="balanceAmount" type="number" step="0.01" inputmode="decimal" placeholder="Es. 4500,00">
+      </div>
+      <button class="primary" id="saveBalanceBtn">💰 Aggiorna saldo reale</button>
+      <button class="soft" id="clearBalanceBtn">Azzera impostazione saldo</button>
+      <div class="balanceHint">
+        Inserisci il saldo che vedi realmente sul conto oggi. Questo valore diventa il nuovo punto di partenza.
+        Il mese corrente mostra il saldo reale inserito; i mesi successivi vengono calcolati automaticamente aggiungendo entrate e sottraendo uscite previste di ogni mese.
+        Puoi aggiornare il saldo reale in qualsiasi momento: tutte le previsioni future si ricalcolano da sole.
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="modal" id="backupModal">
   <div class="sheet">
     <div class="sheetHead">
@@ -516,7 +543,7 @@ input, select, button {
       <button class="close" data-close="backupModal">✕</button>
     </div>
 
-    <div class="badge" id="backupStatus">Backup automatico locale attivo · v20</div>
+    <div class="badge" id="backupStatus">Backup automatico locale attivo · v21</div>
 
     <div class="form">
       <button class="primary" id="exportBackupBtn">💾 Esporta backup adesso</button>
@@ -543,8 +570,9 @@ const ML=["Gennaio","Febbraio","Marzo","Aprile","Maggio","Giugno","Luglio","Agos
 const euro=n=>new Intl.NumberFormat("it-IT",{style:"currency",currency:"EUR",minimumFractionDigits:2}).format(Number(n||0));
 
 let data;try{data=JSON.parse(localStorage.getItem(KEY)||"null")}catch(e){}
-if(!data){data={months:{},rules:{}};seed();localStorage.setItem(KEY,JSON.stringify(data))}
+if(!data){data={months:{},rules:{},balance:null};seed();localStorage.setItem(KEY,JSON.stringify(data))}
 if(!data.months)data.months={};if(!data.rules)data.rules={};
+if(!Object.prototype.hasOwnProperty.call(data,"balance"))data.balance=null;
 
 const now=new Date();const realKey=now.getFullYear()+"-"+String(now.getMonth()+1).padStart(2,"0");
 let cy=Math.max(2026,now.getFullYear()),cm=(cy===now.getFullYear()?now.getMonth():0);
@@ -573,6 +601,28 @@ function materialize(k){if(cmp(k,BASE)<0)return;ensure(k);Object.values(data.rul
 function items(type,k=key()){ensure(k);if(cmp(k,BASE)>=0)materialize(k);return data.months[k][type]}
 function sum(type){return items(type).reduce((s,x)=>s+Number(x.amount||0),0)}
 function expenses(){return sum("fixed")+sum("policies")+sum("needs")}
+function netForMonth(k){
+  const inc=items("income",k).reduce((s,x)=>s+Number(x.amount||0),0);
+  const out=["fixed","policies","needs"].reduce((tot,t)=>tot+items(t,k).reduce((s,x)=>s+Number(x.amount||0),0),0);
+  return inc-out;
+}
+function nextMonthKey(k){const {y,m}=split(k),d=new Date(y,m+1,1);return key(d.getFullYear(),d.getMonth())}
+function previousMonthKey(k){const {y,m}=split(k),d=new Date(y,m-1,1);return key(d.getFullYear(),d.getMonth())}
+function balanceConfigured(){return !!(data.balance&&Number.isFinite(Number(data.balance.amount))&&data.balance.anchorMonth)}
+function projectedBalance(k=key()){
+  if(!balanceConfigured())return null;
+  const anchor=data.balance.anchorMonth;
+  let total=Number(data.balance.amount);
+  if(k===anchor)return total;
+  if(cmp(k,anchor)>0){
+    let cur=nextMonthKey(anchor),guard=0;
+    while(cmp(cur,k)<=0&&guard++<1200){total+=netForMonth(cur);cur=nextMonthKey(cur)}
+    return total;
+  }
+  let cur=anchor,guard=0;
+  while(cmp(cur,k)>0&&guard++<1200){total-=netForMonth(cur);cur=previousMonthKey(cur)}
+  return total;
+}
 function save(){localStorage.setItem(KEY,JSON.stringify(data));dailyBackup();render()}
 
 function meta(item){if(!item.ruleId)return"Solo questo mese";const r=data.rules[item.ruleId];if(!r)return"Ricorrente";const s=r.schedule||{kind:"monthly"};if(s.kind==="monthly")return"Ogni mese";if(s.kind==="annual")return"Ogni "+ML[s.month];if(s.kind==="selectedYearly")return"Mesi scelti ogni anno";if(s.kind==="selectedOneYear")return"Mesi scelti solo "+s.year;return"Ricorrente"}
@@ -618,7 +668,21 @@ function renderCol(type,id){
     el.appendChild(r);
   });
 }
-function render(){$("monthName").textContent=ML[cm];$("monthYear").textContent=cy;$("futureBanner").style.display=future()?"block":"none";$("incomeTotal").textContent=euro(sum("income"));renderIncome();$("fixedTotal").textContent=euro(sum("fixed"));renderCol("fixed","fixedRows");$("policiesTotal").textContent=euro(sum("policies"));renderCol("policies","policiesRows");$("needsTotal").textContent=euro(sum("needs"));renderCol("needs","needsRows");$("expenseTotal").textContent=euro(expenses());$("allExpenses").textContent=euro(expenses());$("savingTotal").textContent=euro(sum("income")-expenses())}
+function renderBalance(){
+  const k=key(),v=projectedBalance(k),title=$("balanceTitle"),value=$("balanceTotal"),sub=$("balanceSub");
+  if(v===null){title.textContent="SALDO TOTALE";value.textContent="Imposta saldo";sub.textContent="Inserisci il saldo reale del conto per attivare le previsioni";return}
+  const anchor=data.balance.anchorMonth;
+  title.textContent=k===anchor?"SALDO REALE":"SALDO PREVISTO";
+  value.textContent=euro(v);
+  if(k===anchor){
+    sub.textContent="Aggiornato "+(data.balance.updatedLabel||"manualmente")+" · tocca per modificare";
+  }else if(cmp(k,anchor)>0){
+    sub.textContent="Proiezione automatica da "+label(anchor)+" · utile mese "+euro(netForMonth(k));
+  }else{
+    sub.textContent="Stima retroattiva rispetto al saldo aggiornato · "+label(anchor);
+  }
+}
+function render(){$("monthName").textContent=ML[cm];$("monthYear").textContent=cy;$("futureBanner").style.display=future()?"block":"none";$("incomeTotal").textContent=euro(sum("income"));renderIncome();$("fixedTotal").textContent=euro(sum("fixed"));renderCol("fixed","fixedRows");$("policiesTotal").textContent=euro(sum("policies"));renderCol("policies","policiesRows");$("needsTotal").textContent=euro(sum("needs"));renderCol("needs","needsRows");$("expenseTotal").textContent=euro(expenses());$("allExpenses").textContent=euro(expenses());$("savingTotal").textContent=euro(sum("income")-expenses());renderBalance()}
 $("prevMonth").onclick=()=>{const d=new Date(cy,cm-1,1);if(d.getFullYear()<2026)return;cy=d.getFullYear();cm=d.getMonth();render()};
 $("nextMonth").onclick=()=>{const d=new Date(cy,cm+1,1);if(d.getFullYear()>2100)return;cy=d.getFullYear();cm=d.getMonth();render()};
 
@@ -710,7 +774,29 @@ $("editFrequency").onchange=updateEditFreq;
 function updateFreq(){const f=$("frequency").value;$("annualBox").classList.toggle("hidden",f!=="annual");$("selectedMonthsBox").classList.toggle("hidden",!(f==="selectedYearly"||f==="selectedOneYear"));$("yearBox").classList.toggle("hidden",f!=="selectedOneYear")}
 $("frequency").onchange=updateFreq;
 function openAdd(type){$("addMonth").textContent="STAI REGISTRANDO SU: "+label().toUpperCase();$("newType").value=type||"fixed";$("newName").value="";$("newAmount").value="";$("frequency").value="once";$("targetYear").value=cy;updateFreq();document.querySelectorAll(".mp").forEach(x=>{x.classList.remove("sel");x.querySelector("input").classList.add("hidden");x.querySelector("input").value=""});$("addModal").classList.add("open")}
-document.querySelectorAll("[data-add]").forEach(b=>b.onclick=e=>{e.stopPropagation();openAdd(b.dataset.add)});$("scheduleCard").onclick=()=>openAdd("fixed");
+document.querySelectorAll("[data-add]").forEach(b=>b.onclick=e=>{e.stopPropagation();openAdd(b.dataset.add)});
+function openBalance(){
+  $("balanceModalMonth").textContent="SALDO REALE · "+label(realKey).toUpperCase();
+  $("balanceAmount").value=balanceConfigured()?Number(data.balance.amount):"";
+  $("clearBalanceBtn").style.display=balanceConfigured()?"block":"none";
+  $("balanceModal").classList.add("open");
+  setTimeout(()=>$("balanceAmount").focus(),120);
+}
+$("balanceCard").onclick=openBalance;
+$("saveBalanceBtn").onclick=()=>{
+  const amount=Number($("balanceAmount").value);
+  if(!Number.isFinite(amount))return alert("Inserisci un saldo valido.");
+  const d=new Date();
+  data.balance={amount,anchorMonth:realKey,updatedAt:d.toISOString(),updatedLabel:d.toLocaleDateString("it-IT")};
+  $("balanceModal").classList.remove("open");
+  save();
+};
+$("clearBalanceBtn").onclick=()=>{
+  if(!confirm("Vuoi rimuovere il saldo impostato? Entrate e uscite non verranno cancellate."))return;
+  data.balance=null;
+  $("balanceModal").classList.remove("open");
+  save();
+};
 
 function collectMonthAmounts(baseAmount){const out={};document.querySelectorAll(".mp.sel").forEach(mp=>{const m=Number(mp.dataset.m),v=Number(mp.querySelector("input").value||baseAmount);out[m]=v});return out}
 $("addBtn").onclick=()=>{const type=$("newType").value,name=$("newName").value.trim(),amount=Number($("newAmount").value),f=$("frequency").value,k=key();if(!name||amount<=0)return alert("Inserisci nome e importo.");ensure(k);if(f==="once"){data.months[k][type].push({id:"o-"+Date.now(),name,amount})}else{const id="r-"+Date.now()+"-"+Math.random().toString(16).slice(2);let schedule;if(f==="monthly")schedule={kind:"monthly"};if(f==="annual")schedule={kind:"annual",month:Number($("annualMonth").value)};if(f==="selectedYearly"){const amounts=collectMonthAmounts(amount);if(!Object.keys(amounts).length)return alert("Seleziona almeno un mese.");schedule={kind:"selectedYearly",amounts}}if(f==="selectedOneYear"){const amounts=collectMonthAmounts(amount);if(!Object.keys(amounts).length)return alert("Seleziona almeno un mese.");schedule={kind:"selectedOneYear",year:Number($("targetYear").value),amounts}}data.rules[id]={id,type,name,start:k,end:null,skip:[],schedule,amount};if(cmp(k,realKey)<=0&&ruleActive(data.rules[id],k)){const a=amountForRule(data.rules[id],k);data.months[k][type].push({id:"i-"+id+"-"+k,name,amount:a,ruleId:id})}}$("addModal").classList.remove("open");save()};
@@ -833,7 +919,7 @@ function getBackupFileName(){
 async function exportBackup(){
   const payload={
     app:"Spese Famiglia",
-    version:"v20",
+    version:"v21",
     exportedAt:new Date().toISOString(),
     data:JSON.parse(JSON.stringify(data))
   };
@@ -875,11 +961,17 @@ function restoreFromBackup(file){
       const incoming=parsed.data||parsed;
       if(!incoming || !incoming.months || !incoming.rules) throw new Error("Backup non valido");
       data=incoming;
+      if(!Object.prototype.hasOwnProperty.call(data,"balance"))data.balance=null;
       localStorage.setItem(KEY,JSON.stringify(data));
       dailyBackup();
       render();
       $("backupModal").classList.remove("open");
-      alert("Backup ripristinato correttamente.");
+      if(!balanceConfigured()){
+        alert("Backup ripristinato correttamente. Ora inserisci il saldo reale attuale del conto: da quel valore calcolerò automaticamente tutte le previsioni future.");
+        openBalance();
+      }else{
+        alert("Backup ripristinato correttamente, compreso il saldo conto.");
+      }
     }catch(e){
       alert("Non riesco a leggere questo backup.");
     }
