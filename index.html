@@ -370,6 +370,18 @@ input, select, button {
 .colItem .colMeta{padding:0!important;margin-top:4px!important;font-size:clamp(8px,2vw,10px)!important;line-height:1.2!important;overflow-wrap:normal!important}
 .colItem .colDots{grid-column:3!important;grid-row:1!important;align-self:start!important;position:static!important;margin:0!important;padding:0!important;font-size:14px!important}
 @media(max-width:370px){.colItem .colTop{grid-template-columns:18px minmax(0,1fr) 7px!important;column-gap:2px!important}.colItem .colDay{width:18px!important;font-size:9px!important}.colTotal{font-size:clamp(11px,3.3vw,14px)!important}}
+
+/* v27: two equal full-width categories; keep original palette */
+.cols,.expenseCard .cols{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px!important}
+.colHead{min-height:82px!important;display:flex!important;align-items:center!important;justify-content:center!important;flex-direction:column!important}
+.colTitle{font-size:clamp(13px,3.7vw,19px)!important;line-height:1.16!important;text-align:center!important}
+.colTotal{font-size:clamp(18px,5.1vw,26px)!important;font-weight:1000!important;text-align:center!important;white-space:nowrap!important;letter-spacing:-.03em!important}
+.colItem .colTop{grid-template-columns:clamp(24px,7vw,34px) minmax(0,1fr) 12px!important;gap:6px!important;align-items:center!important}
+.colItem .colDay{width:clamp(24px,7vw,34px)!important;min-height:32px!important;font-size:clamp(10px,3vw,14px)!important}
+.colItem .colName{font-size:clamp(12px,3.5vw,16px)!important;line-height:1.2!important;overflow-wrap:break-word!important}
+.colItem .colAmt{font-size:clamp(12px,3.5vw,16px)!important;margin-top:6px!important;white-space:nowrap!important}
+.colItem .colMeta{font-size:clamp(10px,2.7vw,13px)!important;line-height:1.2!important}
+@media(max-width:370px){.cols,.expenseCard .cols{gap:6px!important}.colItem .colTop{grid-template-columns:24px minmax(0,1fr) 9px!important;gap:4px!important}.colItem .colDay{width:24px!important}.colTotal{font-size:clamp(16px,4.8vw,22px)!important}}
 </style>
 </head>
 <body>
@@ -414,14 +426,8 @@ input, select, button {
         <div class="colScrollHint">Scorri ↑↓ per vedere tutte le voci</div><button class="colAdd" data-add="fixed">＋ Aggiungi voce</button>
       </div>
 
-      <div class="col policies" data-type="policies">
-        <div class="colHead"><div class="colTitle">🛡️ POLIZZE</div><div class="colTotal" id="policiesTotal">€ 0</div></div>
-        <div class="colList" id="policiesRows"></div>
-        <div class="colScrollHint">Scorri ↑↓ per vedere tutte le voci</div><button class="colAdd" data-add="policies">＋ Aggiungi voce</button>
-      </div>
-
       <div class="col needs" data-type="needs">
-        <div class="colHead"><div class="colTitle">🛒 FABBISOGNO</div><div class="colTotal" id="needsTotal">€ 0</div></div>
+        <div class="colHead"><div class="colTitle">🛒 USCITE CERTE</div><div class="colTotal" id="needsTotal">€ 0</div></div>
         <div class="colList" id="needsRows"></div>
         <div class="colScrollHint">Scorri ↑↓ per vedere tutte le voci</div><button class="colAdd" data-add="needs">＋ Aggiungi voce</button>
       </div>
@@ -458,7 +464,7 @@ input, select, button {
     <div class="badge" id="addMonth"></div>
     <div class="form">
       <div class="two">
-        <div><div class="label">Categoria</div><select id="newType"><option value="income">Entrata</option><option value="fixed">Uscita fissa</option><option value="policies">Polizza</option><option value="needs">Fabbisogno</option></select></div>
+        <div><div class="label">Categoria</div><select id="newType"><option value="income">Entrata</option><option value="fixed">Uscita fissa</option><option value="needs">Uscite certe</option></select></div>
         <div><div class="label">Importo base €</div><input id="newAmount" type="number" step="0.01" min="0" inputmode="decimal"></div>
       </div>
       <div><div class="label">Nome voce</div><input id="newName" placeholder="Es. Luce, assicurazione, stipendio"></div>
@@ -607,6 +613,21 @@ let data;try{data=JSON.parse(localStorage.getItem(KEY)||"null")}catch(e){}
 if(!data){data={months:{},rules:{},balance:null};seed();localStorage.setItem(KEY,JSON.stringify(data))}
 if(!data.months)data.months={};if(!data.rules)data.rules={};
 if(!Object.prototype.hasOwnProperty.call(data,"balance"))data.balance=null;
+function mergeOldPolicies(){
+  if(!data.months)data.months={};if(!data.rules)data.rules={};
+  for(const month of Object.values(data.months)){
+    if(!Array.isArray(month.fixed))month.fixed=[];
+    if(!Array.isArray(month.policies))month.policies=[];
+    if(month.policies.length){
+      const ids=new Set(month.fixed.map(x=>x.id));
+      for(const item of month.policies){if(!ids.has(item.id)){month.fixed.push(item);ids.add(item.id)}}
+      month.policies=[];
+    }
+  }
+  for(const rule of Object.values(data.rules))if(rule.type==="policies")rule.type="fixed";
+}
+mergeOldPolicies();
+
 
 const now=new Date();const realKey=now.getFullYear()+"-"+String(now.getMonth()+1).padStart(2,"0");
 let cy=Math.max(2026,now.getFullYear()),cm=(cy===now.getFullYear()?now.getMonth():0);
@@ -617,7 +638,7 @@ function split(k){const [y,m]=k.split("-").map(Number);return {y,m:m-1}}
 function cmp(a,b){return a.localeCompare(b)}
 function prev(k){const {y,m}=split(k),d=new Date(y,m-1,1);return key(d.getFullYear(),d.getMonth())}
 function blank(){return {income:[],fixed:[],policies:[],needs:[]}}
-function ensure(k){if(!data.months[k])data.months[k]=blank()}
+function ensure(k){if(!data.months[k])data.months[k]=blank();if(!data.months[k].fixed)data.months[k].fixed=[];if(!data.months[k].policies)data.months[k].policies=[];if(!data.months[k].needs)data.months[k].needs=[];if(!data.months[k].income)data.months[k].income=[]}
 function label(k=key()){const {y,m}=split(k);return ML[m]+" "+y}
 function future(k=key()){return cmp(k,realKey)>0}
 
@@ -711,12 +732,12 @@ function renderBalance(){
     sub.textContent="Stima retroattiva rispetto al saldo aggiornato · "+label(anchor);
   }
 }
-function render(){$("monthName").textContent=ML[cm];$("monthYear").textContent=cy;$("futureBanner").style.display=future()?"block":"none";$("incomeTotal").textContent=euro(sum("income"));renderIncome();$("fixedTotal").textContent=euro(sum("fixed"));renderCol("fixed","fixedRows");$("policiesTotal").textContent=euro(sum("policies"));renderCol("policies","policiesRows");$("needsTotal").textContent=euro(sum("needs"));renderCol("needs","needsRows");$("expenseTotal").textContent=euro(expenses());$("allExpenses").textContent=euro(expenses());$("savingTotal").textContent=euro(sum("income")-expenses());renderBalance()}
+function render(){$("monthName").textContent=ML[cm];$("monthYear").textContent=cy;$("futureBanner").style.display=future()?"block":"none";$("incomeTotal").textContent=euro(sum("income"));renderIncome();$("fixedTotal").textContent=euro(sum("fixed"));renderCol("fixed","fixedRows");$("needsTotal").textContent=euro(sum("needs"));renderCol("needs","needsRows");$("expenseTotal").textContent=euro(expenses());$("allExpenses").textContent=euro(expenses());$("savingTotal").textContent=euro(sum("income")-expenses());renderBalance()}
 $("prevMonth").onclick=()=>{const d=new Date(cy,cm-1,1);if(d.getFullYear()<2026)return;cy=d.getFullYear();cm=d.getMonth();render()};
 $("nextMonth").onclick=()=>{const d=new Date(cy,cm+1,1);if(d.getFullYear()>2100)return;cy=d.getFullYear();cm=d.getMonth();render()};
 
 function itemNode(type,item){const d=document.createElement("div");d.className="item";d.innerHTML='<div><div class="itemName"></div><div class="itemMeta"></div></div><div class="itemAmount"></div><div class="actions"><button class="edit">Modifica</button><button class="del">Elimina</button></div>';d.querySelector(".itemName").textContent=item.name;d.querySelector(".itemMeta").textContent=meta(item);d.querySelector(".itemAmount").textContent=euro(item.amount);d.querySelector(".edit").onclick=()=>openEdit(type,item);d.querySelector(".del").onclick=()=>openDelete(type,item);return d}
-function openDetail(which){lastDetail=which;const c=$("detailContent");c.innerHTML="";if(which==="income"){$("detailTitle").textContent="Entrate · "+label();$("detailTotal").textContent=euro(sum("income"));items("income").forEach(x=>c.appendChild(itemNode("income",x)));if(!items("income").length)c.innerHTML='<div class="itemMeta">Nessuna entrata</div>'}else{$("detailTitle").textContent="Uscite · "+label();$("detailTotal").textContent=euro(expenses());[["FISSE","fixed"],["POLIZZE","policies"],["FABBISOGNO","needs"]].forEach(([n,t])=>{const h=document.createElement("div");h.className="detailSection";h.textContent=n+" · "+euro(sum(t));c.appendChild(h);items(t).forEach(x=>c.appendChild(itemNode(t,x)))})}$("detailModal").classList.add("open")}
+function openDetail(which){lastDetail=which;const c=$("detailContent");c.innerHTML="";if(which==="income"){$("detailTitle").textContent="Entrate · "+label();$("detailTotal").textContent=euro(sum("income"));items("income").forEach(x=>c.appendChild(itemNode("income",x)));if(!items("income").length)c.innerHTML='<div class="itemMeta">Nessuna entrata</div>'}else{$("detailTitle").textContent="Uscite · "+label();$("detailTotal").textContent=euro(expenses());[["USCITE FISSE","fixed"],["USCITE CERTE","needs"]].forEach(([n,t])=>{const h=document.createElement("div");h.className="detailSection";h.textContent=n+" · "+euro(sum(t));c.appendChild(h);items(t).forEach(x=>c.appendChild(itemNode(t,x)))})}$("detailModal").classList.add("open")}
 $("incomeCard").onclick=e=>{if(e.target.closest("[data-add]")||e.target.closest(".incomeRow"))return;};document.querySelectorAll(".col").forEach(el=>el.onclick=e=>{if(e.target.closest(".colAdd")||e.target.closest(".colItem"))return;});
 
 function buildSelectors(){$("annualMonth").innerHTML=ML.map((x,i)=>'<option value="'+i+'">'+x+"</option>").join("");$("targetYear").innerHTML=Array.from({length:75},(_,i)=>2026+i).map(y=>'<option value="'+y+'">'+y+"</option>").join("");const g=$("monthPickerGrid");g.innerHTML="";ML.forEach((name,i)=>{const b=document.createElement("div");b.className="mp";b.dataset.m=i;b.innerHTML='<div>'+name.slice(0,3)+'</div><input class="hidden" type="number" min="0" step="0.01" placeholder="€">';b.onclick=e=>{if(e.target.tagName==="INPUT")return;b.classList.toggle("sel");b.querySelector("input").classList.toggle("hidden",!b.classList.contains("sel"))};g.appendChild(b)})}
@@ -835,7 +856,7 @@ function openEdit(type,item){
   pendingEdit={type,item};
   $("editTitle").textContent=item.name;
   $("editMonth").textContent="MESE: "+label().toUpperCase();
-  $("editCategory").textContent=type==="income"?"ENTRATA":type==="fixed"?"USCITA FISSA":type==="policies"?"POLIZZA":"FABBISOGNO";
+  $("editCategory").textContent=type==="income"?"ENTRATA":type==="fixed"?"USCITA FISSA":"USCITA CERTA";
   $("editName").value=item.name;
   $("editAmount").value=item.amount;$("editDay").value=dayOf(item)??"";$("editDayBox").style.display=type==="income"?"none":"";
   $("editTargetYear").value=cy;
@@ -992,6 +1013,7 @@ function restoreFromBackup(file){
       const incoming=parsed.data||parsed;
       if(!incoming || !incoming.months || !incoming.rules) throw new Error("Backup non valido");
       data=incoming;
+      mergeOldPolicies();
       if(!Object.prototype.hasOwnProperty.call(data,"balance"))data.balance=null;
       localStorage.setItem(KEY,JSON.stringify(data));
       dailyBackup();
