@@ -357,6 +357,19 @@ input, select, button {
 .colTitle{overflow-wrap:break-word}
 @media(max-width:370px){.colList{padding:6px 4px}.colTop{grid-template-columns:18px minmax(0,1fr) 7px;gap:2px}.colDay{width:18px;font-size:8px}.colName,.colAmt{font-size:9px}.colMeta{font-size:7.5px}.colHead{padding:7px 5px}.colTotal{font-size:11px}}
 
+
+/* v26: alignment matching reference, overrides legacy mobile rules */
+.colHead{display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:flex-start!important;text-align:center!important;min-width:0!important}
+.colTitle{text-align:center!important;width:100%!important}
+.colTotal{display:block!important;width:100%!important;text-align:center!important;font-weight:1000!important;font-size:clamp(12px,3.55vw,19px)!important;letter-spacing:-.04em!important;line-height:1.12!important;white-space:nowrap!important;overflow:visible!important;text-overflow:clip!important;font-variant-numeric:tabular-nums!important}
+.colItem .colTop{display:grid!important;grid-template-columns:20px minmax(0,1fr) 9px!important;column-gap:4px!important;align-items:center!important;position:static!important;min-width:0!important}
+.colItem .colDay{grid-column:1!important;grid-row:1!important;align-self:center!important;width:20px!important;min-height:24px!important;margin:0!important;position:static!important;padding:0!important;text-align:center!important;font-size:10px!important}
+.colItem .colBody{grid-column:2!important;grid-row:1!important;min-width:0!important;width:100%!important;overflow-wrap:normal!important;overflow:visible!important}
+.colItem .colName{padding:0!important;margin:0!important;font-size:clamp(9px,2.5vw,12px)!important;line-height:1.17!important;overflow-wrap:break-word!important;word-break:normal!important;hyphens:none!important}
+.colItem .colAmt{padding:0!important;margin-top:5px!important;font-size:clamp(9px,2.5vw,12px)!important;line-height:1.15!important;white-space:normal!important;overflow-wrap:normal!important}
+.colItem .colMeta{padding:0!important;margin-top:4px!important;font-size:clamp(8px,2vw,10px)!important;line-height:1.2!important;overflow-wrap:normal!important}
+.colItem .colDots{grid-column:3!important;grid-row:1!important;align-self:start!important;position:static!important;margin:0!important;padding:0!important;font-size:14px!important}
+@media(max-width:370px){.colItem .colTop{grid-template-columns:18px minmax(0,1fr) 7px!important;column-gap:2px!important}.colItem .colDay{width:18px!important;font-size:9px!important}.colTotal{font-size:clamp(11px,3.3vw,14px)!important}}
 </style>
 </head>
 <body>
@@ -816,7 +829,7 @@ $("clearBalanceBtn").onclick=()=>{
 };
 
 function collectMonthAmounts(baseAmount){const out={};document.querySelectorAll(".mp.sel").forEach(mp=>{const m=Number(mp.dataset.m),v=Number(mp.querySelector("input").value||baseAmount);out[m]=v});return out}
-$("addBtn").onclick=()=>{const type=$("newType").value,name=$("newName").value.trim(),amount=Number($("newAmount").value),f=$("frequency").value,k=key();if(!name||amount<=0)return alert("Inserisci nome e importo.");ensure(k);if(f==="once"){data.months[k][type].push({id:"o-"+Date.now(),name,amount,dueDay})}else{const id="r-"+Date.now()+"-"+Math.random().toString(16).slice(2);let schedule;if(f==="monthly")schedule={kind:"monthly"};if(f==="annual")schedule={kind:"annual",month:Number($("annualMonth").value)};if(f==="selectedYearly"){const amounts=collectMonthAmounts(amount);if(!Object.keys(amounts).length)return alert("Seleziona almeno un mese.");schedule={kind:"selectedYearly",amounts}}if(f==="selectedOneYear"){const amounts=collectMonthAmounts(amount);if(!Object.keys(amounts).length)return alert("Seleziona almeno un mese.");schedule={kind:"selectedOneYear",year:Number($("targetYear").value),amounts}}data.rules[id]={id,type,name,start:k,end:null,skip:[],schedule,amount,dueDay};if(cmp(k,realKey)<=0&&ruleActive(data.rules[id],k)){const a=amountForRule(data.rules[id],k);data.months[k][type].push({id:"i-"+id+"-"+k,name,amount:a,ruleId:id,dueDay})}}$("addModal").classList.remove("open");save()};
+$("addBtn").onclick=()=>{const type=$("newType").value,name=$("newName").value.trim(),amount=Number($("newAmount").value),f=$("frequency").value,k=key();let dueDay;try{dueDay=readDay("newDay")}catch(e){return alert(e.message)}if(!name||amount<=0)return alert("Inserisci nome e importo.");ensure(k);if(f==="once"){data.months[k][type].push({id:"o-"+Date.now(),name,amount,dueDay})}else{const id="r-"+Date.now()+"-"+Math.random().toString(16).slice(2);let schedule;if(f==="monthly")schedule={kind:"monthly"};if(f==="annual")schedule={kind:"annual",month:Number($("annualMonth").value)};if(f==="selectedYearly"){const amounts=collectMonthAmounts(amount);if(!Object.keys(amounts).length)return alert("Seleziona almeno un mese.");schedule={kind:"selectedYearly",amounts}}if(f==="selectedOneYear"){const amounts=collectMonthAmounts(amount);if(!Object.keys(amounts).length)return alert("Seleziona almeno un mese.");schedule={kind:"selectedOneYear",year:Number($("targetYear").value),amounts}}data.rules[id]={id,type,name,start:k,end:null,skip:[],schedule,amount,dueDay};if(cmp(k,realKey)<=0&&ruleActive(data.rules[id],k)){const a=amountForRule(data.rules[id],k);data.months[k][type].push({id:"i-"+id+"-"+k,name,amount:a,ruleId:id,dueDay})}}$("addModal").classList.remove("open");save()};
 
 function openEdit(type,item){
   pendingEdit={type,item};
