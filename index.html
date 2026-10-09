@@ -9,7 +9,7 @@
 <meta name="apple-mobile-web-app-title" content="Spese Famiglia">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-192.png">
-<title>Spese Famiglia v24</title>
+<title>Spese Famiglia v22</title>
 <style>
 :root{
   --ink:#10243f;--muted:#718096;--line:#dfe7ef;
@@ -64,8 +64,6 @@ button{touch-action:manipulation}
 .colList{padding:6px 7px;flex:1;height:300px;max-height:300px;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;scrollbar-width:thin}
 .colItem{padding:7px 0;border-bottom:1px solid #e7edf3;cursor:pointer}
 .colItem:last-child{border-bottom:0}
-.dueDay{display:inline-flex;align-items:center;justify-content:center;min-width:19px;padding:3px 2px;margin-right:3px;border-radius:5px;background:#e8eef8;color:#173456;font-size:9px;font-weight:1000;flex-shrink:0}
-.colName{display:flex;align-items:flex-start}
 .colTop{display:grid;grid-template-columns:minmax(0,1fr) auto 10px;gap:4px;align-items:start}
 .colName{font-size:10.5px;font-weight:950;line-height:1.15;overflow:visible;overflow-wrap:anywhere}
 .colAmt{font-size:10px;font-weight:1000;white-space:nowrap}
@@ -343,24 +341,22 @@ input, select, button {
   border-radius: 8px;
 }
 
-/* v24: allineamento delle scadenze e testo leggibile, senza cambiare la struttura */
-@media(max-width:600px){
- .colHead{padding:8px 4px!important;min-height:80px!important}
- .colTitle{font-size:clamp(9px,2.7vw,12px)!important;gap:2px!important}
- .colTotal{font-size:clamp(12px,3.7vw,19px)!important;overflow:visible!important;letter-spacing:-.4px!important}
- .colList{padding:5px 4px!important}
- .colItem{padding:9px 1px!important}
- .colTop{display:grid!important;grid-template-columns:minmax(0,1fr) 10px!important;column-gap:2px!important;align-items:start!important}
- .colTop.hasDueDay{grid-template-columns:20px minmax(0,1fr) 10px!important}
- .colItem.hasDueDay .colTop{grid-template-columns:20px minmax(0,1fr) 10px!important}
- .colName{grid-column:1!important;grid-row:1!important;min-width:0!important;padding-right:0!important;font-size:clamp(10px,2.75vw,12px)!important;overflow-wrap:break-word!important;word-break:normal!important}
- .colItem.hasDueDay .colName{grid-column:2!important}
- .dueDay{grid-column:1!important;grid-row:1!important;min-width:0!important;width:19px!important;margin:0!important;padding:4px 1px!important;font-size:9px!important}
- .colDots{grid-column:2!important;grid-row:1!important;position:static!important;justify-self:end!important;font-size:14px!important}
- .colItem.hasDueDay .colDots{grid-column:3!important}
- .colAmt{grid-column:1/-1!important;grid-row:2!important;margin-top:5px!important;font-size:clamp(11px,3vw,13px)!important;white-space:nowrap!important}
- .colMeta{font-size:9px!important}
-}
+
+/* Scadenze: conserva palette e colonne originali */
+.colTop{display:grid;grid-template-columns:20px minmax(0,1fr) 9px;gap:3px;align-items:start}
+.colDay{width:20px;min-height:23px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:1000;line-height:1;flex-shrink:0}
+.fixed .colDay{background:#dcecff;color:#155da5}
+.policies .colDay{background:#e9ddff;color:#6644a6}
+.needs .colDay{background:#ffe5d2;color:#bd501c}
+.colBody{min-width:0;overflow:hidden}
+.colName{font-size:10px;line-height:1.17;font-weight:950;overflow-wrap:break-word;word-break:normal;hyphens:none}
+.colAmt{display:block;font-size:10px;font-weight:1000;white-space:normal;overflow-wrap:normal;margin-top:4px}
+.colMeta{font-size:8px;line-height:1.18;margin-top:3px;overflow-wrap:break-word}
+.colDots{font-size:13px;line-height:1.1;text-align:center}
+.colTotal{font-size:clamp(11px,3.2vw,16px);letter-spacing:-.035em;overflow:visible}
+.colTitle{overflow-wrap:break-word}
+@media(max-width:370px){.colList{padding:6px 4px}.colTop{grid-template-columns:18px minmax(0,1fr) 7px;gap:2px}.colDay{width:18px;font-size:8px}.colName,.colAmt{font-size:9px}.colMeta{font-size:7.5px}.colHead{padding:7px 5px}.colTotal{font-size:11px}}
+
 </style>
 </head>
 <body>
@@ -453,7 +449,7 @@ input, select, button {
         <div><div class="label">Importo base €</div><input id="newAmount" type="number" step="0.01" min="0" inputmode="decimal"></div>
       </div>
       <div><div class="label">Nome voce</div><input id="newName" placeholder="Es. Luce, assicurazione, stipendio"></div>
-      <div><div class="label">Giorno di scadenza (1-31)</div><input id="newDueDay" type="number" min="1" max="31" step="1" inputmode="numeric" placeholder="Es. 15"></div>
+      <div id="newDayBox"><div class="label">Giorno di scadenza (1-31, facoltativo)</div><input id="newDay" type="number" min="1" max="31" inputmode="numeric" placeholder="Es. 15"></div>
       <div><div class="label">Frequenza</div>
         <select id="frequency">
           <option value="once">Solo questo mese</option>
@@ -489,9 +485,9 @@ input, select, button {
         <div class="label">Importo €</div>
         <input id="editAmount" type="number" step="0.01" min="0">
       </div>
+      <div id="editDayBox"><div class="label">Giorno di scadenza (1-31, facoltativo)</div><input id="editDay" type="number" min="1" max="31" inputmode="numeric" placeholder="Es. 15">
+      </div>
 
-      <div>
-        <div class="label">Giorno di scadenza (1-31)</div><input id="editDueDay" type="number" min="1" max="31" step="1" inputmode="numeric" placeholder="Es. 15"></div>
       <div>
         <div class="label">Frequenza</div>
         <select id="editFrequency">
@@ -595,7 +591,7 @@ const ML=["Gennaio","Febbraio","Marzo","Aprile","Maggio","Giugno","Luglio","Agos
 const euro=n=>new Intl.NumberFormat("it-IT",{style:"currency",currency:"EUR",minimumFractionDigits:2}).format(Number(n||0));
 
 let data;try{data=JSON.parse(localStorage.getItem(KEY)||"null")}catch(e){}
-if(!data){data={months:{},rules:{},balance:null};localStorage.setItem(KEY,JSON.stringify(data))}
+if(!data){data={months:{},rules:{},balance:null};seed();localStorage.setItem(KEY,JSON.stringify(data))}
 if(!data.months)data.months={};if(!data.rules)data.rules={};
 if(!Object.prototype.hasOwnProperty.call(data,"balance"))data.balance=null;
 
@@ -622,7 +618,7 @@ function seed(){ensure(BASE);[
 
 function amountForRule(rule,k){const {y,m}=split(k),s=rule.schedule||{kind:"monthly"};if(s.kind==="monthly")return rule.amount;if(s.kind==="annual")return m===s.month?rule.amount:null;if(s.kind==="selectedYearly")return s.amounts&&s.amounts[m]!=null?Number(s.amounts[m]):null;if(s.kind==="selectedOneYear")return y===s.year&&s.amounts&&s.amounts[m]!=null?Number(s.amounts[m]):null;return null}
 function ruleActive(rule,k){if(cmp(k,rule.start)<0)return false;if(rule.end&&cmp(k,rule.end)>0)return false;if((rule.skip||[]).includes(k))return false;return amountForRule(rule,k)!=null}
-function materialize(k){if(cmp(k,BASE)<0)return;ensure(k);Object.values(data.rules).forEach(rule=>{if(!ruleActive(rule,k))return;const amt=amountForRule(rule,k),a=data.months[k][rule.type];if(!a.some(x=>x.ruleId===rule.id))a.push({id:"i-"+rule.id+"-"+k,name:rule.name,amount:amt,ruleId:rule.id,dueDay:rule.dueDay??null})})}
+function materialize(k){if(cmp(k,BASE)<0)return;ensure(k);Object.values(data.rules).forEach(rule=>{if(!ruleActive(rule,k))return;const amt=amountForRule(rule,k),a=data.months[k][rule.type];if(!a.some(x=>x.ruleId===rule.id))a.push({id:"i-"+rule.id+"-"+k,name:rule.name,amount:amt,ruleId:rule.id})})}
 function items(type,k=key()){ensure(k);if(cmp(k,BASE)>=0)materialize(k);return data.months[k][type]}
 function sum(type){return items(type).reduce((s,x)=>s+Number(x.amount||0),0)}
 function expenses(){return sum("fixed")+sum("policies")+sum("needs")}
@@ -672,31 +668,20 @@ function renderIncome(){
     el.appendChild(r)
   })
 }
-function dueDay(item){const rule=item.ruleId&&data.rules[item.ruleId];const d=Number(item.dueDay??rule?.dueDay);return Number.isInteger(d)&&d>=1&&d<=31?d:null}
-function readDueDay(id){const raw=$(id).value.trim();if(!raw)return null;const d=Number(raw);if(!Number.isInteger(d)||d<1||d>31)throw new Error("Inserisci un giorno di scadenza tra 1 e 31.");return d}
+function dayOf(item){const r=item.ruleId&&data.rules[item.ruleId];const v=item.dueDay??(r&&r.dueDay);return Number.isInteger(Number(v))&&Number(v)>=1&&Number(v)<=31?Number(v):null}
+function readDay(id){const v=$(id).value.trim();if(!v)return null;const n=Number(v);if(!Number.isInteger(n)||n<1||n>31)throw new Error("Inserisci un giorno da 1 a 31.");return n}
 function renderCol(type,id){
-  const el=$(id),a=items(type);
+  const el=$(id),a=items(type).slice().sort((x,y)=>(dayOf(x)??32)-(dayOf(y)??32));
   el.innerHTML="";
-  if(!a.length){
-    el.innerHTML='<div class="colItem"><div class="colTop"><div class="colName">—</div></div></div>';
-    return;
-  }
-  a.slice().sort((a,b)=>(dueDay(a)??32)-(dueDay(b)??32)).forEach(x=>{
-    const r=document.createElement("div");
-    r.className="colItem";
-    r.innerHTML=
-      '<div class="colTop">'+
-        '<div class="colName"></div>'+
-        '<div class="colAmt"></div>'+
-        '<div class="colDots">⋮</div>'+
-      '</div>'+
-      '<div class="colMeta"></div>';
+  if(!a.length){el.innerHTML='<div class="colItem"><div class="colTop"><div class="colName">—</div></div></div>';return}
+  a.forEach(x=>{
+    const r=document.createElement("div");r.className="colItem";
+    r.innerHTML='<div class="colTop"><div class="colDay"></div><div class="colBody"><div class="colName"></div><div class="colAmt"></div><div class="colMeta"></div></div><div class="colDots">⋮</div></div>';
+    r.querySelector(".colDay").textContent=dayOf(x)===null?"–":String(dayOf(x)).padStart(2,"0");
     r.querySelector(".colName").textContent=x.name;
-    const day=dueDay(x);if(day!==null){const badge=document.createElement("span");badge.className="dueDay";badge.textContent=String(day).padStart(2,"0");r.querySelector(".colTop").prepend(badge);r.classList.add("hasDueDay")}
     r.querySelector(".colAmt").textContent=euro(x.amount);
     r.querySelector(".colMeta").textContent=meta(x);
-    r.onclick=e=>{e.stopPropagation();openEdit(type,x)};
-    el.appendChild(r);
+    r.onclick=e=>{e.stopPropagation();openEdit(type,x)};el.appendChild(r);
   });
 }
 function renderBalance(){
@@ -804,7 +789,8 @@ $("editFrequency").onchange=updateEditFreq;
 
 function updateFreq(){const f=$("frequency").value;$("annualBox").classList.toggle("hidden",f!=="annual");$("selectedMonthsBox").classList.toggle("hidden",!(f==="selectedYearly"||f==="selectedOneYear"));$("yearBox").classList.toggle("hidden",f!=="selectedOneYear")}
 $("frequency").onchange=updateFreq;
-function openAdd(type){$("addMonth").textContent="STAI REGISTRANDO SU: "+label().toUpperCase();$("newType").value=type||"fixed";$("newName").value="";$("newAmount").value="";$("newDueDay").value="";$("frequency").value="once";$("targetYear").value=cy;updateFreq();document.querySelectorAll(".mp").forEach(x=>{x.classList.remove("sel");x.querySelector("input").classList.add("hidden");x.querySelector("input").value=""});$("addModal").classList.add("open")}
+$("newType").addEventListener("change",()=>{$("newDayBox").style.display=$("newType").value==="income"?"none":""});
+function openAdd(type){$("addMonth").textContent="STAI REGISTRANDO SU: "+label().toUpperCase();$("newType").value=type||"fixed";$("newName").value="";$("newAmount").value="";$("newDay").value="";$("newDayBox").style.display=type==="income"?"none":"";$("frequency").value="once";$("targetYear").value=cy;updateFreq();document.querySelectorAll(".mp").forEach(x=>{x.classList.remove("sel");x.querySelector("input").classList.add("hidden");x.querySelector("input").value=""});$("addModal").classList.add("open")}
 document.querySelectorAll("[data-add]").forEach(b=>b.onclick=e=>{e.stopPropagation();openAdd(b.dataset.add)});
 function openBalance(){
   $("balanceModalMonth").textContent="SALDO REALE · "+label(realKey).toUpperCase();
@@ -830,7 +816,7 @@ $("clearBalanceBtn").onclick=()=>{
 };
 
 function collectMonthAmounts(baseAmount){const out={};document.querySelectorAll(".mp.sel").forEach(mp=>{const m=Number(mp.dataset.m),v=Number(mp.querySelector("input").value||baseAmount);out[m]=v});return out}
-$("addBtn").onclick=()=>{const type=$("newType").value,name=$("newName").value.trim(),amount=Number($("newAmount").value),f=$("frequency").value,k=key();if(!name||amount<=0)return alert("Inserisci nome e importo.");let day;try{day=readDueDay("newDueDay")}catch(e){return alert(e.message)}ensure(k);if(f==="once"){data.months[k][type].push({id:"o-"+Date.now(),name,amount,dueDay:day})}else{const id="r-"+Date.now()+"-"+Math.random().toString(16).slice(2);let schedule;if(f==="monthly")schedule={kind:"monthly"};if(f==="annual")schedule={kind:"annual",month:Number($("annualMonth").value)};if(f==="selectedYearly"){const amounts=collectMonthAmounts(amount);if(!Object.keys(amounts).length)return alert("Seleziona almeno un mese.");schedule={kind:"selectedYearly",amounts}}if(f==="selectedOneYear"){const amounts=collectMonthAmounts(amount);if(!Object.keys(amounts).length)return alert("Seleziona almeno un mese.");schedule={kind:"selectedOneYear",year:Number($("targetYear").value),amounts}}data.rules[id]={id,type,name,start:k,end:null,skip:[],schedule,amount,dueDay:day};if(cmp(k,realKey)<=0&&ruleActive(data.rules[id],k)){const a=amountForRule(data.rules[id],k);data.months[k][type].push({id:"i-"+id+"-"+k,name,amount:a,ruleId:id,dueDay:day})}}$("addModal").classList.remove("open");save()};
+$("addBtn").onclick=()=>{const type=$("newType").value,name=$("newName").value.trim(),amount=Number($("newAmount").value),f=$("frequency").value,k=key();if(!name||amount<=0)return alert("Inserisci nome e importo.");ensure(k);if(f==="once"){data.months[k][type].push({id:"o-"+Date.now(),name,amount,dueDay})}else{const id="r-"+Date.now()+"-"+Math.random().toString(16).slice(2);let schedule;if(f==="monthly")schedule={kind:"monthly"};if(f==="annual")schedule={kind:"annual",month:Number($("annualMonth").value)};if(f==="selectedYearly"){const amounts=collectMonthAmounts(amount);if(!Object.keys(amounts).length)return alert("Seleziona almeno un mese.");schedule={kind:"selectedYearly",amounts}}if(f==="selectedOneYear"){const amounts=collectMonthAmounts(amount);if(!Object.keys(amounts).length)return alert("Seleziona almeno un mese.");schedule={kind:"selectedOneYear",year:Number($("targetYear").value),amounts}}data.rules[id]={id,type,name,start:k,end:null,skip:[],schedule,amount,dueDay};if(cmp(k,realKey)<=0&&ruleActive(data.rules[id],k)){const a=amountForRule(data.rules[id],k);data.months[k][type].push({id:"i-"+id+"-"+k,name,amount:a,ruleId:id,dueDay})}}$("addModal").classList.remove("open");save()};
 
 function openEdit(type,item){
   pendingEdit={type,item};
@@ -838,8 +824,7 @@ function openEdit(type,item){
   $("editMonth").textContent="MESE: "+label().toUpperCase();
   $("editCategory").textContent=type==="income"?"ENTRATA":type==="fixed"?"USCITA FISSA":type==="policies"?"POLIZZA":"FABBISOGNO";
   $("editName").value=item.name;
-  $("editAmount").value=item.amount;
-  $("editDueDay").value=dueDay(item)??"";
+  $("editAmount").value=item.amount;$("editDay").value=dayOf(item)??"";$("editDayBox").style.display=type==="income"?"none":"";
   $("editTargetYear").value=cy;
   fillEditFrequency(item);
   $("detailModal").classList.remove("open");
@@ -852,8 +837,8 @@ function applyEdit(mode){
   const k=key();
   const name=$("editName").value.trim();
   const amount=Number($("editAmount").value);
+  let dueDay;try{dueDay=readDay("editDay")}catch(e){return alert(e.message)}
   if(!name||amount<=0)return alert("Inserisci nome e importo.");
-  let day;try{day=readDueDay("editDueDay")}catch(e){return alert(e.message)}
 
   let newSchedule;
   try{ newSchedule=scheduleFromEdit(amount); }
@@ -874,11 +859,11 @@ function applyEdit(mode){
       }
     }
     if(newSchedule===null){
-      a[idx]={id:"edit-"+Date.now(),name,amount,dueDay:day};
+      a[idx]={id:"edit-"+Date.now(),name,amount,dueDay};
     }else{
       // Se l'utente sceglie una frequenza nel salvataggio mensile,
       // questa voce resta comunque soltanto un'eccezione del mese corrente.
-      a[idx]={id:"edit-"+Date.now(),name,amount,dueDay:day,frequencyLabel:$("editFrequency").value};
+      a[idx]={id:"edit-"+Date.now(),name,amount,dueDay,frequencyLabel:$("editFrequency").value};
     }
   }else{
     // DA QUESTO MESE IN POI: chiude la vecchia regola e crea la nuova frequenza.
@@ -896,13 +881,13 @@ function applyEdit(mode){
     if(newSchedule===null){
       // "Solo questo mese" scelto anche con pulsante permanente:
       // rimane solo nel mese corrente, nessuna ricorrenza futura.
-      data.months[k][type].push({id:"o-"+Date.now(),name,amount,dueDay:day});
+      data.months[k][type].push({id:"o-"+Date.now(),name,amount,dueDay});
     }else{
       const nid="r-edit-"+Date.now()+"-"+Math.random().toString(16).slice(2);
-      const nr={id:nid,type,name,amount,start:k,end:null,skip:[],schedule:newSchedule,dueDay:day};
+      const nr={id:nid,type,name,amount,dueDay,start:k,end:null,skip:[],schedule:newSchedule};
       data.rules[nid]=nr;
       if(cmp(k,realKey)<=0&&ruleActive(nr,k)){
-        data.months[k][type].push({id:"i-"+nid+"-"+k,name,amount:amountForRule(nr,k),ruleId:nid,dueDay:day});
+        data.months[k][type].push({id:"i-"+nid+"-"+k,name,amount:amountForRule(nr,k),ruleId:nid,dueDay});
       }
     }
   }
