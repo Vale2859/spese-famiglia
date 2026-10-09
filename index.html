@@ -577,7 +577,7 @@ const ML=["Gennaio","Febbraio","Marzo","Aprile","Maggio","Giugno","Luglio","Agos
 const euro=n=>new Intl.NumberFormat("it-IT",{style:"currency",currency:"EUR",minimumFractionDigits:2}).format(Number(n||0));
 
 let data;try{data=JSON.parse(localStorage.getItem(KEY)||"null")}catch(e){}
-if(!data){data={months:{},rules:{},balance:null};seed();localStorage.setItem(KEY,JSON.stringify(data))}
+if(!data){data={months:{},rules:{},balance:null};localStorage.setItem(KEY,JSON.stringify(data))}
 if(!data.months)data.months={};if(!data.rules)data.rules={};
 if(!Object.prototype.hasOwnProperty.call(data,"balance"))data.balance=null;
 
@@ -812,7 +812,7 @@ $("clearBalanceBtn").onclick=()=>{
 };
 
 function collectMonthAmounts(baseAmount){const out={};document.querySelectorAll(".mp.sel").forEach(mp=>{const m=Number(mp.dataset.m),v=Number(mp.querySelector("input").value||baseAmount);out[m]=v});return out}
-$("addBtn").onclick=()=>{const type=$("newType").value,name=$("newName").value.trim(),amount=Number($("newAmount").value),f=$("frequency").value,k=key();if(!name||amount<=0)return alert("Inserisci nome e importo.");ensure(k);if(f==="once"){data.months[k][type].push({id:"o-"+Date.now(),name,amount,dueDay:day})}else{const id="r-"+Date.now()+"-"+Math.random().toString(16).slice(2);let schedule;if(f==="monthly")schedule={kind:"monthly"};if(f==="annual")schedule={kind:"annual",month:Number($("annualMonth").value)};if(f==="selectedYearly"){const amounts=collectMonthAmounts(amount);if(!Object.keys(amounts).length)return alert("Seleziona almeno un mese.");schedule={kind:"selectedYearly",amounts}}if(f==="selectedOneYear"){const amounts=collectMonthAmounts(amount);if(!Object.keys(amounts).length)return alert("Seleziona almeno un mese.");schedule={kind:"selectedOneYear",year:Number($("targetYear").value),amounts}}data.rules[id]={id,type,name,start:k,end:null,skip:[],schedule,amount,dueDay:day};if(cmp(k,realKey)<=0&&ruleActive(data.rules[id],k)){const a=amountForRule(data.rules[id],k);data.months[k][type].push({id:"i-"+id+"-"+k,name,amount:a,ruleId:id,dueDay:day})}}$("addModal").classList.remove("open");save()};
+$("addBtn").onclick=()=>{const type=$("newType").value,name=$("newName").value.trim(),amount=Number($("newAmount").value),f=$("frequency").value,k=key();if(!name||amount<=0)return alert("Inserisci nome e importo.");let day;try{day=readDueDay("newDueDay")}catch(e){return alert(e.message)}ensure(k);if(f==="once"){data.months[k][type].push({id:"o-"+Date.now(),name,amount,dueDay:day})}else{const id="r-"+Date.now()+"-"+Math.random().toString(16).slice(2);let schedule;if(f==="monthly")schedule={kind:"monthly"};if(f==="annual")schedule={kind:"annual",month:Number($("annualMonth").value)};if(f==="selectedYearly"){const amounts=collectMonthAmounts(amount);if(!Object.keys(amounts).length)return alert("Seleziona almeno un mese.");schedule={kind:"selectedYearly",amounts}}if(f==="selectedOneYear"){const amounts=collectMonthAmounts(amount);if(!Object.keys(amounts).length)return alert("Seleziona almeno un mese.");schedule={kind:"selectedOneYear",year:Number($("targetYear").value),amounts}}data.rules[id]={id,type,name,start:k,end:null,skip:[],schedule,amount,dueDay:day};if(cmp(k,realKey)<=0&&ruleActive(data.rules[id],k)){const a=amountForRule(data.rules[id],k);data.months[k][type].push({id:"i-"+id+"-"+k,name,amount:a,ruleId:id,dueDay:day})}}$("addModal").classList.remove("open");save()};
 
 function openEdit(type,item){
   pendingEdit={type,item};
