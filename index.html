@@ -9,7 +9,7 @@
 <meta name="apple-mobile-web-app-title" content="Spese Famiglia">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-192.png">
-<title>Spese Famiglia v22</title>
+<title>Spese Famiglia v24</title>
 <style>
 :root{
   --ink:#10243f;--muted:#718096;--line:#dfe7ef;
@@ -343,6 +343,24 @@ input, select, button {
   border-radius: 8px;
 }
 
+/* v24: allineamento delle scadenze e testo leggibile, senza cambiare la struttura */
+@media(max-width:600px){
+ .colHead{padding:8px 4px!important;min-height:80px!important}
+ .colTitle{font-size:clamp(9px,2.7vw,12px)!important;gap:2px!important}
+ .colTotal{font-size:clamp(12px,3.7vw,19px)!important;overflow:visible!important;letter-spacing:-.4px!important}
+ .colList{padding:5px 4px!important}
+ .colItem{padding:9px 1px!important}
+ .colTop{display:grid!important;grid-template-columns:minmax(0,1fr) 10px!important;column-gap:2px!important;align-items:start!important}
+ .colTop.hasDueDay{grid-template-columns:20px minmax(0,1fr) 10px!important}
+ .colItem.hasDueDay .colTop{grid-template-columns:20px minmax(0,1fr) 10px!important}
+ .colName{grid-column:1!important;grid-row:1!important;min-width:0!important;padding-right:0!important;font-size:clamp(10px,2.75vw,12px)!important;overflow-wrap:break-word!important;word-break:normal!important}
+ .colItem.hasDueDay .colName{grid-column:2!important}
+ .dueDay{grid-column:1!important;grid-row:1!important;min-width:0!important;width:19px!important;margin:0!important;padding:4px 1px!important;font-size:9px!important}
+ .colDots{grid-column:2!important;grid-row:1!important;position:static!important;justify-self:end!important;font-size:14px!important}
+ .colItem.hasDueDay .colDots{grid-column:3!important}
+ .colAmt{grid-column:1/-1!important;grid-row:2!important;margin-top:5px!important;font-size:clamp(11px,3vw,13px)!important;white-space:nowrap!important}
+ .colMeta{font-size:9px!important}
+}
 </style>
 </head>
 <body>
@@ -674,7 +692,7 @@ function renderCol(type,id){
       '</div>'+
       '<div class="colMeta"></div>';
     r.querySelector(".colName").textContent=x.name;
-    const day=dueDay(x);if(day!==null){const badge=document.createElement("span");badge.className="dueDay";badge.textContent=String(day).padStart(2,"0");r.querySelector(".colName").prepend(badge)}
+    const day=dueDay(x);if(day!==null){const badge=document.createElement("span");badge.className="dueDay";badge.textContent=String(day).padStart(2,"0");r.querySelector(".colTop").prepend(badge);r.classList.add("hasDueDay")}
     r.querySelector(".colAmt").textContent=euro(x.amount);
     r.querySelector(".colMeta").textContent=meta(x);
     r.onclick=e=>{e.stopPropagation();openEdit(type,x)};
