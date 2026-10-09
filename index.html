@@ -64,6 +64,8 @@ button{touch-action:manipulation}
 .colList{padding:6px 7px;flex:1;height:300px;max-height:300px;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;scrollbar-width:thin}
 .colItem{padding:7px 0;border-bottom:1px solid #e7edf3;cursor:pointer}
 .colItem:last-child{border-bottom:0}
+.dueDay{display:inline-flex;align-items:center;justify-content:center;min-width:19px;padding:3px 2px;margin-right:3px;border-radius:5px;background:#e8eef8;color:#173456;font-size:9px;font-weight:1000;flex-shrink:0}
+.colName{display:flex;align-items:flex-start}
 .colTop{display:grid;grid-template-columns:minmax(0,1fr) auto 10px;gap:4px;align-items:start}
 .colName{font-size:10.5px;font-weight:950;line-height:1.15;overflow:visible;overflow-wrap:anywhere}
 .colAmt{font-size:10px;font-weight:1000;white-space:nowrap}
@@ -433,6 +435,7 @@ input, select, button {
         <div><div class="label">Importo base €</div><input id="newAmount" type="number" step="0.01" min="0" inputmode="decimal"></div>
       </div>
       <div><div class="label">Nome voce</div><input id="newName" placeholder="Es. Luce, assicurazione, stipendio"></div>
+      <div><div class="label">Giorno di scadenza (1-31)</div><input id="newDueDay" type="number" min="1" max="31" step="1" inputmode="numeric" placeholder="Es. 15"></div>
       <div><div class="label">Frequenza</div>
         <select id="frequency">
           <option value="once">Solo questo mese</option>
@@ -469,6 +472,8 @@ input, select, button {
         <input id="editAmount" type="number" step="0.01" min="0">
       </div>
 
+      <div>
+        <div class="label">Giorno di scadenza (1-31)</div><input id="editDueDay" type="number" min="1" max="31" step="1" inputmode="numeric" placeholder="Es. 15"></div>
       <div>
         <div class="label">Frequenza</div>
         <select id="editFrequency">
@@ -599,7 +604,7 @@ function seed(){ensure(BASE);[
 
 function amountForRule(rule,k){const {y,m}=split(k),s=rule.schedule||{kind:"monthly"};if(s.kind==="monthly")return rule.amount;if(s.kind==="annual")return m===s.month?rule.amount:null;if(s.kind==="selectedYearly")return s.amounts&&s.amounts[m]!=null?Number(s.amounts[m]):null;if(s.kind==="selectedOneYear")return y===s.year&&s.amounts&&s.amounts[m]!=null?Number(s.amounts[m]):null;return null}
 function ruleActive(rule,k){if(cmp(k,rule.start)<0)return false;if(rule.end&&cmp(k,rule.end)>0)return false;if((rule.skip||[]).includes(k))return false;return amountForRule(rule,k)!=null}
-function materialize(k){if(cmp(k,BASE)<0)return;ensure(k);Object.values(data.rules).forEach(rule=>{if(!ruleActive(rule,k))return;const amt=amountForRule(rule,k),a=data.months[k][rule.type];if(!a.some(x=>x.ruleId===rule.id))a.push({id:"i-"+rule.id+"-"+k,name:rule.name,amount:amt,ruleId:rule.id})})}
+function materialize(k){if(cmp(k,BASE)<0)return;ensure(k);Object.values(data.rules).forEach(rule=>{if(!ruleActive(rule,k))return;const amt=amountForRule(rule,k),a=data.months[k][rule.type];if(!a.some(x=>x.ruleId===rule.id))a.push({id:"i-"+rule.id+"-"+k,name:rule.name,amount:amt,ruleId:rule.id,dueDay:rule.dueDay??null})})}
 function items(type,k=key()){ensure(k);if(cmp(k,BASE)>=0)materialize(k);return data.months[k][type]}
 function sum(type){return items(type).reduce((s,x)=>s+Number(x.amount||0),0)}
 function expenses(){return sum("fixed")+sum("policies")+sum("needs")}
@@ -649,6 +654,8 @@ function renderIncome(){
     el.appendChild(r)
   })
 }
+function dueDay(item){const rule=item.ruleId&&data.rules[item.ruleId];const d=Number(item.dueDay??rule?.dueDay);return Number.isInteger(d)&&d>=1&&d<=31?d:null}
+function readDueDay(id){const raw=$(id).value.trim();if(!raw)return null;const d=Number(raw);if(!Number.isInteger(d)||d<1||d>31)throw new Error("Inserisci un giorno di scadenza tra 1 e 31.");return d}
 function renderCol(type,id){
   const el=$(id),a=items(type);
   el.innerHTML="";
@@ -656,7 +663,7 @@ function renderCol(type,id){
     el.innerHTML='<div class="colItem"><div class="colTop"><div class="colName">—</div></div></div>';
     return;
   }
-  a.forEach(x=>{
+  a.slice().sort((a,b)=>(dueDay(a)??32)-(dueDay(b)??32)).forEach(x=>{
     const r=document.createElement("div");
     r.className="colItem";
     r.innerHTML=
@@ -667,6 +674,7 @@ function renderCol(type,id){
       '</div>'+
       '<div class="colMeta"></div>';
     r.querySelector(".colName").textContent=x.name;
+    const day=dueDay(x);if(day!==null){const badge=document.createElement("span");badge.className="dueDay";badge.textContent=String(day).padStart(2,"0");r.querySelector(".colName").prepend(badge)}
     r.querySelector(".colAmt").textContent=euro(x.amount);
     r.querySelector(".colMeta").textContent=meta(x);
     r.onclick=e=>{e.stopPropagation();openEdit(type,x)};
@@ -778,7 +786,7 @@ $("editFrequency").onchange=updateEditFreq;
 
 function updateFreq(){const f=$("frequency").value;$("annualBox").classList.toggle("hidden",f!=="annual");$("selectedMonthsBox").classList.toggle("hidden",!(f==="selectedYearly"||f==="selectedOneYear"));$("yearBox").classList.toggle("hidden",f!=="selectedOneYear")}
 $("frequency").onchange=updateFreq;
-function openAdd(type){$("addMonth").textContent="STAI REGISTRANDO SU: "+label().toUpperCase();$("newType").value=type||"fixed";$("newName").value="";$("newAmount").value="";$("frequency").value="once";$("targetYear").value=cy;updateFreq();document.querySelectorAll(".mp").forEach(x=>{x.classList.remove("sel");x.querySelector("input").classList.add("hidden");x.querySelector("input").value=""});$("addModal").classList.add("open")}
+function openAdd(type){$("addMonth").textContent="STAI REGISTRANDO SU: "+label().toUpperCase();$("newType").value=type||"fixed";$("newName").value="";$("newAmount").value="";$("newDueDay").value="";$("frequency").value="once";$("targetYear").value=cy;updateFreq();document.querySelectorAll(".mp").forEach(x=>{x.classList.remove("sel");x.querySelector("input").classList.add("hidden");x.querySelector("input").value=""});$("addModal").classList.add("open")}
 document.querySelectorAll("[data-add]").forEach(b=>b.onclick=e=>{e.stopPropagation();openAdd(b.dataset.add)});
 function openBalance(){
   $("balanceModalMonth").textContent="SALDO REALE · "+label(realKey).toUpperCase();
@@ -804,7 +812,7 @@ $("clearBalanceBtn").onclick=()=>{
 };
 
 function collectMonthAmounts(baseAmount){const out={};document.querySelectorAll(".mp.sel").forEach(mp=>{const m=Number(mp.dataset.m),v=Number(mp.querySelector("input").value||baseAmount);out[m]=v});return out}
-$("addBtn").onclick=()=>{const type=$("newType").value,name=$("newName").value.trim(),amount=Number($("newAmount").value),f=$("frequency").value,k=key();if(!name||amount<=0)return alert("Inserisci nome e importo.");ensure(k);if(f==="once"){data.months[k][type].push({id:"o-"+Date.now(),name,amount})}else{const id="r-"+Date.now()+"-"+Math.random().toString(16).slice(2);let schedule;if(f==="monthly")schedule={kind:"monthly"};if(f==="annual")schedule={kind:"annual",month:Number($("annualMonth").value)};if(f==="selectedYearly"){const amounts=collectMonthAmounts(amount);if(!Object.keys(amounts).length)return alert("Seleziona almeno un mese.");schedule={kind:"selectedYearly",amounts}}if(f==="selectedOneYear"){const amounts=collectMonthAmounts(amount);if(!Object.keys(amounts).length)return alert("Seleziona almeno un mese.");schedule={kind:"selectedOneYear",year:Number($("targetYear").value),amounts}}data.rules[id]={id,type,name,start:k,end:null,skip:[],schedule,amount};if(cmp(k,realKey)<=0&&ruleActive(data.rules[id],k)){const a=amountForRule(data.rules[id],k);data.months[k][type].push({id:"i-"+id+"-"+k,name,amount:a,ruleId:id})}}$("addModal").classList.remove("open");save()};
+$("addBtn").onclick=()=>{const type=$("newType").value,name=$("newName").value.trim(),amount=Number($("newAmount").value),f=$("frequency").value,k=key();if(!name||amount<=0)return alert("Inserisci nome e importo.");ensure(k);if(f==="once"){data.months[k][type].push({id:"o-"+Date.now(),name,amount,dueDay:day})}else{const id="r-"+Date.now()+"-"+Math.random().toString(16).slice(2);let schedule;if(f==="monthly")schedule={kind:"monthly"};if(f==="annual")schedule={kind:"annual",month:Number($("annualMonth").value)};if(f==="selectedYearly"){const amounts=collectMonthAmounts(amount);if(!Object.keys(amounts).length)return alert("Seleziona almeno un mese.");schedule={kind:"selectedYearly",amounts}}if(f==="selectedOneYear"){const amounts=collectMonthAmounts(amount);if(!Object.keys(amounts).length)return alert("Seleziona almeno un mese.");schedule={kind:"selectedOneYear",year:Number($("targetYear").value),amounts}}data.rules[id]={id,type,name,start:k,end:null,skip:[],schedule,amount,dueDay:day};if(cmp(k,realKey)<=0&&ruleActive(data.rules[id],k)){const a=amountForRule(data.rules[id],k);data.months[k][type].push({id:"i-"+id+"-"+k,name,amount:a,ruleId:id,dueDay:day})}}$("addModal").classList.remove("open");save()};
 
 function openEdit(type,item){
   pendingEdit={type,item};
@@ -813,6 +821,7 @@ function openEdit(type,item){
   $("editCategory").textContent=type==="income"?"ENTRATA":type==="fixed"?"USCITA FISSA":type==="policies"?"POLIZZA":"FABBISOGNO";
   $("editName").value=item.name;
   $("editAmount").value=item.amount;
+  $("editDueDay").value=dueDay(item)??"";
   $("editTargetYear").value=cy;
   fillEditFrequency(item);
   $("detailModal").classList.remove("open");
@@ -826,6 +835,7 @@ function applyEdit(mode){
   const name=$("editName").value.trim();
   const amount=Number($("editAmount").value);
   if(!name||amount<=0)return alert("Inserisci nome e importo.");
+  let day;try{day=readDueDay("editDueDay")}catch(e){return alert(e.message)}
 
   let newSchedule;
   try{ newSchedule=scheduleFromEdit(amount); }
@@ -846,11 +856,11 @@ function applyEdit(mode){
       }
     }
     if(newSchedule===null){
-      a[idx]={id:"edit-"+Date.now(),name,amount};
+      a[idx]={id:"edit-"+Date.now(),name,amount,dueDay:day};
     }else{
       // Se l'utente sceglie una frequenza nel salvataggio mensile,
       // questa voce resta comunque soltanto un'eccezione del mese corrente.
-      a[idx]={id:"edit-"+Date.now(),name,amount,frequencyLabel:$("editFrequency").value};
+      a[idx]={id:"edit-"+Date.now(),name,amount,dueDay:day,frequencyLabel:$("editFrequency").value};
     }
   }else{
     // DA QUESTO MESE IN POI: chiude la vecchia regola e crea la nuova frequenza.
@@ -868,13 +878,13 @@ function applyEdit(mode){
     if(newSchedule===null){
       // "Solo questo mese" scelto anche con pulsante permanente:
       // rimane solo nel mese corrente, nessuna ricorrenza futura.
-      data.months[k][type].push({id:"o-"+Date.now(),name,amount});
+      data.months[k][type].push({id:"o-"+Date.now(),name,amount,dueDay:day});
     }else{
       const nid="r-edit-"+Date.now()+"-"+Math.random().toString(16).slice(2);
-      const nr={id:nid,type,name,amount,start:k,end:null,skip:[],schedule:newSchedule};
+      const nr={id:nid,type,name,amount,start:k,end:null,skip:[],schedule:newSchedule,dueDay:day};
       data.rules[nid]=nr;
       if(cmp(k,realKey)<=0&&ruleActive(nr,k)){
-        data.months[k][type].push({id:"i-"+nid+"-"+k,name,amount:amountForRule(nr,k),ruleId:nid});
+        data.months[k][type].push({id:"i-"+nid+"-"+k,name,amount:amountForRule(nr,k),ruleId:nid,dueDay:day});
       }
     }
   }
