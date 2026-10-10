@@ -382,6 +382,20 @@ input, select, button {
 .colItem .colAmt{font-size:clamp(12px,3.5vw,16px)!important;margin-top:6px!important;white-space:nowrap!important}
 .colItem .colMeta{font-size:clamp(10px,2.7vw,13px)!important;line-height:1.2!important}
 @media(max-width:370px){.cols,.expenseCard .cols{gap:6px!important}.colItem .colTop{grid-template-columns:24px minmax(0,1fr) 9px!important;gap:4px!important}.colItem .colDay{width:24px!important}.colTotal{font-size:clamp(16px,4.8vw,22px)!important}}
+
+/* Entrate scorrevoli */
+.incomeSwipe{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;touch-action:pan-x pan-y;gap:0}
+.incomeSwipe::-webkit-scrollbar{display:none}
+.incomePanel{flex:0 0 100%;min-width:0;scroll-snap-align:start}
+.incomePanel .incomeList{margin-top:0}
+.incomeTabs{display:flex;justify-content:center;gap:9px;margin:7px 0;font-size:11px;font-weight:900;color:#18764c}
+.incomeTabs button{border:0;background:#d7f0e3;border-radius:14px;padding:5px 12px;color:#126c40;font-weight:900}
+.incomeTabs button.active{background:#15965a;color:white}
+.pendingRow{display:grid;grid-template-columns:1fr auto auto;align-items:center;gap:7px;padding:9px 2px;border-bottom:1px solid #e4eaf0}
+.pendingRow .name{font-weight:900}.pendingRow small{color:#718096}
+.pendingRow button{border:0;border-radius:8px;background:#d8f4e5;color:#087647;padding:7px;font-weight:900}
+.notifyLauncher{display:block;margin:7px 0 0 auto;border:0;background:#eaf1ff;border-radius:12px;padding:7px 10px;font-weight:900;color:#173554}
+.notifyOptions{display:grid;gap:12px;margin:12px 0}.notifyOptions label{display:flex;align-items:center;gap:8px;font-weight:800}.notifyOptions input[type=checkbox]{width:auto}
 </style>
 </head>
 <body>
@@ -408,7 +422,8 @@ input, select, button {
       <div><div class="blockLabel">ENTRATE</div><div class="blockMoney" id="incomeTotal">€ 0</div></div>
       <button class="roundAdd" data-add="income">+</button>
     </div>
-    <div class="incomeList" id="incomeRows"></div>
+    <div class="incomeTabs"><button id="receivedTab" class="active" type="button">Ricevute</button><button id="pendingTab" type="button">In attesa →</button></div>
+    <div class="incomeSwipe" id="incomeSwipe"><div class="incomePanel"><div class="incomeList" id="incomeRows"></div></div><div class="incomePanel"><div class="incomeList" id="pendingRows"></div><button class="soft" id="addPendingBtn" type="button" style="width:100%;padding:10px;margin-top:7px;border:0;border-radius:12px;font-weight:900">＋ Nuova entrata in attesa</button></div></div>
   </div>
 
   <div class="card expenseCard">
@@ -587,7 +602,7 @@ input, select, button {
 
     <div class="form">
       <button class="primary" id="exportBackupBtn">💾 Esporta backup adesso</button>
-      <button class="soft" id="restoreBackupBtn">📥 Ripristina da backup</button>
+      <button class="soft" id="restoreBackupBtn">📥 Ripristina da backup</button><button class="soft" id="openNotifyBtn" type="button">🔔 Notifiche</button>
       <input id="restoreFileInput" class="hidden" type="file" accept="application/json,.json">
     </div>
 
@@ -599,6 +614,8 @@ input, select, button {
   </div>
 </div>
 
+<div class="modal" id="pendingModal"><div class="sheet"><div class="sheetHead"><div class="sheetTitle">Entrata in attesa</div><button class="close" data-close="pendingModal">✕</button></div><div class="form"><label>Descrizione<input id="pendingName" placeholder="Es. Rimborso"></label><label>Importo (€)<input id="pendingAmount" type="number" min="0.01" step="0.01"></label><button class="primary" id="savePendingBtn">Salva in attesa</button></div></div></div>
+<div class="modal" id="notifyModal"><div class="sheet"><div class="sheetHead"><div class="sheetTitle">🔔 Notifiche</div><button class="close" data-close="notifyModal">✕</button></div><div class="notifyOptions"><label><input type="checkbox" id="notifyEnabled"> Attiva notifiche</label><label>Avvisa prima della scadenza <select id="notifyAdvance"><option value="0">Il giorno stesso</option><option value="1">1 giorno prima</option><option value="2">2 giorni prima</option><option value="3">3 giorni prima</option><option value="7">7 giorni prima</option></select></label><label><input type="checkbox" id="notifyDue"> Avvisa anche il giorno della scadenza</label><button class="primary" id="requestNotifyBtn">Richiedi autorizzazione iPhone</button><button class="soft" id="saveNotifyBtn" style="border:0;padding:12px;border-radius:12px;font-weight:900">Salva preferenze</button><div class="itemMeta" id="notifyStatus">Le notifiche locali vengono controllate quando l'app è aperta. Per riceverle con l'app chiusa serve configurare un servizio push remoto. Su iPhone aggiungi prima l'app alla schermata Home.</div></div></div></div>
 <script>
 (function(){
 "use strict";
@@ -611,7 +628,7 @@ const euro=n=>new Intl.NumberFormat("it-IT",{style:"currency",currency:"EUR",min
 
 let data;try{data=JSON.parse(localStorage.getItem(KEY)||"null")}catch(e){}
 if(!data){data={months:{},rules:{},balance:null};localStorage.setItem(KEY,JSON.stringify(data))}
-if(!data.months)data.months={};if(!data.rules)data.rules={};
+if(!data.months)data.months={};if(!data.rules)data.rules={};if(!Array.isArray(data.pendingIncome))data.pendingIncome=[];
 if(!Object.prototype.hasOwnProperty.call(data,"balance"))data.balance=null;
 function mergeOldPolicies(){
   if(!data.months)data.months={};if(!data.rules)data.rules={};
@@ -685,6 +702,11 @@ function save(){localStorage.setItem(KEY,JSON.stringify(data));dailyBackup();ren
 
 function meta(item){if(!item.ruleId)return"Solo questo mese";const r=data.rules[item.ruleId];if(!r)return"Ricorrente";const s=r.schedule||{kind:"monthly"};if(s.kind==="monthly")return"Ogni mese";if(s.kind==="annual")return"Ogni "+ML[s.month];if(s.kind==="selectedYearly")return"Mesi scelti ogni anno";if(s.kind==="selectedOneYear")return"Mesi scelti solo "+s.year;return"Ricorrente"}
 
+function renderPending(){
+ const el=$("pendingRows");if(!el)return;el.innerHTML="";
+ if(!data.pendingIncome.length){el.innerHTML='<div class="incomeRow"><div class="name">Nessuna entrata in attesa</div></div>';return}
+ data.pendingIncome.forEach(x=>{const row=document.createElement("div");row.className="pendingRow";const info=document.createElement("div");info.innerHTML='<div class="name"></div><small>Data da definire</small>';info.querySelector('.name').textContent=x.name;const amount=document.createElement('strong');amount.textContent=euro(x.amount);const btn=document.createElement('button');btn.textContent='✓ Ricevuto';btn.onclick=()=>{if(!confirm('Confermi che hai ricevuto '+euro(x.amount)+'? Verrà registrato in '+label()+'.'))return;ensure(key());data.months[key()].income.push({id:'p-'+Date.now(),name:x.name,amount:x.amount});data.pendingIncome=data.pendingIncome.filter(y=>y.id!==x.id);save()};const del=document.createElement('button');del.textContent='✕';del.title='Elimina';del.onclick=()=>{if(confirm('Eliminare questa entrata in attesa?')){data.pendingIncome=data.pendingIncome.filter(y=>y.id!==x.id);save()}};row.append(info,amount,btn,del);el.appendChild(row)})
+}
 function renderIncome(){
   const el=$("incomeRows"),a=items("income");el.innerHTML="";
   if(!a.length){
@@ -732,7 +754,7 @@ function renderBalance(){
     sub.textContent="Stima retroattiva rispetto al saldo aggiornato · "+label(anchor);
   }
 }
-function render(){$("monthName").textContent=ML[cm];$("monthYear").textContent=cy;$("futureBanner").style.display=future()?"block":"none";$("incomeTotal").textContent=euro(sum("income"));renderIncome();$("fixedTotal").textContent=euro(sum("fixed"));renderCol("fixed","fixedRows");$("needsTotal").textContent=euro(sum("needs"));renderCol("needs","needsRows");$("expenseTotal").textContent=euro(expenses());$("allExpenses").textContent=euro(expenses());$("savingTotal").textContent=euro(sum("income")-expenses());renderBalance()}
+function render(){renderPending();$("monthName").textContent=ML[cm];$("monthYear").textContent=cy;$("futureBanner").style.display=future()?"block":"none";$("incomeTotal").textContent=euro(sum("income"));renderIncome();$("fixedTotal").textContent=euro(sum("fixed"));renderCol("fixed","fixedRows");$("needsTotal").textContent=euro(sum("needs"));renderCol("needs","needsRows");$("expenseTotal").textContent=euro(expenses());$("allExpenses").textContent=euro(expenses());$("savingTotal").textContent=euro(sum("income")-expenses());renderBalance()}
 $("prevMonth").onclick=()=>{const d=new Date(cy,cm-1,1);if(d.getFullYear()<2026)return;cy=d.getFullYear();cm=d.getMonth();render()};
 $("nextMonth").onclick=()=>{const d=new Date(cy,cm+1,1);if(d.getFullYear()>2100)return;cy=d.getFullYear();cm=d.getMonth();render()};
 
@@ -1058,7 +1080,19 @@ if($("restoreFileInput")) $("restoreFileInput").onchange=e=>{
   e.target.value="";
 };
 
-dailyBackup();render();
+$("receivedTab").onclick=()=>$("incomeSwipe").scrollTo({left:0,behavior:"smooth"});
+$("pendingTab").onclick=()=>$("incomeSwipe").scrollTo({left:$("incomeSwipe").clientWidth,behavior:"smooth"});
+$("incomeSwipe").addEventListener("scroll",()=>{const second=$("incomeSwipe").scrollLeft>$("incomeSwipe").clientWidth/2;$("receivedTab").classList.toggle("active",!second);$("pendingTab").classList.toggle("active",second)},{passive:true});
+$("addPendingBtn").onclick=()=>{$("pendingName").value="";$("pendingAmount").value="";$("pendingModal").classList.add("open")};
+$("savePendingBtn").onclick=()=>{const name=$("pendingName").value.trim(),amount=Number($("pendingAmount").value);if(!name||!Number.isFinite(amount)||amount<=0)return alert("Inserisci nome e importo valido.");data.pendingIncome.push({id:"pending-"+Date.now(),name,amount});$("pendingModal").classList.remove("open");save()};
+const NOTIFY_KEY="speseFamiglia_notify_v29";
+function notifyPrefs(){try{return JSON.parse(localStorage.getItem(NOTIFY_KEY)||"null")||{enabled:false,advance:1,due:true}}catch(e){return {enabled:false,advance:1,due:true}}}
+$("openNotifyBtn").onclick=()=>{const p=notifyPrefs();$("notifyEnabled").checked=p.enabled;$("notifyAdvance").value=String(p.advance);$("notifyDue").checked=p.due;$("notifyModal").classList.add("open")};
+$("requestNotifyBtn").onclick=async()=>{if(!("Notification" in window))return alert("Notifiche non supportate in questo browser. Su iPhone installa la web app sulla schermata Home.");try{const permission=await Notification.requestPermission();$("notifyStatus").textContent="Autorizzazione: "+permission+". Le notifiche con app chiusa richiedono un servizio push remoto."}catch(e){alert("Autorizzazione non disponibile: aggiungi l'app alla schermata Home e riprova.")}};
+$("saveNotifyBtn").onclick=()=>{localStorage.setItem(NOTIFY_KEY,JSON.stringify({enabled:$("notifyEnabled").checked,advance:Number($("notifyAdvance").value),due:$("notifyDue").checked}));$("notifyModal").classList.remove("open");checkDueAlerts()};
+function checkDueAlerts(){const p=notifyPrefs();if(!p.enabled||!("Notification" in window)||Notification.permission!=="granted")return;const now=new Date(),today=new Date(now.getFullYear(),now.getMonth(),now.getDate());const k=key(today.getFullYear(),today.getMonth());let alerts=[];for(const type of ["fixed","needs"]){for(const x of items(type,k)){const d=dayOf(x);if(!d)continue;const due=new Date(today.getFullYear(),today.getMonth(),Math.min(d,new Date(today.getFullYear(),today.getMonth()+1,0).getDate()));const diff=Math.round((due-today)/86400000);if((p.advance>0&&diff===p.advance)||(p.due&&diff===0)||(p.advance===0&&diff===0))alerts.push(x)}}const stamp=today.toISOString().slice(0,10);for(const x of alerts){const token="spese-notified-"+stamp+"-"+x.id;if(localStorage.getItem(token))continue;try{new Notification("Scadenza: "+x.name,{body:euro(x.amount)+" · Controlla il pagamento"});localStorage.setItem(token,"1")}catch(e){}}}
+for(const id of ["pendingModal","notifyModal"]){$(id).querySelector("[data-close]").onclick=()=>$(id).classList.remove("open")}
+dailyBackup();render();checkDueAlerts();
 if("serviceWorker" in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}));
 })();
 </script>
