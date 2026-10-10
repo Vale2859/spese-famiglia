@@ -426,6 +426,11 @@ input, select, button {
 .pendingRow button:last-child{grid-column:2!important;justify-self:end!important}
 .expenseCard{padding-top:10px!important}
 @media(max-width:390px){.incomeSwipe,.incomePanel{height:144px!important;max-height:144px!important}}
+/* v33: totale in attesa solo nella seconda schermata, fuori dalla lista */
+.incomePendingTotal{display:none;justify-content:flex-end;align-items:center;gap:7px;margin:5px 2px 0;font-size:11px;font-weight:800;color:#c62828;text-align:right}
+.incomeCard.showPending .incomePendingTotal{display:flex}
+.incomeSwipe{overscroll-behavior-x:contain;touch-action:pan-y!important;scroll-behavior:smooth}
+.incomePanel{scroll-snap-stop:always}
 </style>
 </head>
 <body>
@@ -453,7 +458,7 @@ input, select, button {
       <button class="roundAdd" data-add="income">+</button>
     </div>
     <div class="incomeTabs"><button id="backIncomeTab" type="button" aria-label="Torna alle entrate" hidden>←</button><button id="pendingTab" type="button">In attesa →</button></div>
-    <div class="incomeSwipe" id="incomeSwipe"><div class="incomePanel"><div class="incomeList" id="incomeRows"></div></div><div class="incomePanel"><div class="incomeList" id="pendingRows"></div><button class="soft" id="addPendingBtn" type="button" style="width:100%;padding:10px;margin-top:7px;border:0;border-radius:12px;font-weight:900">＋ Nuova entrata in attesa</button></div></div>
+    <div class="incomeSwipe" id="incomeSwipe"><div class="incomePanel"><div class="incomeList" id="incomeRows"></div></div><div class="incomePanel"><div class="incomeList" id="pendingRows"></div><button class="soft" id="addPendingBtn" type="button" style="width:100%;padding:10px;margin-top:7px;border:0;border-radius:12px;font-weight:900">＋ Nuova entrata in attesa</button></div></div><div class="incomePendingTotal" id="incomePendingTotal">Da ricevere: <strong id="pendingSum">0,00 €</strong></div>
   </div>
 
   <div class="card expenseCard">
@@ -733,7 +738,7 @@ function save(){try{localStorage.setItem(KEY,JSON.stringify(data))}catch(e){aler
 function meta(item){if(!item.ruleId)return"Solo questo mese";const r=data.rules[item.ruleId];if(!r)return"Ricorrente";const s=r.schedule||{kind:"monthly"};if(s.kind==="monthly")return"Ogni mese";if(s.kind==="annual")return"Ogni "+ML[s.month];if(s.kind==="selectedYearly")return"Mesi scelti ogni anno";if(s.kind==="selectedOneYear")return"Mesi scelti solo "+s.year;return"Ricorrente"}
 
 function renderPending(){
- const el=$("pendingRows");if(!el)return;el.innerHTML="";
+ const el=$("pendingRows");if(!el)return;el.innerHTML="";const total=data.pendingIncome.reduce((sum,x)=>sum+(Number(x.amount)||0),0);if($("pendingSum"))$("pendingSum").textContent=euro(total);
  if(!data.pendingIncome.length){el.innerHTML='<div class="incomeRow"><div class="name">Nessuna entrata in attesa</div></div>';return}
  data.pendingIncome.forEach(x=>{const row=document.createElement("div");row.className="pendingRow";const info=document.createElement("div");info.innerHTML='<div class="name"></div><small>Data da definire</small>';info.querySelector('.name').textContent=x.name;const amount=document.createElement('strong');amount.textContent=euro(x.amount);const btn=document.createElement('button');btn.textContent='✓ Ricevuto';btn.onclick=()=>{if(!confirm('Confermi che hai ricevuto '+euro(x.amount)+'? Verrà registrato in '+label()+'.'))return;ensure(key());data.months[key()].income.push({id:'p-'+Date.now(),name:x.name,amount:x.amount});data.pendingIncome=data.pendingIncome.filter(y=>y.id!==x.id);save()};const del=document.createElement('button');del.textContent='✕';del.title='Elimina';del.onclick=()=>{if(confirm('Eliminare questa entrata in attesa?')){data.pendingIncome=data.pendingIncome.filter(y=>y.id!==x.id);save()}};row.append(info,amount,btn,del);el.appendChild(row)})
 }
@@ -1117,10 +1122,16 @@ if($("restoreFileInput")) $("restoreFileInput").onchange=e=>{
 
 
 function setIncomePanel(second){const el=$("incomeSwipe");el.scrollTo({left:second?el.clientWidth:0,behavior:"smooth"});updateIncomeTabs(second)}
-function updateIncomeTabs(second){$("backIncomeTab").hidden=!second;$("pendingTab").classList.toggle("active",second)}
+function updateIncomeTabs(second){$("backIncomeTab").hidden=!second;$("pendingTab").classList.toggle("active",second);$("incomeCard").classList.toggle("showPending",second)}
 $("pendingTab").onclick=()=>setIncomePanel(true);
 $("backIncomeTab").onclick=()=>setIncomePanel(false);
 $("incomeSwipe").addEventListener("scroll",()=>updateIncomeTabs($("incomeSwipe").scrollLeft>$("incomeSwipe").clientWidth/2),{passive:true});
+// Gestione swipe esplicita per iPhone: funziona anche sopra le righe scorrevoli.
+(()=>{const area=$("incomeSwipe");let startX=0,startY=0,tracking=false;
+area.addEventListener("touchstart",e=>{if(e.touches.length!==1)return;startX=e.touches[0].clientX;startY=e.touches[0].clientY;tracking=true},{passive:true});
+area.addEventListener("touchend",e=>{if(!tracking||!e.changedTouches.length)return;tracking=false;const dx=e.changedTouches[0].clientX-startX,dy=e.changedTouches[0].clientY-startY;if(Math.abs(dx)>35&&Math.abs(dx)>Math.abs(dy)*1.25)setIncomePanel(dx<0);},{passive:true});
+area.addEventListener("touchcancel",()=>{tracking=false},{passive:true});
+})();
 $("addPendingBtn").onclick=()=>{$("pendingName").value="";$("pendingAmount").value="";$("pendingModal").classList.add("open")};
 $("savePendingBtn").onclick=()=>{const name=$("pendingName").value.trim(),amount=Number($("pendingAmount").value);if(!name||!Number.isFinite(amount)||amount<=0)return alert("Inserisci nome e importo valido.");data.pendingIncome.push({id:"pending-"+Date.now(),name,amount});$("pendingModal").classList.remove("open");save()};
 const NOTIFY_KEY="speseFamiglia_notify_v29";
