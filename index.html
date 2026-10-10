@@ -396,6 +396,13 @@ input, select, button {
 .pendingRow button{border:0;border-radius:8px;background:#d8f4e5;color:#087647;padding:7px;font-weight:900}
 .notifyLauncher{display:block;margin:7px 0 0 auto;border:0;background:#eaf1ff;border-radius:12px;padding:7px 10px;font-weight:900;color:#173554}
 .notifyOptions{display:grid;gap:12px;margin:12px 0}.notifyOptions label{display:flex;align-items:center;gap:8px;font-weight:800}.notifyOptions input[type=checkbox]{width:auto}
+/* Header compatto: Backup e Notifiche affiancati anche su iPhone */
+.headerTools{margin-left:auto;display:flex;align-items:center;gap:2px;flex:0 0 auto}
+.headerTools .gear{font-size:17px;width:30px;height:32px;display:grid;place-items:center;padding:0;border-radius:9px;background:#f3f6fa}
+.header>div:nth-child(2){min-width:0;flex:1}
+.incomeTabs{justify-content:flex-end;margin:3px 0 7px}
+.incomeTabs button{font-size:10px;padding:5px 9px}
+@media(max-width:390px){.headerTools .gear{width:27px;font-size:16px}.headerTools{gap:1px}}
 </style>
 </head>
 <body>
@@ -406,7 +413,7 @@ input, select, button {
       <div class="headerTitle">Bilancio Mensile<span class="family">Famiglia</span></div>
       <div class="headerSub">Controlla oggi, vivi meglio domani</div>
     </div>
-    <button class="gear" id="backupBtn" aria-label="Backup">💾</button>
+    <div class="headerTools"><button class="gear" id="backupBtn" aria-label="Backup" title="Backup">💾</button><button class="gear" id="headerNotifyBtn" aria-label="Notifiche" title="Notifiche">🔔</button></div>
   </div>
 
   <div class="monthCard">
@@ -422,7 +429,7 @@ input, select, button {
       <div><div class="blockLabel">ENTRATE</div><div class="blockMoney" id="incomeTotal">€ 0</div></div>
       <button class="roundAdd" data-add="income">+</button>
     </div>
-    <div class="incomeTabs"><button id="receivedTab" class="active" type="button">Ricevute</button><button id="pendingTab" type="button">In attesa →</button></div>
+    <div class="incomeTabs"><button id="pendingTab" type="button">In attesa →</button></div>
     <div class="incomeSwipe" id="incomeSwipe"><div class="incomePanel"><div class="incomeList" id="incomeRows"></div></div><div class="incomePanel"><div class="incomeList" id="pendingRows"></div><button class="soft" id="addPendingBtn" type="button" style="width:100%;padding:10px;margin-top:7px;border:0;border-radius:12px;font-weight:900">＋ Nuova entrata in attesa</button></div></div>
   </div>
 
@@ -1080,13 +1087,14 @@ if($("restoreFileInput")) $("restoreFileInput").onchange=e=>{
   e.target.value="";
 };
 
-$("receivedTab").onclick=()=>$("incomeSwipe").scrollTo({left:0,behavior:"smooth"});
+
 $("pendingTab").onclick=()=>$("incomeSwipe").scrollTo({left:$("incomeSwipe").clientWidth,behavior:"smooth"});
-$("incomeSwipe").addEventListener("scroll",()=>{const second=$("incomeSwipe").scrollLeft>$("incomeSwipe").clientWidth/2;$("receivedTab").classList.toggle("active",!second);$("pendingTab").classList.toggle("active",second)},{passive:true});
+$("incomeSwipe").addEventListener("scroll",()=>{const second=$("incomeSwipe").scrollLeft>$("incomeSwipe").clientWidth/2;$("pendingTab").classList.toggle("active",second)},{passive:true});
 $("addPendingBtn").onclick=()=>{$("pendingName").value="";$("pendingAmount").value="";$("pendingModal").classList.add("open")};
 $("savePendingBtn").onclick=()=>{const name=$("pendingName").value.trim(),amount=Number($("pendingAmount").value);if(!name||!Number.isFinite(amount)||amount<=0)return alert("Inserisci nome e importo valido.");data.pendingIncome.push({id:"pending-"+Date.now(),name,amount});$("pendingModal").classList.remove("open");save()};
 const NOTIFY_KEY="speseFamiglia_notify_v29";
 function notifyPrefs(){try{return JSON.parse(localStorage.getItem(NOTIFY_KEY)||"null")||{enabled:false,advance:1,due:true}}catch(e){return {enabled:false,advance:1,due:true}}}
+$("headerNotifyBtn").onclick=()=>$("openNotifyBtn").click();
 $("openNotifyBtn").onclick=()=>{const p=notifyPrefs();$("notifyEnabled").checked=p.enabled;$("notifyAdvance").value=String(p.advance);$("notifyDue").checked=p.due;$("notifyModal").classList.add("open")};
 $("requestNotifyBtn").onclick=async()=>{if(!("Notification" in window))return alert("Notifiche non supportate in questo browser. Su iPhone installa la web app sulla schermata Home.");try{const permission=await Notification.requestPermission();$("notifyStatus").textContent="Autorizzazione: "+permission+". Le notifiche con app chiusa richiedono un servizio push remoto."}catch(e){alert("Autorizzazione non disponibile: aggiungi l'app alla schermata Home e riprova.")}};
 $("saveNotifyBtn").onclick=()=>{localStorage.setItem(NOTIFY_KEY,JSON.stringify({enabled:$("notifyEnabled").checked,advance:Number($("notifyAdvance").value),due:$("notifyDue").checked}));$("notifyModal").classList.remove("open");checkDueAlerts()};
