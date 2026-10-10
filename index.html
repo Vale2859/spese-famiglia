@@ -391,6 +391,9 @@ input, select, button {
 .incomeTabs{display:flex;justify-content:center;gap:9px;margin:7px 0;font-size:11px;font-weight:900;color:#18764c}
 .incomeTabs button{border:0;background:#d7f0e3;border-radius:14px;padding:5px 12px;color:#126c40;font-weight:900}
 .incomeTabs button.active{background:#15965a;color:white}
+.incomeTabs button[hidden]{display:none!important}
+.incomeTabs:has(#backIncomeTab:not([hidden])){justify-content:flex-start}
+.incomeTabs:has(#backIncomeTab:not([hidden])) #pendingTab{display:none}
 .pendingRow{display:grid;grid-template-columns:1fr auto auto;align-items:center;gap:7px;padding:9px 2px;border-bottom:1px solid #e4eaf0}
 .pendingRow .name{font-weight:900}.pendingRow small{color:#718096}
 .pendingRow button{border:0;border-radius:8px;background:#d8f4e5;color:#087647;padding:7px;font-weight:900}
@@ -429,7 +432,7 @@ input, select, button {
       <div><div class="blockLabel">ENTRATE</div><div class="blockMoney" id="incomeTotal">€ 0</div></div>
       <button class="roundAdd" data-add="income">+</button>
     </div>
-    <div class="incomeTabs"><button id="pendingTab" type="button">In attesa →</button></div>
+    <div class="incomeTabs"><button id="backIncomeTab" type="button" aria-label="Torna alle entrate" hidden>←</button><button id="pendingTab" type="button">In attesa →</button></div>
     <div class="incomeSwipe" id="incomeSwipe"><div class="incomePanel"><div class="incomeList" id="incomeRows"></div></div><div class="incomePanel"><div class="incomeList" id="pendingRows"></div><button class="soft" id="addPendingBtn" type="button" style="width:100%;padding:10px;margin-top:7px;border:0;border-radius:12px;font-weight:900">＋ Nuova entrata in attesa</button></div></div>
   </div>
 
@@ -610,7 +613,7 @@ input, select, button {
     <div class="form">
       <button class="primary" id="exportBackupBtn">💾 Esporta backup adesso</button>
       <button class="soft" id="restoreBackupBtn">📥 Ripristina da backup</button><button class="soft" id="openNotifyBtn" type="button">🔔 Notifiche</button>
-      <input id="restoreFileInput" class="hidden" type="file" accept="application/json,.json">
+      <input id="restoreFileInput" type="file" accept=".json,application/json,text/plain" style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none" aria-label="Seleziona backup JSON">
     </div>
 
     <div class="itemMeta" style="margin-top:12px;line-height:1.4">
@@ -705,7 +708,7 @@ function projectedBalance(k=key()){
   while(cmp(cur,k)>=0&&guard++<1200){total-=netForMonth(cur);cur=previousMonthKey(cur)}
   return total;
 }
-function save(){localStorage.setItem(KEY,JSON.stringify(data));dailyBackup();render()}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(data))}catch(e){alert("Salvataggio non riuscito: memoria del browser non disponibile o piena. Esporta un backup e libera spazio.");return}try{dailyBackup()}catch(e){console.warn("Backup automatico non disponibile",e)}render()}
 
 function meta(item){if(!item.ruleId)return"Solo questo mese";const r=data.rules[item.ruleId];if(!r)return"Ricorrente";const s=r.schedule||{kind:"monthly"};if(s.kind==="monthly")return"Ogni mese";if(s.kind==="annual")return"Ogni "+ML[s.month];if(s.kind==="selectedYearly")return"Mesi scelti ogni anno";if(s.kind==="selectedOneYear")return"Mesi scelti solo "+s.year;return"Ricorrente"}
 
@@ -1039,13 +1042,17 @@ function restoreFromBackup(file){
   reader.onload=()=>{
     try{
       const parsed=JSON.parse(reader.result);
-      const incoming=parsed.data||parsed;
-      if(!incoming || !incoming.months || !incoming.rules) throw new Error("Backup non valido");
-      data=incoming;
+      const incoming=parsed.data||parsed.backup?.data||parsed.backup||parsed;
+      if(!incoming || typeof incoming!=="object" || !incoming.months || typeof incoming.months!=="object") throw new Error("Il file non contiene un archivio Spese Famiglia valido");
+      const restored=JSON.parse(JSON.stringify(incoming));
+      if(!restored.rules || typeof restored.rules!=="object")restored.rules={};
+      if(!Array.isArray(restored.pendingIncome))restored.pendingIncome=[];
+      // Non sostituire i dati correnti fino a quando il backup non e' stato validato.
+      data=restored;
       mergeOldPolicies();
       if(!Object.prototype.hasOwnProperty.call(data,"balance"))data.balance=null;
       localStorage.setItem(KEY,JSON.stringify(data));
-      dailyBackup();
+      try{dailyBackup()}catch(e){console.warn("Backup automatico non disponibile",e)}
       render();
       $("backupModal").classList.remove("open");
       if(!balanceConfigured()){
@@ -1055,9 +1062,10 @@ function restoreFromBackup(file){
         alert("Backup ripristinato correttamente, compreso il saldo conto.");
       }
     }catch(e){
-      alert("Non riesco a leggere questo backup.");
+      alert("Impossibile importare il backup: "+(e.message||"file non valido"));
     }
   };
+  reader.onerror=()=>alert("Impossibile leggere il file selezionato.");
   reader.readAsText(file);
 }
 
@@ -1088,8 +1096,11 @@ if($("restoreFileInput")) $("restoreFileInput").onchange=e=>{
 };
 
 
-$("pendingTab").onclick=()=>$("incomeSwipe").scrollTo({left:$("incomeSwipe").clientWidth,behavior:"smooth"});
-$("incomeSwipe").addEventListener("scroll",()=>{const second=$("incomeSwipe").scrollLeft>$("incomeSwipe").clientWidth/2;$("pendingTab").classList.toggle("active",second)},{passive:true});
+function setIncomePanel(second){const el=$("incomeSwipe");el.scrollTo({left:second?el.clientWidth:0,behavior:"smooth"});updateIncomeTabs(second)}
+function updateIncomeTabs(second){$("backIncomeTab").hidden=!second;$("pendingTab").classList.toggle("active",second)}
+$("pendingTab").onclick=()=>setIncomePanel(true);
+$("backIncomeTab").onclick=()=>setIncomePanel(false);
+$("incomeSwipe").addEventListener("scroll",()=>updateIncomeTabs($("incomeSwipe").scrollLeft>$("incomeSwipe").clientWidth/2),{passive:true});
 $("addPendingBtn").onclick=()=>{$("pendingName").value="";$("pendingAmount").value="";$("pendingModal").classList.add("open")};
 $("savePendingBtn").onclick=()=>{const name=$("pendingName").value.trim(),amount=Number($("pendingAmount").value);if(!name||!Number.isFinite(amount)||amount<=0)return alert("Inserisci nome e importo valido.");data.pendingIncome.push({id:"pending-"+Date.now(),name,amount});$("pendingModal").classList.remove("open");save()};
 const NOTIFY_KEY="speseFamiglia_notify_v29";
@@ -1100,7 +1111,7 @@ $("requestNotifyBtn").onclick=async()=>{if(!("Notification" in window))return al
 $("saveNotifyBtn").onclick=()=>{localStorage.setItem(NOTIFY_KEY,JSON.stringify({enabled:$("notifyEnabled").checked,advance:Number($("notifyAdvance").value),due:$("notifyDue").checked}));$("notifyModal").classList.remove("open");checkDueAlerts()};
 function checkDueAlerts(){const p=notifyPrefs();if(!p.enabled||!("Notification" in window)||Notification.permission!=="granted")return;const now=new Date(),today=new Date(now.getFullYear(),now.getMonth(),now.getDate());const k=key(today.getFullYear(),today.getMonth());let alerts=[];for(const type of ["fixed","needs"]){for(const x of items(type,k)){const d=dayOf(x);if(!d)continue;const due=new Date(today.getFullYear(),today.getMonth(),Math.min(d,new Date(today.getFullYear(),today.getMonth()+1,0).getDate()));const diff=Math.round((due-today)/86400000);if((p.advance>0&&diff===p.advance)||(p.due&&diff===0)||(p.advance===0&&diff===0))alerts.push(x)}}const stamp=today.toISOString().slice(0,10);for(const x of alerts){const token="spese-notified-"+stamp+"-"+x.id;if(localStorage.getItem(token))continue;try{new Notification("Scadenza: "+x.name,{body:euro(x.amount)+" · Controlla il pagamento"});localStorage.setItem(token,"1")}catch(e){}}}
 for(const id of ["pendingModal","notifyModal"]){$(id).querySelector("[data-close]").onclick=()=>$(id).classList.remove("open")}
-dailyBackup();render();checkDueAlerts();
+try{dailyBackup()}catch(e){console.warn("Backup automatico non disponibile",e)}render();checkDueAlerts();
 if("serviceWorker" in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}));
 })();
 </script>
