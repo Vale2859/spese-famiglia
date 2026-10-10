@@ -610,7 +610,7 @@ const ML=["Gennaio","Febbraio","Marzo","Aprile","Maggio","Giugno","Luglio","Agos
 const euro=n=>new Intl.NumberFormat("it-IT",{style:"currency",currency:"EUR",minimumFractionDigits:2}).format(Number(n||0));
 
 let data;try{data=JSON.parse(localStorage.getItem(KEY)||"null")}catch(e){}
-if(!data){data={months:{},rules:{},balance:null};seed();localStorage.setItem(KEY,JSON.stringify(data))}
+if(!data){data={months:{},rules:{},balance:null};localStorage.setItem(KEY,JSON.stringify(data))}
 if(!data.months)data.months={};if(!data.rules)data.rules={};
 if(!Object.prototype.hasOwnProperty.call(data,"balance"))data.balance=null;
 function mergeOldPolicies(){
