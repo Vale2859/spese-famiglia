@@ -737,10 +737,41 @@ function save(){try{localStorage.setItem(KEY,JSON.stringify(data))}catch(e){aler
 
 function meta(item){if(!item.ruleId)return"Solo questo mese";const r=data.rules[item.ruleId];if(!r)return"Ricorrente";const s=r.schedule||{kind:"monthly"};if(s.kind==="monthly")return"Ogni mese";if(s.kind==="annual")return"Ogni "+ML[s.month];if(s.kind==="selectedYearly")return"Mesi scelti ogni anno";if(s.kind==="selectedOneYear")return"Mesi scelti solo "+s.year;return"Ricorrente"}
 
+function moveIncomeToPending(item){
+ const month=key();
+ if(!confirm('Spostare "'+item.name+'" ('+euro(item.amount)+') in attesa? Il saldo previsto di '+label(month)+' sarà aggiornato.'))return;
+ const arr=items('income',month),index=arr.findIndex(x=>x.id===item.id);
+ if(index<0)return;
+ const original=arr[index];
+ data.pendingIncome.push({id:'waiting-'+Date.now()+'-'+Math.random().toString(36).slice(2),name:original.name,amount:Number(original.amount),originMonth:month,originId:original.id,originRuleId:original.ruleId||null});
+ if(original.ruleId&&data.rules[original.ruleId]){
+  const rule=data.rules[original.ruleId];if(!Array.isArray(rule.skip))rule.skip=[];
+  if(!rule.skip.includes(month))rule.skip.push(month);
+ }
+ arr.splice(index,1);
+ save();
+}
 function renderPending(){
  const el=$("pendingRows");if(!el)return;el.innerHTML="";const total=data.pendingIncome.reduce((sum,x)=>sum+(Number(x.amount)||0),0);if($("pendingSum"))$("pendingSum").textContent=euro(total);
  if(!data.pendingIncome.length){el.innerHTML='<div class="incomeRow"><div class="name">Nessuna entrata in attesa</div></div>';return}
- data.pendingIncome.forEach(x=>{const row=document.createElement("div");row.className="pendingRow";const info=document.createElement("div");info.innerHTML='<div class="name"></div><small>Data da definire</small>';info.querySelector('.name').textContent=x.name;const amount=document.createElement('strong');amount.textContent=euro(x.amount);const btn=document.createElement('button');btn.textContent='✓ Ricevuto';btn.onclick=()=>{if(!confirm('Confermi che hai ricevuto '+euro(x.amount)+'? Verrà registrato in '+label()+'.'))return;ensure(key());data.months[key()].income.push({id:'p-'+Date.now(),name:x.name,amount:x.amount});data.pendingIncome=data.pendingIncome.filter(y=>y.id!==x.id);save()};const del=document.createElement('button');del.textContent='✕';del.title='Elimina';del.onclick=()=>{if(confirm('Eliminare questa entrata in attesa?')){data.pendingIncome=data.pendingIncome.filter(y=>y.id!==x.id);save()}};row.append(info,amount,btn,del);el.appendChild(row)})
+ data.pendingIncome.forEach(x=>{
+  const row=document.createElement('div');row.className='pendingRow';
+  const info=document.createElement('div');info.innerHTML='<div class="name"></div><small></small>';
+  info.querySelector('.name').textContent=x.name;
+  info.querySelector('small').textContent=x.originMonth?'Prevista: '+label(x.originMonth):'Data da definire';
+  const amount=document.createElement('strong');amount.textContent=euro(x.amount);
+  const btn=document.createElement('button');btn.textContent='✓ Ricevuto';
+  btn.onclick=()=>{
+   const receiptMonth=key();
+   if(!confirm('Confermi di aver ricevuto '+euro(x.amount)+'? Verrà registrato in '+label(receiptMonth)+'.'))return;
+   ensure(receiptMonth);
+   data.months[receiptMonth].income.push({id:'p-'+Date.now()+'-'+Math.random().toString(36).slice(2),name:x.name,amount:Number(x.amount),receivedFromPending:true,originMonth:x.originMonth||null});
+   data.pendingIncome=data.pendingIncome.filter(y=>y.id!==x.id);save();
+  };
+  const del=document.createElement('button');del.textContent='✕';del.title='Elimina';
+  del.onclick=()=>{if(confirm('Eliminare definitivamente questa entrata in attesa?')){data.pendingIncome=data.pendingIncome.filter(y=>y.id!==x.id);save()}};
+  row.append(info,amount,btn,del);el.appendChild(row);
+ });
 }
 function renderIncome(){
   const el=$("incomeRows"),a=items("income");el.innerHTML="";
@@ -756,6 +787,9 @@ function renderIncome(){
     r.querySelector(".meta").textContent=meta(x);
     r.querySelector(".amt").textContent=euro(x.amount);
     r.onclick=e=>{e.stopPropagation();openEdit("income",x)};
+    const dots=r.querySelector('.dots');dots.style.cursor='pointer';dots.setAttribute('role','button');dots.setAttribute('aria-label','Opzioni entrata');dots.tabIndex=0;
+    const showActions=e=>{e.stopPropagation();const choice=prompt('Opzioni per '+x.name+'\n1 - Sposta in attesa\n2 - Modifica', '1');if(choice==='1')moveIncomeToPending(x);else if(choice==='2')openEdit('income',x)};
+    dots.onclick=showActions;dots.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();showActions(e)}};
     el.appendChild(r)
   })
 }
@@ -793,7 +827,8 @@ function render(){renderPending();$("monthName").textContent=ML[cm];$("monthYear
 $("prevMonth").onclick=()=>{const d=new Date(cy,cm-1,1);if(d.getFullYear()<2026)return;cy=d.getFullYear();cm=d.getMonth();render()};
 $("nextMonth").onclick=()=>{const d=new Date(cy,cm+1,1);if(d.getFullYear()>2100)return;cy=d.getFullYear();cm=d.getMonth();render()};
 
-function itemNode(type,item){const d=document.createElement("div");d.className="item";d.innerHTML='<div><div class="itemName"></div><div class="itemMeta"></div></div><div class="itemAmount"></div><div class="actions"><button class="edit">Modifica</button><button class="del">Elimina</button></div>';d.querySelector(".itemName").textContent=item.name;d.querySelector(".itemMeta").textContent=meta(item);d.querySelector(".itemAmount").textContent=euro(item.amount);d.querySelector(".edit").onclick=()=>openEdit(type,item);d.querySelector(".del").onclick=()=>openDelete(type,item);return d}
+function itemNode(type,item){const d=document.createElement("div");d.className="item";d.innerHTML='<div><div class="itemName"></div><div class="itemMeta"></div></div><div class="itemAmount"></div><div class="actions"><button class="edit">Modifica</button><button class="del">Elimina</button></div>';d.querySelector(".itemName").textContent=item.name;d.querySelector(".itemMeta").textContent=meta(item);d.querySelector(".itemAmount").textContent=euro(item.amount);d.querySelector(".edit").onclick=()=>openEdit(type,item);
+if(type==='income'){const pending=document.createElement('button');pending.textContent='In attesa';pending.onclick=()=>{moveIncomeToPending(item);openDetail('income')};d.querySelector('.actions').prepend(pending)}d.querySelector(".del").onclick=()=>openDelete(type,item);return d}
 function openDetail(which){lastDetail=which;const c=$("detailContent");c.innerHTML="";if(which==="income"){$("detailTitle").textContent="Entrate · "+label();$("detailTotal").textContent=euro(sum("income"));items("income").forEach(x=>c.appendChild(itemNode("income",x)));if(!items("income").length)c.innerHTML='<div class="itemMeta">Nessuna entrata</div>'}else{$("detailTitle").textContent="Uscite · "+label();$("detailTotal").textContent=euro(expenses());[["USCITE FISSE","fixed"],["FABBISOGNO","needs"]].forEach(([n,t])=>{const h=document.createElement("div");h.className="detailSection";h.textContent=n+" · "+euro(sum(t));c.appendChild(h);items(t).forEach(x=>c.appendChild(itemNode(t,x)))})}$("detailModal").classList.add("open")}
 $("incomeCard").onclick=e=>{if(e.target.closest("[data-add]")||e.target.closest(".incomeRow"))return;};document.querySelectorAll(".col").forEach(el=>el.onclick=e=>{if(e.target.closest(".colAdd")||e.target.closest(".colItem"))return;});
 
