@@ -586,6 +586,7 @@ input, select, button {
       <div class="choice">
         <button class="soft" id="editOnly">🗓️ Salva solo questo mese</button>
         <button class="primary" id="editForever">♾️ Salva da questo mese in poi</button>
+        <button class="soft" id="editMovePending" type="button" style="background:#fff0d9;color:#865400;font-weight:900">🕒 Sposta in attesa</button>
         <button class="danger" id="editDelete">🗑️ Elimina questa voce</button>
       </div>
     </div>
@@ -739,9 +740,9 @@ function meta(item){if(!item.ruleId)return"Solo questo mese";const r=data.rules[
 
 function moveIncomeToPending(item){
  const month=key();
- if(!confirm('Spostare "'+item.name+'" ('+euro(item.amount)+') in attesa? Il saldo previsto di '+label(month)+' sarà aggiornato.'))return;
+
  const arr=items('income',month),index=arr.findIndex(x=>x.id===item.id);
- if(index<0)return;
+ if(index<0)return false;
  const original=arr[index];
  data.pendingIncome.push({id:'waiting-'+Date.now()+'-'+Math.random().toString(36).slice(2),name:original.name,amount:Number(original.amount),originMonth:month,originId:original.id,originRuleId:original.ruleId||null});
  if(original.ruleId&&data.rules[original.ruleId]){
@@ -750,6 +751,7 @@ function moveIncomeToPending(item){
  }
  arr.splice(index,1);
  save();
+ return true;
 }
 function renderPending(){
  const el=$("pendingRows");if(!el)return;el.innerHTML="";const total=data.pendingIncome.reduce((sum,x)=>sum+(Number(x.amount)||0),0);if($("pendingSum"))$("pendingSum").textContent=euro(total);
@@ -788,7 +790,7 @@ function renderIncome(){
     r.querySelector(".amt").textContent=euro(x.amount);
     r.onclick=e=>{e.stopPropagation();openEdit("income",x)};
     const dots=r.querySelector('.dots');dots.style.cursor='pointer';dots.setAttribute('role','button');dots.setAttribute('aria-label','Opzioni entrata');dots.tabIndex=0;
-    const showActions=e=>{e.stopPropagation();const choice=prompt('Opzioni per '+x.name+'\n1 - Sposta in attesa\n2 - Modifica', '1');if(choice==='1')moveIncomeToPending(x);else if(choice==='2')openEdit('income',x)};
+    const showActions=e=>{e.stopPropagation();openEdit('income',x)};
     dots.onclick=showActions;dots.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();showActions(e)}};
     el.appendChild(r)
   })
@@ -946,6 +948,7 @@ $("addBtn").onclick=()=>{const type=$("newType").value,name=$("newName").value.t
 
 function openEdit(type,item){
   pendingEdit={type,item};
+  $("editMovePending").style.display=type==="income"?"":"none";
   $("editTitle").textContent=item.name;
   $("editMonth").textContent="MESE: "+label().toUpperCase();
   $("editCategory").textContent=type==="income"?"ENTRATA":type==="fixed"?"USCITA FISSA":"USCITA CERTA";
@@ -1027,6 +1030,7 @@ function applyEdit(mode){
 }
 $("editOnly").onclick=()=>applyEdit("month");
 $("editForever").onclick=()=>applyEdit("forever");
+$("editMovePending").onclick=()=>{if(!pendingEdit||pendingEdit.type!=="income")return;const item=pendingEdit.item;if(moveIncomeToPending(item)){$("editModal").classList.remove("open");pendingEdit=null}};
 $("editDelete").onclick=()=>{
   if(!pendingEdit)return;
   const {type,item}=pendingEdit;
