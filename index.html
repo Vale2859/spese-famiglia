@@ -432,6 +432,9 @@ input, select, button {
 .incomeSwipe{overscroll-behavior-x:contain;touch-action:pan-y!important;scroll-behavior:smooth}
 .incomePanel{scroll-snap-stop:always}
 </style>
+<style>
+.categoryPanel{margin:12px 10px 18px;padding:16px 12px;background:#fff;border-radius:19px;box-shadow:0 3px 14px #20305012}.categoryHeading{font-size:13px;font-weight:900;color:#32486d;margin-bottom:12px}.categoryLayout{display:flex;align-items:center;justify-content:center;gap:17px;flex-wrap:wrap}.categoryDonut{width:170px;height:170px;flex-shrink:0;border-radius:50%;display:grid;place-items:center;position:relative}.categoryDonut:before{content:'';position:absolute;inset:28px;border-radius:50%;background:white}.categoryCenter{position:relative;text-align:center;font-weight:900;font-size:12px;max-width:105px;overflow-wrap:anywhere}.categoryCenter strong{display:block;font-size:17px;margin-top:4px}.categoryLegend{flex:1;min-width:145px;max-width:340px}.categoryLegend button{display:flex;align-items:center;gap:7px;width:100%;border:0;background:transparent;padding:6px 3px;text-align:left;font-size:12px;color:#25334a;cursor:pointer}.categoryLegend button.active{background:#edf3ff;border-radius:7px}.categoryDot{width:10px;height:10px;flex:none;border-radius:50%}.categoryLegend .categoryPercent{margin-left:auto;font-weight:800}.colName{overflow-wrap:anywhere;word-break:normal}
+</style>
 </head>
 <body>
 <div class="app">
@@ -469,6 +472,7 @@ input, select, button {
       
     </div>
 
+    <div class="categoryPanel"><div class="categoryHeading">📊 DOVE VANNO LE USCITE · <span id="categoryMonth"></span></div><div class="categoryLayout"><div class="categoryDonut" id="categoryDonut"><div class="categoryCenter" id="categoryCenter">Nessuna spesa</div></div><div class="categoryLegend" id="categoryLegend"></div></div></div>
     <div class="cols">
       <div class="col fixed" data-type="fixed">
         <div class="colHead"><div class="colTitle">🏠 USCITE FISSE</div><div class="colTotal" id="fixedTotal">€ 0</div></div>
@@ -799,6 +803,16 @@ function renderIncome(){
 }
 function dayOf(item){const r=item.ruleId&&data.rules[item.ruleId];const v=item.dueDay??(r&&r.dueDay);return Number.isInteger(Number(v))&&Number(v)>=1&&Number(v)<=31?Number(v):null}
 function readDay(id){const v=$(id).value.trim();if(!v)return null;const n=Number(v);if(!Number.isInteger(n)||n<1||n>31)throw new Error("Inserisci un giorno da 1 a 31.");return n}
+function shortExpenseName(name){
+ const raw=String(name||'').trim(),n=raw.toLowerCase();
+ const known=[[/condominio talea/, 'Condominio Talea'],[/condominio vico/, 'Condominio Vico'],[/enel/, 'Enel Energia'],[/agos|suzuki ignis finanziamento/, 'Rata finanziamento'],[/sky italia/, 'Sky'],[/uci matera/, 'Cinema UCI'],[/apple\.com|apple com/, 'Apple'],[/deliveroo/, 'Deliveroo'],[/old wild west/, 'Old Wild West'],[/pellegrino lucia/, 'Alimentari Pellegrino'],[/crai/, 'Supermercato Crai'],[/lindt/, 'Lindt'],[/disposizione di giroconto/, 'Giroconto'],[/agenzia delle entrate/, 'Agenzia Entrate'],[/commissione.*bonifico/, 'Commissione bonifico'],[/commissione.*(cbill|pagopa)/, 'Commissione PagoPA'],[/pagamento tramite pos/, 'Pagamento POS'],[/prelievo sportello/, 'Prelievo contanti'],[/intrend/, 'Intrend'],[/klarna/, 'Klarna'],[/bonifico.*farmacia montesano/, 'Bonifico Farmacia'],[/coin casa|^coin\b/, 'Coin'],[/lavatrice/, 'Lavatrice'],[/polizza/, 'Assicurazione']];
+ for(const [re,label] of known)if(re.test(n))return label;
+ let clean=raw.replace(/\b(bonifico istantaneo disposto da|bonifico disposto a favore di|addebito diretto disposto a favore di)\b/ig,'').replace(/\b(generi alimentari e supermercato|ristoranti e bar|rate mutuo e finanziamento|domiciliazioni e utenze|altre uscite|bonifici ricevuti|spese condominiali|tempo libero varie|casa varie)\b/ig,'').replace(/\s+/g,' ').trim();
+ return clean.length>32?clean.slice(0,29).trim()+'…':clean||'Spesa';
+}
+const categoryPalette=[['Casa','#15a7e5'],['Alimentari','#48ad54'],['Trasporti','#ff9a12'],['Finanziamenti','#9b6bd4'],['Tempo libero','#e2b900'],['Shopping','#f2463d'],['Commissioni','#77859a'],['Altro','#c6d2df']];
+function expenseCategory(name){const n=String(name||'').toLowerCase();if(/condominio|enel|energia|sky|internet|utenze|affitto|lavatrice|arred|casa|talea/.test(n))return 'Casa';if(/crai|aliment|supermercato|pellegrino|lindt|ristorant|deliveroo|old wild|cibo|bevande|spesa/.test(n))return 'Alimentari';if(/benzina|carburante|auto|moto|trasport|parcheggio|treno|taxi/.test(n))return 'Trasporti';if(/agos|rata|finanziamento|prestito|mutuo|klarna/.test(n))return 'Finanziamenti';if(/uci|cinema|viaggio|vacanz|logitravel|spettacol|tempo libero/.test(n))return 'Tempo libero';if(/intrend|coin|abbigliamento|shopping|apple|amazon/.test(n))return 'Shopping';if(/commission|pagopa|cbill|imposte|bollo/.test(n))return 'Commissioni';return 'Altro'}
+function renderCategories(){const totals=new Map();for(const t of ['fixed','needs'])for(const x of items(t)){const v=Number(x.amount)||0;if(v<=0)continue;const c=expenseCategory(x.name);totals.set(c,(totals.get(c)||0)+v)}const total=[...totals.values()].reduce((a,b)=>a+b,0),donut=$('categoryDonut'),legend=$('categoryLegend'),center=$('categoryCenter');$('categoryMonth').textContent=ML[cm]+' '+cy;legend.replaceChildren();if(!total){donut.style.background='#e9edf4';center.textContent='Nessuna spesa';return}let start=0,segments=[];const rows=categoryPalette.filter(([n])=>totals.has(n)).sort((a,b)=>totals.get(b[0])-totals.get(a[0]));for(const [name,color] of rows){const amount=totals.get(name),end=start+amount/total*100;segments.push(`${color} ${start}% ${end}%`);start=end}donut.style.background='conic-gradient('+segments.join(',')+')';function choose(name){const amount=totals.get(name);center.replaceChildren();const title=document.createElement('div');title.textContent=name;const value=document.createElement('strong');value.textContent=euro(amount);const pct=document.createElement('div');pct.textContent=(amount/total*100).toLocaleString('it-IT',{maximumFractionDigits:1})+'%';center.append(title,value,pct);legend.querySelectorAll('button').forEach(b=>b.classList.toggle('active',b.dataset.cat===name))}for(const [name,color] of rows){const btn=document.createElement('button');btn.dataset.cat=name;const dot=document.createElement('span');dot.className='categoryDot';dot.style.background=color;const title=document.createElement('span');title.textContent=name;const percent=document.createElement('span');percent.className='categoryPercent';percent.textContent=(totals.get(name)/total*100).toLocaleString('it-IT',{maximumFractionDigits:1})+'%';btn.append(dot,title,percent);btn.onclick=()=>choose(name);legend.append(btn)}choose(rows[0][0])}
 function renderCol(type,id){
   const el=$(id),a=items(type).slice().sort((x,y)=>(dayOf(x)??32)-(dayOf(y)??32));
   el.innerHTML="";
@@ -807,7 +821,7 @@ function renderCol(type,id){
     const r=document.createElement("div");r.className="colItem";
     r.innerHTML='<div class="colTop"><div class="colDay"></div><div class="colBody"><div class="colName"></div><div class="colAmt"></div><div class="colMeta"></div></div><div class="colDots">⋮</div></div>';
     r.querySelector(".colDay").textContent=dayOf(x)===null?"–":String(dayOf(x)).padStart(2,"0");
-    r.querySelector(".colName").textContent=x.name;
+    r.querySelector(".colName").textContent=shortExpenseName(x.name);r.querySelector(".colName").title=x.name;
     r.querySelector(".colAmt").textContent=euro(x.amount);
     r.querySelector(".colMeta").textContent=meta(x);
     r.onclick=e=>{e.stopPropagation();openEdit(type,x)};el.appendChild(r);
@@ -827,7 +841,7 @@ function renderBalance(){
     sub.textContent="Stima retroattiva rispetto al saldo aggiornato · "+label(anchor);
   }
 }
-function render(){renderPending();$("monthName").textContent=ML[cm];$("monthYear").textContent=cy;$("futureBanner").style.display=future()?"block":"none";$("incomeTotal").textContent=euro(sum("income"));renderIncome();$("fixedTotal").textContent=euro(sum("fixed"));renderCol("fixed","fixedRows");$("needsTotal").textContent=euro(sum("needs"));renderCol("needs","needsRows");$("expenseTotal").textContent=euro(expenses());$("allExpenses").textContent=euro(expenses());$("savingTotal").textContent=euro(sum("income")-expenses());renderBalance()}
+function render(){renderPending();$("monthName").textContent=ML[cm];$("monthYear").textContent=cy;$("futureBanner").style.display=future()?"block":"none";$("incomeTotal").textContent=euro(sum("income"));renderIncome();$("fixedTotal").textContent=euro(sum("fixed"));renderCol("fixed","fixedRows");$("needsTotal").textContent=euro(sum("needs"));renderCol("needs","needsRows");renderCategories();$("expenseTotal").textContent=euro(expenses());$("allExpenses").textContent=euro(expenses());$("savingTotal").textContent=euro(sum("income")-expenses());renderBalance()}
 $("prevMonth").onclick=()=>{const d=new Date(cy,cm-1,1);if(d.getFullYear()<2026)return;cy=d.getFullYear();cm=d.getMonth();render()};
 $("nextMonth").onclick=()=>{const d=new Date(cy,cm+1,1);if(d.getFullYear()>2100)return;cy=d.getFullYear();cm=d.getMonth();render()};
 
