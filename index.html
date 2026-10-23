@@ -435,6 +435,62 @@ input, select, button {
 <style>
 .categoryPanel{margin:12px 10px 18px;padding:16px 12px;background:#fff;border-radius:19px;box-shadow:0 3px 14px #20305012}.categoryHeading{font-size:13px;font-weight:900;color:#32486d;margin-bottom:12px}.categoryLayout{display:flex;align-items:center;justify-content:center;gap:17px;flex-wrap:wrap}.categoryDonut{width:170px;height:170px;flex-shrink:0;border-radius:50%;display:grid;place-items:center;position:relative}.categoryDonut:before{content:'';position:absolute;inset:28px;border-radius:50%;background:white}.categoryCenter{position:relative;text-align:center;font-weight:900;font-size:12px;max-width:105px;overflow-wrap:anywhere}.categoryCenter strong{display:block;font-size:17px;margin-top:4px}.categoryLegend{flex:1;min-width:145px;max-width:340px}.categoryLegend button{display:flex;align-items:center;gap:7px;width:100%;border:0;background:transparent;padding:6px 3px;text-align:left;font-size:12px;color:#25334a;cursor:pointer}.categoryLegend button.active{background:#edf3ff;border-radius:7px}.categoryDot{width:10px;height:10px;flex:none;border-radius:50%}.categoryLegend .categoryPercent{margin-left:auto;font-weight:800}.colName{overflow-wrap:anywhere;word-break:normal}
 </style>
+<style>
+
+/* v46: SOLO compattazione responsive. Nessuna modifica a struttura, funzioni o dati. */
+@media (max-width:600px){
+ .app{padding:4px 7px calc(7px + env(safe-area-inset-bottom))!important}
+ .header{grid-template-columns:49px minmax(0,1fr) auto!important;gap:6px!important;margin:0 0 3px!important}
+ .headerIcon{width:46px!important;height:46px!important;border-radius:12px!important}
+ .headerTitle,.headerTitle .family{font-size:clamp(18px,5vw,21px)!important;line-height:.93!important}
+ .headerSub{font-size:9px!important;margin-top:3px!important}
+ .headerTools .gear{width:26px!important;height:28px!important;font-size:16px!important}
+ .monthCard{margin:3px 0 5px!important;padding:3px 8px!important;border-radius:12px!important;min-height:36px!important}
+ .monthArrow{font-size:23px!important;padding:0 10px!important}
+ .monthText .m{font-size:15px!important}.monthText .y{font-size:11px!important;margin-top:1px!important}
+ .future{padding:5px 8px!important;font-size:9px!important;line-height:1.25!important;margin-bottom:5px!important}
+ .incomeCard{padding:7px 9px!important;margin-bottom:6px!important;border-radius:15px!important}
+ .incomeHeader{grid-template-columns:36px 1fr 34px!important;gap:6px!important;margin-bottom:0!important}
+ .visualIcon{font-size:27px!important}.blockLabel{font-size:13px!important}.blockMoney{font-size:clamp(23px,6vw,27px)!important;margin-top:1px!important}
+ .roundAdd{width:34px!important;height:34px!important;font-size:24px!important}
+ .incomeTabs{height:18px!important;min-height:18px!important;margin:0 0 3px!important}
+ .incomeTabs button{font-size:9px!important;padding:2px 7px!important}
+ .incomeSwipe,.incomePanel{height:clamp(42px,7.5dvh,65px)!important;max-height:clamp(42px,7.5dvh,65px)!important}
+ .incomePanel .incomeList{padding:6px 8px!important}
+ .incomeRow{min-height:31px!important}.incomeRow .name{font-size:11px!important}.incomeRow .amt{font-size:11px!important}
+ .expenseCard{padding:6px!important;border-radius:16px!important}
+ #smartCategoryPanel{margin:2px 4px 4px!important;gap:5px!important;flex-wrap:nowrap!important}
+ #smartReview{padding:5px 7px!important;font-size:10px!important;white-space:nowrap!important}
+ #smartStatus{font-size:9px!important;line-height:1.1!important;max-height:25px!important;overflow:hidden!important}
+ .categoryPanel{margin:3px 3px 6px!important;padding:8px!important;border-radius:14px!important}
+ .categoryHeading{font-size:11px!important;margin-bottom:5px!important}
+ .categoryLayout{flex-wrap:nowrap!important;gap:8px!important;justify-content:space-between!important}
+ .categoryDonut{width:clamp(104px,31vw,137px)!important;height:clamp(104px,31vw,137px)!important}
+ .categoryDonut:before{inset:clamp(19px,5.7vw,25px)!important}
+ .categoryCenter{font-size:10px!important;max-width:84px!important}.categoryCenter strong{font-size:14px!important;margin-top:2px!important}
+ .categoryLegend{min-width:0!important;max-width:none!important;flex:1!important}
+ .categoryLegend button{font-size:10px!important;gap:4px!important;padding:3px 2px!important;line-height:1.1!important}
+ .categoryDot{width:8px!important;height:8px!important}
+ .cols,.expenseCard .cols{gap:6px!important}
+ .col{border-radius:12px!important}
+ .colHead{min-height:45px!important;padding:5px 4px!important}
+ .colTitle{font-size:clamp(11px,3.2vw,14px)!important}.colTotal{font-size:clamp(15px,4.2vw,19px)!important;margin-top:1px!important}
+ .colList{height:clamp(75px,13dvh,120px)!important;max-height:clamp(75px,13dvh,120px)!important;padding:3px 5px!important}
+ .colItem{padding:4px 0!important}.colItem .colName{font-size:clamp(10px,2.8vw,12px)!important}.colItem .colAmt{font-size:clamp(10px,2.8vw,12px)!important;margin-top:2px!important}.colItem .colMeta{font-size:9px!important}
+ .colItem .colDay{min-height:25px!important}
+ .colScrollHint{font-size:8px!important;padding:2px!important}
+ .colAdd{margin:3px!important;padding:5px 3px!important;font-size:9px!important}
+ .kpis{margin-top:5px!important;gap:5px!important}.kpi{padding:6px 8px!important;border-radius:11px!important}.kpiValue{font-size:17px!important;margin-top:1px!important}.kpiNote{font-size:7px!important}
+ .schedule{margin-top:5px!important;padding:7px 9px!important;grid-template-columns:26px 1fr 16px!important;gap:6px!important;border-radius:12px!important}.scheduleIcon{font-size:21px!important}.scheduleValue{font-size:19px!important}.scheduleSub{font-size:7px!important;margin-top:1px!important}
+}
+@media (max-width:600px) and (max-height:750px){
+ .headerIcon{width:40px!important;height:40px!important}.header{grid-template-columns:43px minmax(0,1fr) auto!important}
+ .categoryDonut{width:103px!important;height:103px!important}.categoryLegend button{padding:2px!important}
+ .colList{height:75px!important;max-height:75px!important}
+ .incomeSwipe,.incomePanel{height:42px!important;max-height:42px!important}
+}
+
+</style>
 </head>
 <body>
 <div class="app">
