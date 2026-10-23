@@ -491,6 +491,39 @@ input, select, button {
 }
 
 </style>
+<style>
+
+/* v47: SOLO altezza dinamica delle liste, conservando struttura e grafica v46. */
+@media (max-width:600px){
+  /* Entrate: mostra tutte le righe, senza tagli o scorrimento interno. */
+  .incomeSwipe,.incomePanel{
+    height:auto!important;min-height:0!important;max-height:none!important;
+  }
+  .incomeSwipe{align-items:stretch!important;overflow-y:visible!important;}
+  .incomePanel{overflow:visible!important;align-self:stretch!important;}
+  .incomePanel .incomeList{
+    height:auto!important;min-height:0!important;max-height:none!important;
+    overflow-y:visible!important;overflow-x:hidden!important;
+    flex:0 0 auto!important;
+  }
+  .incomeRow{min-height:36px!important;padding:5px 0!important;}
+  /* Le due colonne sono alte quanto quella con piu' voci. */
+  .cols,.expenseCard .cols{align-items:stretch!important;}
+  .col{height:auto!important;min-height:0!important;align-self:stretch!important;}
+  .colList{
+    height:auto!important;min-height:0!important;max-height:none!important;
+    overflow-y:visible!important;overflow-x:hidden!important;
+    flex:1 0 auto!important;
+  }
+  .colScrollHint{display:none!important;}
+  .colAdd{margin-top:auto!important;}
+}
+@media (max-width:600px) and (max-height:750px){
+  .incomeSwipe,.incomePanel{height:auto!important;max-height:none!important;}
+  .colList{height:auto!important;max-height:none!important;}
+}
+
+</style>
 </head>
 <body>
 <div class="app">
