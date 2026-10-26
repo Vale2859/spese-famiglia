@@ -9,7 +9,7 @@
 <meta name="apple-mobile-web-app-title" content="Spese Famiglia">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-192.png">
-<title>Spese Famiglia v22</title>
+<title>Spese Famiglia v48 · Compatta</title>
 <style>
 :root{
   --ink:#10243f;--muted:#718096;--line:#dfe7ef;
@@ -524,6 +524,43 @@ input, select, button {
 }
 
 </style>
+<style>
+/* v48: stessa disposizione e stessi colori, altezza adattata al telefono. */
+:root{--v48-list:clamp(96px,14dvh,160px);--v48-income:clamp(58px,8.3dvh,82px)}
+button{cursor:pointer}button:focus-visible,[role=button]:focus-visible{outline:3px solid #2c79bd;outline-offset:2px}
+.categoryMore{font-size:10px!important;font-weight:850!important;color:#195d9f!important;justify-content:center!important;border-top:1px solid #e6edf5!important;margin-top:2px!important}
+.categoryCenter{cursor:pointer}.categoryLegend button{border-radius:6px}.categoryLegend button:hover{background:#f0f5fb}
+.v48ReviewTools{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin:10px 0}.v48ReviewTools input,.v48ReviewTools select{font-size:16px;padding:10px;min-width:0}
+.v48ReviewRow{border-bottom:1px solid #e5ebf2;padding:11px 0}.v48ReviewTop{display:flex;align-items:center;gap:10px}.v48ReviewName{flex:1;font-size:13px;font-weight:850;min-width:0;overflow-wrap:anywhere}.v48ReviewAmount{font-size:13px;font-weight:900;white-space:nowrap}.v48ReviewMeta{font-size:10px;color:#718096;margin:3px 0 6px}.v48ReviewRow select{font-size:14px;padding:8px;border-width:1px}.v48ReviewRow.warning{border-left:3px solid #e4b96a;padding-left:8px}.v48ReviewEmpty{text-align:center;padding:26px 10px;font-size:13px;color:#718096}.v48ReviewActions{display:flex;gap:7px;margin:12px 0;flex-wrap:wrap}.v48ReviewActions button{flex:1;min-height:38px;padding:9px;font-size:11px;border:0;border-radius:10px;font-weight:850}.v48ReviewNote{font-size:10px;line-height:1.5;color:#718096;margin:9px 0}.v48CustomForm{padding:10px;border-radius:12px;background:#f2f6fb;display:flex;gap:7px;align-items:center}.v48CustomForm input[type=text]{font-size:16px;flex:1;min-width:0;padding:9px}.v48CustomForm input[type=color]{width:39px;height:39px;padding:3px;flex:0 0 auto}.v48CustomForm button{font-size:11px;border:0;background:#10243f;color:white;border-radius:9px;padding:10px}.v48LayoutChoice{padding:11px;border-radius:11px;background:#edf4fb;display:flex;align-items:center;gap:9px;font-size:12px;color:#36546f}.v48LayoutChoice input{width:19px;height:19px;accent-color:#217bb3;flex:none}.v48LayoutChoice small{display:block;font-size:10px;color:#718096;margin-top:3px}
+@media(max-width:600px){
+ .incomeSwipe,.incomePanel{height:var(--v48-income)!important;min-height:0!important;max-height:var(--v48-income)!important;overflow-y:hidden!important}
+ .incomePanel .incomeList{height:100%!important;max-height:100%!important;overflow-y:auto!important;flex:1 1 auto!important;padding:4px 8px!important}
+ .incomeRow{min-height:28px!important;padding:3px 0!important}.incomeRow .name{font-size:12px!important}.incomeRow .meta{font-size:9px!important}.incomeRow .amt{font-size:12px!important}
+ .categoryPanel{padding:7px 8px!important}.categoryHeading{font-size:10px!important;line-height:1.2!important;margin-bottom:5px!important}
+ .categoryLayout{gap:10px!important;align-items:center!important}.categoryDonut{width:clamp(100px,27vw,117px)!important;height:clamp(100px,27vw,117px)!important}.categoryDonut:before{inset:19px!important}.categoryCenter{font-size:10px!important;line-height:1.2!important;max-width:75px!important}.categoryCenter strong{font-size:13px!important;margin:3px 0!important}
+ .categoryLegend button{padding:4px 2px!important;min-height:19px!important;line-height:1.1!important;font-size:10px!important}.categoryLegend .categoryMore{min-height:20px!important;font-size:9px!important}
+ .colList{height:var(--v48-list)!important;min-height:0!important;max-height:var(--v48-list)!important;flex:1 1 auto!important;overflow-y:auto!important;overflow-x:hidden!important;padding:3px 5px!important;overscroll-behavior:contain;scrollbar-width:thin}
+ .colScrollHint{display:block!important;font-size:8px!important;line-height:1.3!important;padding:3px 0!important;color:#687e94!important}.colAdd{margin:3px!important;padding:7px 3px!important;min-height:29px!important}
+ .colItem .colTop{grid-template-columns:22px minmax(0,1fr) 9px!important;gap:5px!important}.colItem .colDay{width:22px!important;min-height:25px!important;font-size:10px!important}.colItem .colName{font-size:11px!important;line-height:1.18!important}.colItem .colAmt{font-size:12px!important;line-height:1.2!important;margin-top:2px!important}.colItem .colMeta{font-size:9px!important;margin-top:2px!important}.colItem{padding:6px 0!important}
+ .kpiLabel{font-size:10px!important}.kpiValue{font-size:20px!important}.kpiNote{font-size:8px!important}.kpi{padding:8px!important}.scheduleTitle{font-size:10px!important}.scheduleValue{font-size:21px!important}.scheduleSub{font-size:8px!important;line-height:1.35!important}.schedule{padding:9px!important}
+ body.v48Expanded .incomeSwipe,body.v48Expanded .incomePanel{height:auto!important;max-height:none!important;overflow:visible!important}
+ body.v48Expanded .incomePanel .incomeList{height:auto!important;max-height:none!important;overflow-y:visible!important}
+ body.v48Expanded .colList{height:auto!important;max-height:none!important;overflow-y:visible!important;flex:1 0 auto!important}
+ body.v48Expanded .colScrollHint{display:none!important}
+}
+@media(max-width:600px) and (max-height:740px){:root{--v48-list:90px;--v48-income:58px}.categoryDonut{width:95px!important;height:95px!important}.categoryLegend button{padding:3px 2px!important;min-height:17px!important}.categoryLegend .categoryMore{min-height:18px!important}.kpi{padding:6px 8px!important}.schedule{padding:7px 9px!important}.headerIcon{width:40px!important;height:40px!important}}
+@media(prefers-reduced-motion:no-preference){.modal.open .sheet{animation:v48Sheet .18s ease-out}.categoryDonut{transition:box-shadow .2s}.categoryDonut:hover{box-shadow:0 0 0 3px #edf3fa}@keyframes v48Sheet{from{opacity:.7;transform:translateY(12px)}to{opacity:1;transform:none}}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;animation:none!important;transition:none!important}}
+</style>
+<style>
+@media(max-width:600px) and (max-height:820px) and (min-height:741px){:root{--v48-list:clamp(90px,12dvh,110px);--v48-income:60px}}
+@media(max-width:600px) and (max-height:740px){:root{--v48-list:78px;--v48-income:48px}}
+/* Due voci complete nella vista compatta; le altre scorrono nel riquadro. */
+@media(max-width:600px){
+ body:not(.v48Expanded) .colList{height:var(--v48-two-list-size,var(--v48-list))!important;max-height:var(--v48-two-list-size,var(--v48-list))!important;flex:0 0 auto!important;padding-bottom:0!important;overflow-anchor:none}
+ body:not(.v48Expanded) .colList>.colItem{min-height:var(--v48-two-item-size,0px)!important}
+}
+</style>
 </head>
 <body>
 <div class="app">
@@ -561,7 +598,7 @@ input, select, button {
       
     </div>
 
-    <div id="smartCategoryPanel" style="margin:5px 10px 8px;display:flex;align-items:center;gap:9px;flex-wrap:wrap"><button type="button" id="smartReview" style="padding:8px 12px;border:1px solid #b8c9e2;border-radius:10px;background:#f4f8ff;color:#24466b;font-size:12px;font-weight:800">✨ Rianalizza categorie</button><span id="smartStatus" aria-live="polite" style="font-size:11px;color:#53657b;flex:1"></span></div>
+    <div id="smartCategoryPanel" style="margin:5px 10px 8px;display:flex;align-items:center;gap:9px;flex-wrap:wrap"><button type="button" id="smartReview" style="padding:8px 12px;border:1px solid #b8c9e2;border-radius:10px;background:#f4f8ff;color:#24466b;font-size:12px;font-weight:800">✨ Categorie</button><span id="smartStatus" aria-live="polite" style="font-size:11px;color:#53657b;flex:1"></span></div>
 <div class="categoryPanel"><div class="categoryHeading">📊 DOVE VANNO LE USCITE · <span id="categoryMonth"></span></div><div class="categoryLayout"><div class="categoryDonut" id="categoryDonut"><div class="categoryCenter" id="categoryCenter">Nessuna spesa</div></div><div class="categoryLegend" id="categoryLegend"></div></div></div>
     <div class="cols">
       <div class="col fixed" data-type="fixed">
@@ -608,7 +645,7 @@ input, select, button {
     <div class="badge" id="addMonth"></div>
     <div class="form">
       <div class="two">
-        <div><div class="label">Categoria</div><select id="newType"><option value="income">Entrata</option><option value="fixed">Uscita fissa</option><option value="needs">Fabbisogno</option></select></div>
+        <div><div class="label">Tipo di movimento</div><select id="newType"><option value="income">Entrata</option><option value="fixed">Uscita fissa</option><option value="needs">Fabbisogno</option></select></div>
         <div><div class="label">Importo base €</div><input id="newAmount" type="number" step="0.01" min="0" inputmode="decimal"></div>
       </div>
       <div><div class="label">Nome voce</div><input id="newName" placeholder="Es. Luce, assicurazione, stipendio"></div><div id="newExpenseCategoryBox"><div class="label">Categoria della spesa (proposta automaticamente, modificabile)</div><select id="newExpenseCategory"><option value="Casa">Casa</option><option value="Alimentari">Alimentari</option><option value="Trasporti">Trasporti</option><option value="Finanziamenti">Finanziamenti</option><option value="Tempo libero">Tempo libero</option><option value="Shopping">Shopping</option><option value="Commissioni">Commissioni</option><option value="Altro">Altro</option></select></div>
@@ -729,11 +766,12 @@ input, select, button {
       <button class="close" data-close="backupModal">✕</button>
     </div>
 
-    <div class="badge" id="backupStatus">Backup automatico locale attivo · v22</div>
+    <div class="badge" id="backupStatus">Backup automatico locale attivo · v48</div>
+<label class="v48LayoutChoice"><input type="checkbox" id="v48Compact" checked><span>Vista compatta per il telefono<small>Disattiva per mostrare le liste estese come nella v47.</small></span></label>
 
     <div class="form">
       <button class="primary" id="exportBackupBtn">💾 Esporta backup adesso</button>
-      <button class="soft" id="restoreBackupBtn">📥 Ripristina da backup</button><button class="soft" id="openNotifyBtn" type="button" hidden>🔔 Notifiche</button>
+      <button class="soft" id="restoreBackupBtn">📥 Ripristina da backup</button><button class="soft hidden" id="v48PreImportBtn" type="button">↩ Scarica copia precedente all’ultimo ripristino</button><button class="soft" id="openNotifyBtn" type="button" hidden>🔔 Notifiche</button>
       <input id="restoreFileInput" type="file" accept=".json,application/json,text/plain" style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none" aria-label="Seleziona backup JSON">
     </div>
 
@@ -794,14 +832,6 @@ function blank(){return {income:[],fixed:[],policies:[],needs:[]}}
 function ensure(k){if(!data.months[k])data.months[k]=blank();if(!data.months[k].fixed)data.months[k].fixed=[];if(!data.months[k].policies)data.months[k].policies=[];if(!data.months[k].needs)data.months[k].needs=[];if(!data.months[k].income)data.months[k].income=[]}
 function label(k=key()){const {y,m}=split(k);return ML[m]+" "+y}
 function future(k=key()){return cmp(k,realKey)>0}
-
-function seedRule(type,name,amount){const id="seed-"+type+"-"+Math.random().toString(16).slice(2);data.rules[id]={id,type,name,start:BASE,end:null,skip:[],schedule:{kind:"monthly"},amount};return id}
-function seed(){ensure(BASE);[
-["income","Stipendio",3900],
-["fixed","Garage Perrone",116],["fixed","Condominio",80],["fixed","Sky",40],["fixed","Fastweb",30],["fixed","Acqua/Luce/Gas",300],["fixed","Emanuela",500],["fixed","Suzuki Ignis finanziamento",374.40],
-["policies","Polizza EY54591",38],["policies","Polizza Ignis",55],["policies","Polizza Honda SH",41],
-["needs","Cibo",200],["needs","Benzina",200]
-].forEach(([t,n,a])=>{const r=seedRule(t,n,a);data.months[BASE][t].push({id:"i-"+r+"-"+BASE,name:n,amount:a,ruleId:r})})}
 
 function amountForRule(rule,k){const {y,m}=split(k),s=rule.schedule||{kind:"monthly"};if(s.kind==="monthly")return rule.amount;if(s.kind==="annual")return m===s.month?rule.amount:null;if(s.kind==="selectedYearly")return s.amounts&&s.amounts[m]!=null?Number(s.amounts[m]):null;if(s.kind==="selectedOneYear")return y===s.year&&s.amounts&&s.amounts[m]!=null?Number(s.amounts[m]):null;return null}
 function ruleActive(rule,k){if(cmp(k,rule.start)<0)return false;if(rule.end&&cmp(k,rule.end)>0)return false;if((rule.skip||[]).includes(k))return false;return amountForRule(rule,k)!=null}
@@ -904,35 +934,119 @@ function shortExpenseName(name){
  let clean=raw.replace(/\b(bonifico istantaneo disposto da|bonifico disposto a favore di|addebito diretto disposto a favore di)\b/ig,'').replace(/\b(generi alimentari e supermercato|ristoranti e bar|rate mutuo e finanziamento|domiciliazioni e utenze|altre uscite|bonifici ricevuti|spese condominiali|tempo libero varie|casa varie)\b/ig,'').replace(/\s+/g,' ').trim();
  return clean.length>32?clean.slice(0,29).trim()+'…':clean||'Spesa';
 }
-const categoryPalette=[['Casa','#15a7e5'],['Alimentari','#48ad54'],['Trasporti','#ff9a12'],['Finanziamenti','#9b6bd4'],['Tempo libero','#e2b900'],['Shopping','#f2463d'],['Commissioni','#77859a'],['Altro','#c6d2df']];
-// Motore locale: riconoscimento, memoria delle correzioni e revisione completa.
+const categoryPalette=[['Casa','#15a7e5'],['Alimentari','#48ad54'],['Trasporti','#ff9a12'],['Finanziamenti','#9b6bd4'],['Tempo libero','#e2b900'],['Shopping','#f2463d'],['Commissioni','#77859a'],['Altro','#c6d2df'],['Salute','#e65b86'],['Famiglia e scuola','#e39f38'],['Ristoranti e bar','#e27845'],['Abbonamenti','#6e7ed6'],['Assicurazioni','#5489c0'],['Viaggi','#23a89d'],['Tasse','#ac794e'],['Animali','#a88962']];
+// v48: categorie compatibili, correzioni manuali e catalogo condiviso.
+const baseExpenseCategories=categoryPalette.map(row=>row.slice());
+const customExpenseColors=['#7d8fd1','#49a89b','#bf81b8','#b79752','#7d9e62','#8b91a0'];
+function registerExistingCategories(){
+  // Le categorie importate restano disponibili con il loro nome originale.
+  const known=new Set(baseExpenseCategories.map(([name])=>name)),custom=new Map();
+  function add(name,color){
+    if(typeof name!=='string'||!name.trim()||known.has(name)||custom.has(name))return;
+    let hash=0;for(const ch of name)hash=(hash*31+ch.charCodeAt(0))>>>0;
+    custom.set(name,{name,color:typeof color==='string'&&/^#[0-9a-f]{3}(?:[0-9a-f]{3})?$/i.test(color)?color:customExpenseColors[hash%customExpenseColors.length]});
+  }
+  function read(value,key){
+    if(Array.isArray(value)){add(value[0],value[1]);return}
+    if(value&&typeof value==='object'){add(value.name||value.label||value.category||key||value.id,value.color);return}
+    if(typeof value==='string'){if(key)add(key,value);else add(value)}
+  }
+  const extra=data.customCategories;
+  if(Array.isArray(extra))extra.forEach(value=>read(value));
+  else if(extra&&typeof extra==='object')Object.entries(extra).forEach(([name,value])=>read(value,name));
+  for(const rule of Object.values(data.rules||{}))if(rule&&rule.type!=='income')add(rule.expenseCategory);
+  for(const month of Object.values(data.months||{}))if(month&&typeof month==='object'){
+    for(const type of ['fixed','needs','policies'])if(Array.isArray(month[type])){
+      for(const item of month[type])if(item)add(item.expenseCategory);
+    }
+  }
+  for(const category of Object.values(data.categoryLearning||{}))add(category);
+  categoryPalette.splice(0,categoryPalette.length,...baseExpenseCategories.map(row=>row.slice()),...[...custom.values()].map(({name,color})=>[name,color]));
+  data.customCategories=[...custom.values()];
+}
+function syncCategoryOptions(){
+  registerExistingCategories();
+  for(const id of ['newExpenseCategory','editExpenseCategory']){
+    const select=$(id);if(!select)continue;
+    // Una sincronizzazione della home non interrompe una scelta nel modulo aperto.
+    const modal=select.closest('.modal');if(modal&&modal.classList.contains('open'))continue;
+    const names=categoryPalette.map(([name])=>name),existing=[...select.options].map(option=>option.value);
+    if(existing.length===names.length&&existing.every((name,index)=>name===names[index]))continue;
+    const selected=select.value;
+    const options=names.map(name=>{const option=document.createElement('option');option.value=name;option.textContent=name;return option});
+    select.replaceChildren(...options);
+    if(names.includes(selected))select.value=selected;
+  }
+}
+syncCategoryOptions();
+// Motore interamente locale: i nomi e gli importi non vengono inviati online.
 function normExpense(n){return String(n||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,' ').trim().replace(/\s+/g,' ')}
-function learnedCategory(name){const n=normExpense(name);const m=data.categoryLearning||{};if(m[n]&&categoryPalette.some(([c])=>c===m[n]))return m[n];return null}
+function learnedCategory(name){const n=normExpense(name),memory=data.categoryLearning||{};return categoryPalette.some(([category])=>category===memory[n])?memory[n]:null}
 function learnCategory(name,category){if(!name||!categoryPalette.some(([c])=>c===category))return;data.categoryLearning=data.categoryLearning||{};data.categoryLearning[normExpense(name)]=category}
-function inferExpense(name){const n=normExpense(name),learned=learnedCategory(name);if(learned)return {category:learned,confidence:1,source:'imparato'};
- const rules=[
- ['Commissioni', /\b(commissione|commissioni|quota carta banca|canone carta|spese bancarie|costo bonifico|canone conto|pagopa commissione|cbill commissione)\b/, .98],
- ['Finanziamenti', /\b(agos|prestito|finanziamento|mutuo|leasing|rata prestito|rata finanziamento|creditis|credifarma)\b/, .97],
- ['Trasporti', /\b(benzina|gasolio|carburante|rifornimento|distributore|eni station|q8|tamoil|ip carburanti|parcheggio|parcheggi|telepass|pedaggio|autostrada|taxi|uber|trenitalia|italo|scuola guida|5 guide|tagliando|pneumatici|gomme|revisione auto|bollo auto|polizza auto|polizza t cross|polizza t-cross|assicurazione moto|assicurazione auto|assicurazione honda|auto milano|bollo moto|moto|t cross|t cross|fz6|hornet)\b/, .97],
- ['Casa', /\b(condominio|enel|energia elettrica|bolletta|gas domestico|acquedotto|affitto|imu|tari|riscaldamento|utenze|fastweb|fibra|sky italia|sky tv|lavatrice|arredamento|ikea|leroy merlin|talea)\b/, .95],
- ['Alimentari', /\b(crai|conad|coop|lidl|eurospin|esselunga|supermercato|supermercati|spesa alimentare|alimentari|macelleria|panificio|pizzeria|pizze|pizza|ristorante|ristoranti|deliveroo|glovo|just eat|old wild west|lindt|cibo roma|colazione|gelato|gelateria|bar caffe|ristorazione|cibo|supermercati|alimentazione)\b/, .96],
- ['Shopping', /\b(regalo|regali|natale|san valentino|festa della mamma|intrend|zalando|zara|h m|abbigliamento|scarpe|vestiti|shopping|coin|amazon|apple store|iphone nuovo|macbook|ipad nuovo|profumeria)\b/, .94],
- ['Tempo libero', /\b(hotel|albergo|booking|airbnb|b b|bed breakfast|vacanza|vacanze|viaggio|voli|volo|ryanair|easyjet|logitravel|fine settimana|cinema|uci|concerto|teatro|museo|spotify|netflix|disney|icloud|apple icloud|app store abbonamento|abbonamento|weekend|uscite milano)\b/, .93],
- ];
- if(/benzina e spese personali|carta credito|carta di credito|giroconto|prelievo|trasferimento|bonifico|pagamento tramite pos|acquisti vari|spese personali/.test(n))return {category:'Altro',confidence:.2,source:'da verificare'};
- for(const [category,re,confidence] of rules)if(re.test(n))return {category,confidence,source:'regola'};
- return {category:'Altro',confidence:.1,source:'da verificare'};
+function inferExpense(name){
+  const n=normExpense(name),learned=learnedCategory(name);
+  if(learned)return {category:learned,confidence:1,source:'imparato'};
+  if(/\bbenzina e spese personali\b/.test(n))return {category:'Altro',confidence:.2,source:'da verificare'};
+  const rules=[
+    ['Commissioni',/\b(commissione|commissioni|quota carta banca|canone carta|spese bancarie|costo bonifico|canone conto|pagopa commissione|cbill commissione)\b/,.98],
+    ['Assicurazioni',/\b(assicurazione|assicurazioni|polizza|polizze|premio assicurativo|rc auto|rca|rc moto|unipol|allianz|generali|genertel|reale mutua)\b/,.97],
+    ['Animali',/\b(veterinario|veterinaria|veterinari|clinica veterinaria|farmacia veterinaria|pet shop|arcaplanet|maxi zoo|zooplus|croccantini|crocchette|mangime|lettiera|toelettatura|cibo cane|cibo gatto)\b/,.96],
+    ['Salute',/\b(farmacia|farmacie|parafarmacia|farmaco|farmaci|medicinale|medicinali|medico|medica|visita specialistica|dentista|odontoiatra|oculista|analisi cliniche|analisi sangue|ticket sanitario|ospedale|fisioterapia|fisioterapista|psicologo|psicologa|ottico|occhiali|sanitaria)\b/,.96],
+    ['Finanziamenti',/\b(agos|prestito|finanziamento|mutuo|leasing|rata prestito|rata finanziamento|creditis|credifarma|klarna)\b/,.97],
+    ['Famiglia e scuola',/\b(asilo|nido|scuola(?! guida)|mensa scolastica|mensa scuola|retta scolastica|libri scolastici|universita|istruzione|baby sitter|babysitter|pannolini|materiale scolastico|doposcuola|ripetizioni)\b/,.95],
+    ['Tasse',/\b(f24|imu|tari|tasi|irpef|imposta|imposte|tassa|tasse|tributo|tributi|bollo|superbollo|agenzia delle entrate|agenzia entrate|riscossione|multa|multe|sanzione|sanzioni)\b/,.97],
+    ['Ristoranti e bar',/\b(ristorante|ristoranti|ristorazione|pizzeria|pizze|pizza|deliveroo|glovo|just eat|old wild west|bar|caffe|caffetteria|colazione|aperitivo|apericena|pub|sushi|trattoria|osteria|gelato|gelateria|cena fuori|pranzo fuori)\b/,.96],
+    ['Viaggi',/\b(hotel|albergo|booking|airbnb|bed breakfast|b b|vacanza|vacanze|viaggio|viaggi|voli|volo|ryanair|easyjet|logitravel|villaggio turistico|campeggio|agriturismo)\b/,.95],
+    ['Trasporti',/\b(benzina|gasolio|carburante|rifornimento|distributore|eni station|q8|tamoil|ip carburanti|parcheggio|parcheggi|telepass|pedaggio|autostrada|taxi|uber|trenitalia|italo|autobus|metro|metropolitana|scuola guida|5 guide|patente|tagliando|pneumatici|gomme|revisione auto|auto milano|moto|t cross|fz6|hornet|officina|meccanico)\b/,.96],
+    ['Abbonamenti',/\b(spotify|netflix|disney|dazn|now tv|sky|icloud|apple icloud|youtube premium|amazon prime|prime video|apple one|microsoft 365|app store abbonamento|abbonamento|abbonamenti)\b/,.95],
+    ['Casa',/\b(condominio|enel|energia elettrica|bolletta|bollette|gas domestico|acquedotto|affitto|riscaldamento|utenze|fastweb|fibra|lavatrice|arredamento|ikea|leroy merlin|talea|garage|idraulico|elettricista|acqua luce gas)\b/,.95],
+    ['Alimentari',/\b(crai|conad|coop|lidl|eurospin|esselunga|supermercato|supermercati|spesa alimentare|alimentari|macelleria|panificio|fruttivendolo|lindt|cibo roma|cibo|alimentazione|spesa supermercato)\b/,.96],
+    ['Shopping',/\b(regalo|regali|natale|san valentino|festa della mamma|intrend|zalando|zara|h m|abbigliamento|scarpe|vestiti|shopping|coin|apple store|iphone nuovo|macbook|ipad nuovo|profumeria)\b/,.94],
+    ['Shopping',/\bamazon\b/,.7],
+    ['Tempo libero',/\b(cinema|uci|concerto|teatro|museo|palestra|piscina|sport|hobby|videogioco|videogiochi|weekend|fine settimana|uscite milano)\b/,.93]
+  ];
+  // Prima i beneficiari riconoscibili: anche un "bonifico farmacia" resta Salute.
+  for(const [category,re,confidence] of rules)if(re.test(n))return {category,confidence,source:'regola'};
+  if(/\b(carta credito|carta di credito|giroconto|prelievo|trasferimento|bonifico|pagamento tramite pos|acquisti vari|spese personali)\b/.test(n))return {category:'Altro',confidence:.2,source:'da verificare'};
+  return {category:'Altro',confidence:.1,source:'da verificare'};
 }
 function expenseCategory(name){return inferExpense(name).category}
-function categoryForItem(x){return categoryPalette.some(([n])=>n===x.expenseCategory)?x.expenseCategory:expenseCategory(x.name)}
-function backfillExpenseCategories(force=false){let changed=0;
- for(const r of Object.values(data.rules||{})){if(r.type==='income')continue;const guess=inferExpense(r.name);if(!r.categoryManual&&(force||r.expenseCategory!==guess.category||!r.expenseCategory)){r.expenseCategory=guess.category;r.categoryConfidence=guess.confidence;r.categorySource='local';changed++}}
- for(const month of Object.values(data.months||{}))for(const type of ['fixed','needs','policies'])for(const x of (month[type]||[])){
-  if(x.categoryManual)continue;const guess=inferExpense(x.name);if(force||x.expenseCategory!==guess.category||!x.expenseCategory){if(x.expenseCategory!==guess.category||!x.expenseCategory){changed++}x.expenseCategory=guess.category;x.categoryConfidence=guess.confidence;x.categorySource='local'}
- }
- return changed;
+function categoryForItem(item){return categoryPalette.some(([name])=>name===item.expenseCategory)?item.expenseCategory:expenseCategory(item.name)}
+function backfillExpenseCategories(force=false){
+  // La revisione esplicita è l'unica operazione che riclassifica l'archivio.
+  if(force!==true)return 0;
+  registerExistingCategories();let changed=0;
+  function review(item){
+    if(!item||item.categoryManual)return;
+    const guess=inferExpense(item.name);
+    if(item.expenseCategory!==guess.category){item.expenseCategory=guess.category;changed++}
+    item.categoryConfidence=guess.confidence;item.categorySource=guess.source==='imparato'?'imparato':'local';
+  }
+  for(const rule of Object.values(data.rules||{}))if(rule&&rule.type!=='income')review(rule);
+  for(const month of Object.values(data.months||{}))if(month&&typeof month==='object'){
+    for(const type of ['fixed','needs','policies'])if(Array.isArray(month[type]))month[type].forEach(review);
+  }
+  return changed;
 }
-function renderCategories(){const totals=new Map();for(const t of ['fixed','needs'])for(const x of items(t)){const v=Number(x.amount)||0;if(v<=0)continue;const c=categoryForItem(x);totals.set(c,(totals.get(c)||0)+v)}const total=[...totals.values()].reduce((a,b)=>a+b,0),donut=$('categoryDonut'),legend=$('categoryLegend'),center=$('categoryCenter');$('categoryMonth').textContent=ML[cm]+' '+cy;legend.replaceChildren();if(!total){donut.style.background='#e9edf4';center.textContent='Nessuna spesa';return}let start=0,segments=[];const rows=categoryPalette.filter(([n])=>totals.has(n)).sort((a,b)=>totals.get(b[0])-totals.get(a[0]));for(const [name,color] of rows){const amount=totals.get(name),end=start+amount/total*100;segments.push(`${color} ${start}% ${end}%`);start=end}donut.style.background='conic-gradient('+segments.join(',')+')';function choose(name){const amount=totals.get(name);center.replaceChildren();const title=document.createElement('div');title.textContent=name;const value=document.createElement('strong');value.textContent=euro(amount);const pct=document.createElement('div');pct.textContent=(amount/total*100).toLocaleString('it-IT',{maximumFractionDigits:1})+'%';center.append(title,value,pct);legend.querySelectorAll('button').forEach(b=>b.classList.toggle('active',b.dataset.cat===name))}for(const [name,color] of rows){const btn=document.createElement('button');btn.dataset.cat=name;const dot=document.createElement('span');dot.className='categoryDot';dot.style.background=color;const title=document.createElement('span');title.textContent=name;const percent=document.createElement('span');percent.className='categoryPercent';percent.textContent=(totals.get(name)/total*100).toLocaleString('it-IT',{maximumFractionDigits:1})+'%';btn.append(dot,title,percent);btn.onclick=()=>choose(name);legend.append(btn)}choose(rows[0][0])}
+function renderCategories(){
+ const all=v48CategoryEntries(),totals=new Map(),counts=new Map();
+ for(const {item:x} of all){const value=Number(x.amount)||0;if(value<=0)continue;const c=categoryForItem(x);totals.set(c,(totals.get(c)||0)+value);counts.set(c,(counts.get(c)||0)+1)}
+ const total=[...totals.values()].reduce((a,b)=>a+b,0),donut=$('categoryDonut'),legend=$('categoryLegend'),center=$('categoryCenter');
+ $('categoryMonth').textContent=ML[cm]+' '+cy;legend.replaceChildren();
+ const review=all.filter(({item})=>v48NeedsReview(item)).length;
+ $('smartStatus').textContent=totals.size+' categorie'+(review?' · '+review+' da verificare':' · tutto classificato');
+ donut.setAttribute('role','button');donut.tabIndex=0;donut.title='Tocca per vedere i movimenti della categoria';
+ if(!total){donut.style.background='#e9edf4';center.textContent='Nessuna spesa';legend.innerHTML='<button type="button" class="categoryMore">Gestisci categorie ›</button>';legend.firstChild.onclick=()=>v48OpenReview();donut.onclick=()=>v48OpenReview();return}
+ const sorted=categoryPalette.filter(([n])=>totals.has(n)).sort((a,b)=>totals.get(b[0])-totals.get(a[0]));let start=0;
+ donut.style.background='conic-gradient('+sorted.map(([name,color])=>{const end=start+totals.get(name)/total*100,part=color+' '+start+'% '+end+'%';start=end;return part}).join(',')+')';
+ function choose(name){v48SelectedCategory=name;center.replaceChildren();const labelEl=document.createElement('div');labelEl.textContent=name||'Totale uscite';const value=document.createElement('strong');value.textContent=euro(name?totals.get(name):total);const hint=document.createElement('div');hint.textContent=name?(totals.get(name)/total*100).toLocaleString('it-IT',{maximumFractionDigits:1})+'%':'Tocca per dettagli';hint.style.fontSize='8px';center.append(labelEl,value,hint);legend.querySelectorAll('[data-cat]').forEach(b=>b.classList.toggle('active',b.dataset.cat===name));donut.setAttribute('aria-label','Mostra movimenti '+(name||'tutte le categorie'))}
+ for(const [name,color] of sorted.slice(0,5)){const btn=document.createElement('button');btn.type='button';btn.dataset.cat=name;const dot=document.createElement('span');dot.className='categoryDot';dot.style.background=color;const title=document.createElement('span');title.textContent=name;const pct=document.createElement('span');pct.className='categoryPercent';pct.textContent=(totals.get(name)/total*100).toLocaleString('it-IT',{maximumFractionDigits:0})+'%';btn.append(dot,title,pct);btn.onclick=()=>choose(name);legend.append(btn)}
+ const more=document.createElement('button');more.type='button';more.className='categoryMore';more.textContent=sorted.length>5?'＋ Altre '+(sorted.length-5)+' categorie · vedi tutte ›':'Vedi tutte le categorie ›';more.onclick=()=>v48OpenReview();legend.append(more);
+ if(!totals.has(v48SelectedCategory))v48SelectedCategory=null;choose(v48SelectedCategory);donut.onclick=()=>v48OpenReview(v48SelectedCategory);donut.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();v48OpenReview(v48SelectedCategory)}};
+}
+let v48SelectedCategory=null;
+function v48CategoryEntries(){return ['fixed','needs','policies'].flatMap(type=>items(type).map(item=>({type,item})));}
+function v48NeedsReview(x){const guess=inferExpense(x.name);return !x.categoryManual&&(guess.confidence<.9||categoryForItem(x)!==guess.category);}
 function renderCol(type,id){
   const el=$(id),a=items(type).slice().sort((x,y)=>(dayOf(x)??32)-(dayOf(y)??32));
   el.innerHTML="";
@@ -946,6 +1060,23 @@ function renderCol(type,id){
     r.querySelector(".colMeta").textContent=meta(x);
     r.onclick=e=>{e.stopPropagation();openEdit(type,x)};el.appendChild(r);
   });
+}
+function v48FitTwoRows(){
+  const grid=document.querySelector('.cols');
+  const lists=[$('fixedRows'),$('needsRows')];
+  const positions=lists.map(list=>list.scrollTop);
+  grid.style.removeProperty('--v48-two-item-size');
+  grid.style.removeProperty('--v48-two-list-size');
+  if(!window.matchMedia('(max-width:600px)').matches||document.body.classList.contains('v48Expanded'))return;
+  // Keep the approved card size whenever two full rows already fit. If a
+  // name wraps, both columns grow just enough to show two complete rows.
+  const paddingTop=parseFloat(getComputedStyle(lists[0]).paddingTop)||0;
+  const baseline=Math.max(...lists.map(list=>list.getBoundingClientRect().height));
+  const natural=Math.max(0,...lists.flatMap(list=>Array.from(list.children).slice(0,2).map(row=>row.getBoundingClientRect().height)));
+  const rowHeight=Math.ceil(Math.max((baseline-paddingTop)/2,natural)*64)/64;
+  grid.style.setProperty('--v48-two-item-size',rowHeight+'px');
+  grid.style.setProperty('--v48-two-list-size',(paddingTop+2*rowHeight)+'px');
+  lists.forEach((list,index)=>{list.scrollTop=positions[index]});
 }
 function renderBalance(){
   const k=key(),v=projectedBalance(k),title=$("balanceTitle"),value=$("balanceTotal"),sub=$("balanceSub");
@@ -961,7 +1092,7 @@ function renderBalance(){
     sub.textContent="Stima retroattiva rispetto al saldo aggiornato · "+label(anchor);
   }
 }
-function render(){backfillExpenseCategories();renderPending();$("monthName").textContent=ML[cm];$("monthYear").textContent=cy;$("futureBanner").style.display=future()?"block":"none";$("incomeTotal").textContent=euro(sum("income"));renderIncome();$("fixedTotal").textContent=euro(sum("fixed"));renderCol("fixed","fixedRows");$("needsTotal").textContent=euro(sum("needs"));renderCol("needs","needsRows");renderCategories();$("expenseTotal").textContent=euro(expenses());$("allExpenses").textContent=euro(expenses());$("savingTotal").textContent=euro(sum("income")-expenses());renderBalance()}
+function render(){syncCategoryOptions();renderPending();$("monthName").textContent=ML[cm];$("monthYear").textContent=cy;$("futureBanner").style.display=future()?"block":"none";$("incomeTotal").textContent=euro(sum("income"));renderIncome();$("fixedTotal").textContent=euro(sum("fixed"));renderCol("fixed","fixedRows");$("needsTotal").textContent=euro(sum("needs"));renderCol("needs","needsRows");renderCategories();$("expenseTotal").textContent=euro(expenses());$("allExpenses").textContent=euro(expenses());$("savingTotal").textContent=euro(sum("income")-expenses());renderBalance();v48FitTwoRows()}
 $("prevMonth").onclick=()=>{const d=new Date(cy,cm-1,1);if(d.getFullYear()<2026)return;cy=d.getFullYear();cm=d.getMonth();render()};
 $("nextMonth").onclick=()=>{const d=new Date(cy,cm+1,1);if(d.getFullYear()>2100)return;cy=d.getFullYear();cm=d.getMonth();render()};
 
@@ -1084,7 +1215,7 @@ $("clearBalanceBtn").onclick=()=>{
 };
 
 function collectMonthAmounts(baseAmount){const out={};document.querySelectorAll(".mp.sel").forEach(mp=>{const m=Number(mp.dataset.m),v=Number(mp.querySelector("input").value||baseAmount);out[m]=v});return out}
-$("addBtn").onclick=()=>{const type=$("newType").value,name=$("newName").value.trim(),expenseCategory=type==="income"?undefined:$("newExpenseCategory").value,amount=Number($("newAmount").value),f=$("frequency").value,k=key();let dueDay;try{dueDay=readDay("newDay")}catch(e){return alert(e.message)}if(!name||amount<=0)return alert("Inserisci nome e importo.");ensure(k);if(type!=="income"&&newCategoryTouched)learnCategory(name,expenseCategory);if(f==="once"){data.months[k][type].push({id:"o-"+Date.now(),name,amount,dueDay,expenseCategory,categoryManual:newCategoryTouched})}else{const id="r-"+Date.now()+"-"+Math.random().toString(16).slice(2);let schedule;if(f==="monthly")schedule={kind:"monthly"};if(f==="annual")schedule={kind:"annual",month:Number($("annualMonth").value)};if(f==="selectedYearly"){const amounts=collectMonthAmounts(amount);if(!Object.keys(amounts).length)return alert("Seleziona almeno un mese.");schedule={kind:"selectedYearly",amounts}}if(f==="selectedOneYear"){const amounts=collectMonthAmounts(amount);if(!Object.keys(amounts).length)return alert("Seleziona almeno un mese.");schedule={kind:"selectedOneYear",year:Number($("targetYear").value),amounts}}data.rules[id]={id,type,name,start:k,end:null,skip:[],schedule,amount,dueDay,expenseCategory,categoryManual:newCategoryTouched};if(cmp(k,realKey)<=0&&ruleActive(data.rules[id],k)){const a=amountForRule(data.rules[id],k);data.months[k][type].push({id:"i-"+id+"-"+k,name,amount:a,ruleId:id,dueDay,expenseCategory,categoryManual:newCategoryTouched})}}$("addModal").classList.remove("open");save()};
+$("addBtn").onclick=()=>{const type=$("newType").value,name=$("newName").value.trim(),expenseCategory=type==="income"?undefined:$("newExpenseCategory").value,amount=Number($("newAmount").value),f=$("frequency").value,k=key();let dueDay;try{dueDay=readDay("newDay")}catch(e){return alert(e.message)}if(!name||!Number.isFinite(amount)||amount<=0)return alert("Inserisci nome e importo valido.");ensure(k);if(type!=="income"&&newCategoryTouched)learnCategory(name,expenseCategory);if(f==="once"){data.months[k][type].push({id:"o-"+Date.now(),name,amount,dueDay,expenseCategory,categoryManual:newCategoryTouched})}else{const id="r-"+Date.now()+"-"+Math.random().toString(16).slice(2);let schedule;if(f==="monthly")schedule={kind:"monthly"};if(f==="annual")schedule={kind:"annual",month:Number($("annualMonth").value)};if(f==="selectedYearly"){const amounts=collectMonthAmounts(amount);if(Object.values(amounts).some(v=>!Number.isFinite(v)||v<=0))return alert("Inserisci importi validi per i mesi selezionati.");if(!Object.keys(amounts).length)return alert("Seleziona almeno un mese.");schedule={kind:"selectedYearly",amounts}}if(f==="selectedOneYear"){const amounts=collectMonthAmounts(amount);if(Object.values(amounts).some(v=>!Number.isFinite(v)||v<=0))return alert("Inserisci importi validi per i mesi selezionati.");if(!Object.keys(amounts).length)return alert("Seleziona almeno un mese.");schedule={kind:"selectedOneYear",year:Number($("targetYear").value),amounts}}data.rules[id]={id,type,name,start:k,end:null,skip:[],schedule,amount,dueDay,expenseCategory,categoryManual:newCategoryTouched};if(cmp(k,realKey)<=0&&ruleActive(data.rules[id],k)){const a=amountForRule(data.rules[id],k);data.months[k][type].push({id:"i-"+id+"-"+k,name,amount:a,ruleId:id,dueDay,expenseCategory,categoryManual:newCategoryTouched})}}$("addModal").classList.remove("open");save()};
 
 function openEdit(type,item){
   pendingEdit={type,item};
@@ -1103,73 +1234,42 @@ function openEdit(type,item){
 }
 function applyEdit(mode){
   if(!pendingEdit)return;
-  const {type,item}=pendingEdit;
-  const k=key();
-  const name=$("editName").value.trim();
-  const amount=Number($("editAmount").value);
-  const expenseCategory=type==="income"?undefined:$("editExpenseCategory").value;
-  if(type!=="income"){learnCategory(name,expenseCategory);if(item.ruleId&&data.rules[item.ruleId]){data.rules[item.ruleId].categoryManual=true;data.rules[item.ruleId].expenseCategory=expenseCategory}}
-  let dueDay;try{dueDay=readDay("editDay")}catch(e){return alert(e.message)}
-  if(!name||amount<=0)return alert("Inserisci nome e importo.");
-
-  let newSchedule;
-  try{ newSchedule=scheduleFromEdit(amount); }
-  catch(e){ return alert(e.message); }
-
+  const {type,item}=pendingEdit,k=key(),name=$("editName").value.trim(),amount=Number($("editAmount").value),expenseCategory=type==="income"?undefined:$("editExpenseCategory").value;
+  let dueDay,newSchedule;
+  try{
+    if(!name||!Number.isFinite(amount)||amount<=0)throw new Error("Inserisci nome e importo valido.");
+    dueDay=readDay("editDay");newSchedule=scheduleFromEdit(amount);
+    if(newSchedule!==null)newSchedule=v48ArchiveSchedule(newSchedule,amount);
+    if(type!=="income"&&!categoryPalette.some(([c])=>c===expenseCategory))throw new Error("Seleziona una categoria valida.");
+  }catch(e){return alert(e.message)}
   ensure(k);
-  const a=data.months[k][type];
-  const idx=a.findIndex(x=>x.id===item.id);
+  const a=data.months[k][type],idx=a.findIndex(x=>x.id===item.id);
   if(idx<0)return;
-
+  // Learn only after all input has passed validation. Existing rules retain their
+  // historical category: monthly exceptions must never rewrite the whole series.
+  if(type!=="income")learnCategory(name,expenseCategory);
+  const edited={...item,id:"edit-"+Date.now(),name,amount,dueDay,expenseCategory,categoryManual:true};delete edited.ruleId;
   if(mode==="month"){
-    // SOLO questo mese: salva una eccezione mensile.
-    if(item.ruleId){
-      const old=data.rules[item.ruleId];
-      if(old){
-        if(!old.skip)old.skip=[];
-        if(!old.skip.includes(k))old.skip.push(k);
-      }
+    if(item.ruleId&&data.rules[item.ruleId]){
+      const old=data.rules[item.ruleId];if(!Array.isArray(old.skip))old.skip=[];if(!old.skip.includes(k))old.skip.push(k);
     }
-    if(newSchedule===null){
-      a[idx]={id:"edit-"+Date.now(),name,amount,dueDay,expenseCategory,categoryManual:true};
-    }else{
-      // Se l'utente sceglie una frequenza nel salvataggio mensile,
-      // questa voce resta comunque soltanto un'eccezione del mese corrente.
-      a[idx]={id:"edit-"+Date.now(),name,amount,dueDay,expenseCategory,categoryManual:true,frequencyLabel:$("editFrequency").value};
-    }
+    if(newSchedule!==null)edited.frequencyLabel=$("editFrequency").value;else delete edited.frequencyLabel;
+    a[idx]=edited;
   }else{
-    // DA QUESTO MESE IN POI: chiude la vecchia regola e crea la nuova frequenza.
-    if(item.ruleId && data.rules[item.ruleId]){
+    const inherited=item.ruleId&&data.rules[item.ruleId]?JSON.parse(JSON.stringify(data.rules[item.ruleId])):{};
+    if(item.ruleId&&data.rules[item.ruleId]){
       data.rules[item.ruleId].end=prev(k);
-      Object.keys(data.months).forEach(m=>{
-        if(cmp(m,k)>=0){
-          data.months[m][type]=data.months[m][type].filter(x=>x.ruleId!==item.ruleId);
-        }
-      });
-    }else{
-      a.splice(idx,1);
-    }
-
-    if(newSchedule===null){
-      // "Solo questo mese" scelto anche con pulsante permanente:
-      // rimane solo nel mese corrente, nessuna ricorrenza futura.
-      data.months[k][type].push({id:"o-"+Date.now(),name,amount,dueDay,expenseCategory,categoryManual:true});
-    }else{
-      const nid="r-edit-"+Date.now()+"-"+Math.random().toString(16).slice(2);
-      const nr={id:nid,type,name,amount,dueDay,expenseCategory,categoryManual:true,start:k,end:null,skip:[],schedule:newSchedule};
+      Object.keys(data.months).forEach(m=>{if(cmp(m,k)>=0)data.months[m][type]=data.months[m][type].filter(x=>x.ruleId!==item.ruleId)});
+    }else a.splice(idx,1);
+    if(newSchedule===null){edited.id="o-"+Date.now();delete edited.frequencyLabel;data.months[k][type].push(edited)}
+    else{
+      const nid="r-edit-"+Date.now()+"-"+Math.random().toString(16).slice(2),nr={...inherited,id:nid,type,name,amount,dueDay,expenseCategory,categoryManual:true,start:k,end:null,skip:[],schedule:newSchedule};
       data.rules[nid]=nr;
-      if(cmp(k,realKey)<=0&&ruleActive(nr,k)){
-        data.months[k][type].push({id:"i-"+nid+"-"+k,name,amount:amountForRule(nr,k),ruleId:nid,dueDay,expenseCategory,categoryManual:true});
-      }
+      if(cmp(k,realKey)<=0&&ruleActive(nr,k))data.months[k][type].push({...edited,id:"i-"+nid+"-"+k,amount:amountForRule(nr,k),ruleId:nid});
     }
   }
-
   pendingEdit=null;
-  $("editModal").classList.remove("open");
-  $("detailModal").classList.remove("open");
-  $("deleteModal").classList.remove("open");
-  save();
-  window.scrollTo({top:0,behavior:"smooth"});
+  $("editModal").classList.remove("open");$("detailModal").classList.remove("open");$("deleteModal").classList.remove("open");save();window.scrollTo({top:0,behavior:"smooth"});
 }
 $("editOnly").onclick=()=>applyEdit("month");
 $("editForever").onclick=()=>applyEdit("forever");
@@ -1210,7 +1310,7 @@ function getBackupFileName(){
 async function exportBackup(){
   const payload={
     app:"Spese Famiglia",
-    version:"v22",
+    version:"v48",
     exportedAt:new Date().toISOString(),
     data:JSON.parse(JSON.stringify(data))
   };
@@ -1244,30 +1344,111 @@ async function exportBackup(){
   setTimeout(()=>URL.revokeObjectURL(url),1500);
 }
 
+
+// v48: validate a detached candidate before touching the active archive.
+const PRE_IMPORT_BACKUP_KEY=KEY+"_preImport_v48";
+function v48ArchiveObject(value){return !!value&&typeof value==="object"&&!Array.isArray(value)}
+function v48ArchiveMonth(value,label="Mese"){
+  if(typeof value!=="string"||!/^\d{4}-(0[1-9]|1[0-2])$/.test(value)||Number(value.slice(0,4))<1900)throw new Error(label+": usa il formato AAAA-MM (anno da 1900).");
+  return value;
+}
+function v48ArchiveAmount(value,label="Importo",signed=false){
+  if((typeof value!=="number"&&typeof value!=="string")||value===""||(typeof value==="string"&&!value.trim()))throw new Error(label+": inserisci un numero valido.");
+  const n=Number(value);
+  if(!Number.isFinite(n)||(!signed&&n<0)||Math.abs(n)>1e12)throw new Error(label+": deve essere un numero finito"+(signed?"":" e non negativo")+".");
+  return n;
+}
+function v48ArchiveText(value,fallback,max,label){
+  if(value==null)return fallback;
+  if(typeof value!=="string"&&typeof value!=="number")throw new Error(label+": testo non valido.");
+  const s=String(value).trim();if(s.length>max)throw new Error(label+": massimo "+max+" caratteri.");return s||fallback;
+}
+function v48ArchiveDay(value){
+  if(value==null||value==="")return null;
+  const n=Number(value);if(!Number.isInteger(n)||n<1||n>31)throw new Error("Giorno di scadenza non valido: usa un valore da 1 a 31.");return n;
+}
+function v48ArchiveSchedule(source,baseAmount){
+  const s=source==null?{kind:"monthly"}:JSON.parse(JSON.stringify(source));
+  if(!v48ArchiveObject(s)||!["monthly","annual","selectedYearly","selectedOneYear"].includes(s.kind))throw new Error("Una frequenza ricorrente non è valida.");
+  if(s.kind==="annual"){
+    const n=Number(s.month);if((typeof s.month!=="number"&&typeof s.month!=="string")||s.month===""||!Number.isInteger(n)||n<0||n>11)throw new Error("Il mese annuale deve essere compreso tra 0 e 11.");s.month=n;
+  }
+  if(s.kind==="selectedOneYear"){
+    const n=Number(s.year);if(!Number.isInteger(n)||n<1900||n>9999)throw new Error("L’anno della ricorrenza non è valido.");s.year=n;
+  }
+  if(s.kind==="selectedYearly"||s.kind==="selectedOneYear"){
+    if(!v48ArchiveObject(s.amounts)||!Object.keys(s.amounts).length||Object.keys(s.amounts).length>12)throw new Error("Seleziona almeno un mese della ricorrenza.");
+    for(const m of Object.keys(s.amounts)){
+      if(!/^(0|[1-9]|10|11)$/.test(m))throw new Error("Mese selezionato non valido: usa 0–11.");
+      s.amounts[m]=v48ArchiveAmount(s.amounts[m],"Importo della ricorrenza");
+    }
+  }
+  return s;
+}
+function validateImportedArchive(parsed){
+  if(!v48ArchiveObject(parsed))throw new Error("Il file non contiene un archivio Spese Famiglia valido.");
+  const incoming=parsed.data||parsed.backup?.data||parsed.backup||parsed;
+  if(!v48ArchiveObject(incoming)||!v48ArchiveObject(incoming.months))throw new Error("Il backup deve contenere l’oggetto months.");
+  const restored=JSON.parse(JSON.stringify(incoming)),groups=["income","fixed","policies","needs"];
+  if(Object.keys(restored.months).length>2400)throw new Error("Il backup contiene troppi mesi (massimo 2.400).");
+  if(restored.rules==null)restored.rules={};else if(!v48ArchiveObject(restored.rules))throw new Error("Le ricorrenze devono essere un oggetto.");
+  if(Object.keys(restored.rules).length>50000)throw new Error("Il backup contiene troppe ricorrenze.");
+  if(restored.categoryLearning!=null&&!v48ArchiveObject(restored.categoryLearning))throw new Error("La memoria delle categorie non è valida.");
+  let count=0;
+  function item(source,label,fallback){
+    if(!v48ArchiveObject(source))throw new Error(label+": movimento non valido.");
+    const x={...source};x.id=v48ArchiveText(x.id,fallback,256,"ID movimento");x.name=v48ArchiveText(x.name,"Movimento senza nome",500,"Nome movimento");x.amount=v48ArchiveAmount(x.amount,label);x.dueDay=v48ArchiveDay(x.dueDay);
+    if(x.ruleId!=null)x.ruleId=v48ArchiveText(x.ruleId,null,256,"ID ricorrenza");
+    return x;
+  }
+  for(const [month,m] of Object.entries(restored.months)){
+    v48ArchiveMonth(month);if(!v48ArchiveObject(m))throw new Error("Il mese "+month+" non è valido.");
+    for(const group of groups){
+      if(m[group]==null)m[group]=[];else if(!Array.isArray(m[group]))throw new Error("Il gruppo "+group+" del mese "+month+" deve essere un elenco.");
+      count+=m[group].length;if(m[group].length>50000||count>300000)throw new Error("Il backup contiene troppi movimenti.");
+      m[group]=m[group].map((x,i)=>item(x,"Importo nel mese "+month,"v48-import-"+month+"-"+group+"-"+i));
+    }
+    // Same legacy migration, applied exclusively to the detached candidate.
+    const ids=new Set(m.fixed.map(x=>x.id));for(const x of m.policies)if(!ids.has(x.id)){m.fixed.push(x);ids.add(x.id)}m.policies=[];
+  }
+  for(const [id,r] of Object.entries(restored.rules)){
+    if(["__proto__","prototype","constructor"].includes(id)||id.length>256||!v48ArchiveObject(r))throw new Error("Una ricorrenza ha un ID o formato non valido.");
+    if(r.id!=null&&r.id!==id)throw new Error("L’ID di una ricorrenza non coincide con il suo riferimento.");r.id=id;
+    if(!groups.includes(r.type))throw new Error("Il tipo di una ricorrenza non è valido.");if(r.type==="policies")r.type="fixed";
+    r.name=v48ArchiveText(r.name,"Ricorrenza senza nome",500,"Nome ricorrenza");r.amount=v48ArchiveAmount(r.amount,"Importo di «"+r.name+"»");r.dueDay=v48ArchiveDay(r.dueDay);
+    r.start=v48ArchiveMonth(r.start||Object.keys(restored.months).sort()[0]||BASE,"Inizio ricorrenza");
+    if(r.end!=null&&r.end!=="")v48ArchiveMonth(r.end,"Fine ricorrenza");else r.end=null;
+    if(r.skip==null)r.skip=[];else if(!Array.isArray(r.skip)||r.skip.length>2400)throw new Error("I mesi saltati di una ricorrenza non sono validi.");
+    r.skip=[...new Set(r.skip.map(m=>v48ArchiveMonth(m,"Mese saltato")))];r.schedule=v48ArchiveSchedule(r.schedule,r.amount);
+  }
+  if(restored.pendingIncome==null)restored.pendingIncome=[];
+  if(!Array.isArray(restored.pendingIncome)||restored.pendingIncome.length>50000)throw new Error("Le entrate in attesa devono essere un elenco valido.");
+  restored.pendingIncome=restored.pendingIncome.map((x,i)=>{const p=item(x,"Entrata in attesa","v48-pending-"+i);if(p.originMonth)v48ArchiveMonth(p.originMonth,"Mese di origine");return p});
+  if(!Object.prototype.hasOwnProperty.call(restored,"balance"))restored.balance=null;
+  if(restored.balance!=null){
+    if(!v48ArchiveObject(restored.balance))throw new Error("Il saldo del conto non è valido.");
+    restored.balance.amount=v48ArchiveAmount(restored.balance.amount,"Saldo del conto",true);v48ArchiveMonth(restored.balance.anchorMonth,"Mese del saldo");
+  }
+  return restored;
+}
+
 function restoreFromBackup(file){
+  if(!file)return;
+  if(file.size>15*1024*1024){alert("Il backup supera 15 MB. Seleziona un file JSON più piccolo.");return}
   const reader=new FileReader();
   reader.onload=()=>{
     try{
-      const parsed=JSON.parse(reader.result);
-      const incoming=parsed.data||parsed.backup?.data||parsed.backup||parsed;
-      if(!incoming || typeof incoming!=="object" || !incoming.months || typeof incoming.months!=="object") throw new Error("Il file non contiene un archivio Spese Famiglia valido");
-      const restored=JSON.parse(JSON.stringify(incoming));
-      if(!restored.rules || typeof restored.rules!=="object")restored.rules={};
-      if(!Array.isArray(restored.pendingIncome))restored.pendingIncome=[];
-      // Non sostituire i dati correnti fino a quando il backup non e' stato validato.
+      const restored=validateImportedArchive(JSON.parse(reader.result));
+      const snapshot={app:"Spese Famiglia",version:"v48",reason:"pre-import",createdAt:new Date().toISOString(),data:JSON.parse(JSON.stringify(data))};
+      // Keep this copy separate from the daily backup that save/render may refresh.
+      localStorage.setItem(PRE_IMPORT_BACKUP_KEY,JSON.stringify(snapshot));
+      localStorage.setItem(KEY,JSON.stringify(restored));
       data=restored;
-      mergeOldPolicies();
-      if(!Object.prototype.hasOwnProperty.call(data,"balance"))data.balance=null;
-      localStorage.setItem(KEY,JSON.stringify(data));
+      if(typeof syncCategoryOptions==="function")syncCategoryOptions();
       try{dailyBackup()}catch(e){console.warn("Backup automatico non disponibile",e)}
       render();
       $("backupModal").classList.remove("open");
-      if(!balanceConfigured()){
-        alert("Backup ripristinato correttamente. Ora inserisci il saldo reale attuale del conto: da quel valore calcolerò automaticamente tutte le previsioni future.");
-        openBalance();
-      }else{
-        alert("Backup ripristinato correttamente, compreso il saldo conto.");
-      }
+      alert(balanceConfigured()?"Backup ripristinato correttamente, compreso il saldo conto.":"Backup ripristinato correttamente. Puoi impostare il saldo dal riquadro Saldo totale quando vuoi.");
     }catch(e){
       alert("Impossibile importare il backup: "+(e.message||"file non valido"));
     }
@@ -1277,6 +1458,7 @@ function restoreFromBackup(file){
 }
 
 function updateBackupBadge(){
+  if($("v48PreImportBtn"))$("v48PreImportBtn").classList.toggle("hidden",!localStorage.getItem(PRE_IMPORT_BACKUP_KEY));
   let b=[];
   try{b=JSON.parse(localStorage.getItem(BACKUP_KEY)||"[]")}catch(e){}
   const last=b[b.length-1];
@@ -1349,6 +1531,47 @@ $('bankFile').onchange=async e=>{const file=e.target.files[0];if(!file)return;$(
 $('bankImport').onclick=()=>{let selected=bankRows.filter(r=>r.selected);if(!selected.length)return alert('Nessun movimento selezionato.');if(!confirm('Importare '+selected.length+' movimenti? Controlla che non siano duplicati.'))return;data.bankImported=data.bankImported||[];for(const r of selected){const k=r.date.slice(0,7);ensure(k);let t=r.type;data.months[k][t].push({id:'bank-'+Date.now()+'-'+Math.random().toString(36).slice(2),name:r.name,amount:Math.abs(r.amount),dueDay:Number(r.date.slice(8)),bankDate:r.date,bankImported:true,bankPosted:r.posted,expenseCategory:r.type==="income"?undefined:expenseCategory(bankShortName(r.name))});data.bankImported.push(bankSignature(r)+'#'+r.bankOccurrence)}save();render();bankModal.classList.remove('open');bankRows=[];$('bankFile').value='';$('bankRows').innerHTML='';$('bankStatus').textContent='Nessun file selezionato.';$('bankImport').style.display='none';window.scrollTo({top:0,behavior:'smooth'});alert('Importati '+selected.length+' movimenti. Home aggiornata.')};
 
 $("smartReview").onclick=()=>{const btn=$("smartReview"),status=$("smartStatus");btn.disabled=true;status.textContent="Controllo in corso…";try{const count=backfillExpenseCategories(true);save();render();const pending=new Set();for(const month of Object.values(data.months||{}))for(const type of ['fixed','needs','policies'])for(const x of (month[type]||[])){if(!x.categoryManual&&inferExpense(x.name).confidence<.9)pending.add(normExpense(x.name))}status.textContent=count+" voci aggiornate · "+pending.size+" descrizioni da verificare";}catch(e){console.error(e);status.textContent="Errore: "+e.message}finally{btn.disabled=false}};
+$('v48PreImportBtn').onclick=()=>{try{const raw=localStorage.getItem(PRE_IMPORT_BACKUP_KEY);if(!raw)return alert("Nessuna copia precedente disponibile.");const blob=new Blob([raw],{type:"application/json"}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='Spese_Famiglia_Prima_Ripristino.json';document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1500)}catch(e){alert("Copia non disponibile: "+e.message)}};
+// v48: dettaglio categorie e preferenza compatta, con la disposizione originale.
+let v48ReviewModal=null;
+function v48ReviewRows(){
+ if(!v48ReviewModal)return;
+ const q=$('v48CategorySearch').value.toLowerCase().trim(),filter=$('v48CategoryFilter').value,root=$('v48CategoryRows');root.replaceChildren();
+ const rows=v48CategoryEntries().filter(({item:x})=>(!q||(x.name+' '+categoryForItem(x)).toLowerCase().includes(q))&&(!filter||(filter==='__review'?v48NeedsReview(x):categoryForItem(x)===filter))).sort((a,b)=>Number(b.item.amount)-Number(a.item.amount));
+ $('v48CategorySummary').textContent=rows.length+' voci · '+euro(rows.reduce((s,{item})=>s+Number(item.amount||0),0));
+ if(!rows.length){const empty=document.createElement('div');empty.className='v48ReviewEmpty';empty.textContent='Nessuna voce per questo filtro.';root.append(empty);return}
+ for(const {type,item} of rows){
+  const row=document.createElement('div');row.className='v48ReviewRow'+(v48NeedsReview(item)?' warning':'');
+  const top=document.createElement('div');top.className='v48ReviewTop';const name=document.createElement('span');name.className='v48ReviewName';name.textContent=item.name;const amount=document.createElement('strong');amount.className='v48ReviewAmount';amount.textContent=euro(item.amount);top.append(name,amount);
+  const metaEl=document.createElement('div');metaEl.className='v48ReviewMeta';metaEl.textContent=(type==='needs'?'Fabbisogno':'Uscita fissa')+' · '+meta(item)+(v48NeedsReview(item)?' · verifica categoria':'');
+  const select=document.createElement('select');select.setAttribute('aria-label','Categoria di '+item.name);for(const [n] of categoryPalette){const o=document.createElement('option');o.value=n;o.textContent=n;select.append(o)}select.value=categoryForItem(item);select.onchange=()=>{item.expenseCategory=select.value;item.categoryManual=true;item.categoryConfidence=1;learnCategory(item.name,select.value);save();v48ReviewRows()};
+  const edit=document.createElement('button');edit.type='button';edit.className='soft';edit.style.cssText='border:0;border-radius:7px;padding:6px 9px;margin-top:6px;font-size:10px;font-weight:800';edit.textContent='Modifica voce e ricorrenza ›';edit.onclick=()=>{v48ReviewModal.classList.remove('open');openEdit(type,item)};
+  row.append(top,metaEl,select,edit);root.append(row);
+ }
+}
+function v48OpenReview(category){
+ if(!v48ReviewModal){
+  v48ReviewModal=document.createElement('div');v48ReviewModal.id='v48CategoriesModal';v48ReviewModal.className='modal';v48ReviewModal.innerHTML='<div class="sheet"><div class="sheetHead"><div class="sheetTitle">📊 Categorie</div><button type="button" class="close" id="v48CategoryClose" aria-label="Chiudi categorie">✕</button></div><div class="badge" id="v48CategorySummary"></div><div class="v48ReviewTools"><input type="search" id="v48CategorySearch" placeholder="Cerca una spesa…" aria-label="Cerca nelle categorie"><select id="v48CategoryFilter" aria-label="Filtra categorie"></select></div><div class="v48ReviewNote">Le correzioni valgono per la voce di questo mese. Per aggiornare una ricorrenza usa «Modifica voce e ricorrenza».</div><div id="v48CategoryRows"></div><div class="v48ReviewActions"><button type="button" class="soft" id="v48AnalyzeCategories">✨ Rianalizza automatiche</button><button type="button" class="soft" id="v48ShowCustom">＋ Nuova categoria</button></div><form id="v48CustomCategory" class="v48CustomForm hidden"><input type="text" id="v48CustomName" placeholder="Nome categoria" maxlength="40" required aria-label="Nome nuova categoria"><input type="color" id="v48CustomColor" value="#6497b1" aria-label="Colore nuova categoria"><button type="submit">Crea</button></form><div class="v48ReviewNote" id="v48CategoryFeedback" aria-live="polite">Riconoscimento locale tramite regole e correzioni memorizzate. Le categorie confermate a mano sono sempre mantenute.</div></div>';
+  document.body.append(v48ReviewModal);const v48Sheet=v48ReviewModal.querySelector('.sheet'),v48Rows=$('v48CategoryRows');v48Sheet.insertBefore(v48ReviewModal.querySelector('.v48ReviewActions'),v48Rows);v48Sheet.insertBefore($('v48CustomCategory'),v48Rows);$('v48CategoryClose').onclick=()=>v48ReviewModal.classList.remove('open');v48ReviewModal.onclick=e=>{if(e.target===v48ReviewModal)v48ReviewModal.classList.remove('open')};$('v48CategorySearch').oninput=v48ReviewRows;$('v48CategoryFilter').onchange=v48ReviewRows;
+  $('v48AnalyzeCategories').onclick=()=>{const changed=backfillExpenseCategories(true);save();v48ReviewRows();$('v48CategoryFeedback').textContent=changed+' voci automatiche controllate / aggiornate. Le conferme manuali restano conservate.'};
+  $('v48ShowCustom').onclick=()=>{$('v48CustomCategory').classList.toggle('hidden');if(!$('v48CustomCategory').classList.contains('hidden'))$('v48CustomName').focus()};
+  $('v48CustomCategory').onsubmit=e=>{e.preventDefault();const name=$('v48CustomName').value.trim(),color=$('v48CustomColor').value;if(!name)return;if(categoryPalette.some(([n])=>n.toLowerCase()===name.toLowerCase())){$('v48CategoryFeedback').textContent='Questa categoria esiste già.';return}categoryPalette.push([name,color]);if(!Array.isArray(data.customCategories))data.customCategories=[];data.customCategories.push({name,color});syncCategoryOptions();save();$('v48CustomName').value='';$('v48CustomCategory').classList.add('hidden');v48UpdateReviewOptions('');v48ReviewRows();$('v48CategoryFeedback').textContent='Categoria «'+name+'» creata: ora puoi assegnarla alle tue spese.'};
+ }
+ $('v48CategorySearch').value='';v48UpdateReviewOptions(category||'');v48ReviewRows();v48ReviewModal.classList.add('open');
+}
+function v48UpdateReviewOptions(selected){const select=$('v48CategoryFilter');select.replaceChildren();for(const [value,labelText] of [['','Tutte le categorie'],['__review','⚠ Da verificare'],...categoryPalette.map(([n])=>[n,n])]){const o=document.createElement('option');o.value=value;o.textContent=labelText;select.append(o)}select.value=selected||''}
+$('smartReview').onclick=()=>v48OpenReview();
+const V48_VIEW_KEY='speseFamiglia_v48_compact';
+let v48Compact=true;try{v48Compact=localStorage.getItem(V48_VIEW_KEY)!=='false'}catch(e){}
+$('v48Compact').checked=v48Compact;document.body.classList.toggle('v48Expanded',!v48Compact);
+$('v48Compact').onchange=()=>{v48Compact=$('v48Compact').checked;document.body.classList.toggle('v48Expanded',!v48Compact);v48FitTwoRows();try{localStorage.setItem(V48_VIEW_KEY,String(v48Compact))}catch(e){}};
+let v48RowsFrame=0;
+function v48ScheduleTwoRows(){cancelAnimationFrame(v48RowsFrame);v48RowsFrame=requestAnimationFrame(v48FitTwoRows)}
+window.addEventListener('resize',v48ScheduleTwoRows,{passive:true});
+window.addEventListener('pageshow',v48ScheduleTwoRows);
+if(document.fonts)document.fonts.ready.then(v48ScheduleTwoRows);
+document.addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelectorAll('.modal.open').forEach(m=>m.classList.remove('open'))});
+
 try{dailyBackup()}catch(e){console.warn("Backup automatico non disponibile",e)}render();checkDueAlerts();
 if("serviceWorker" in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}));
 })();
