@@ -60,3 +60,5 @@ VERIFICHE
 Interfaccia provata con viewport mobile 390x844 e altre dimensioni.
 Controllati import/export, nuove categorie e modifiche alle ricorrenze.
 Le anteprime fornite nella chat usano dati inventati, non inclusi nell'app.
+
+VERSIONE 51: importazione uscite in Fabbisogno salvo Sky, Apple e Agos; spostamento manuale bidirezionale delle spese importate tramite pulsante nella riga di dettaglio.
