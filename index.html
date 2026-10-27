@@ -785,7 +785,7 @@ button{cursor:pointer}button:focus-visible,[role=button]:focus-visible{outline:3
 
 <div class="modal" id="pendingModal"><div class="sheet"><div class="sheetHead"><div class="sheetTitle">Entrata in attesa</div><button class="close" data-close="pendingModal">✕</button></div><div class="form"><label>Descrizione<input id="pendingName" placeholder="Es. Rimborso"></label><label>Importo (€)<input id="pendingAmount" type="number" min="0.01" step="0.01"></label><button class="primary" id="savePendingBtn">Salva in attesa</button></div></div></div>
 <div class="modal" id="notifyModal"><div class="sheet"><div class="sheetHead"><div class="sheetTitle">🔔 Notifiche</div><button class="close" data-close="notifyModal">✕</button></div><div class="notifyOptions"><label><input type="checkbox" id="notifyEnabled"> Attiva notifiche</label><label>Avvisa prima della scadenza <select id="notifyAdvance"><option value="0">Il giorno stesso</option><option value="1">1 giorno prima</option><option value="2">2 giorni prima</option><option value="3">3 giorni prima</option><option value="7">7 giorni prima</option></select></label><label><input type="checkbox" id="notifyDue"> Avvisa anche il giorno della scadenza</label><button class="primary" id="requestNotifyBtn">Richiedi autorizzazione iPhone</button><button class="soft" id="saveNotifyBtn" style="border:0;padding:12px;border-radius:12px;font-weight:900">Salva preferenze</button><div class="itemMeta" id="notifyStatus">Le notifiche locali vengono controllate quando l'app è aperta. Per riceverle con l'app chiusa serve configurare un servizio push remoto. Su iPhone aggiungi prima l'app alla schermata Home.</div></div></div></div>
-<div class="modal" id="bankModal"><div class="sheet bankSheet"><div class="sheetHead"><div class="sheetTitle">🏦 Importa estratto conto <small>Intesa Sanpaolo</small></div><button class="close" id="bankClose">✕</button></div><div class="bankIntro">Carica il PDF, verifica le operazioni e scegli cosa aggiungere.</div><div class="bankUpload"><label for="bankFile">📄 Seleziona il PDF Intesa</label><input type="file" id="bankFile" accept="application/pdf,.pdf"></div><div id="bankStatus" class="bankStatus">Nessun file selezionato.</div><div id="bankRows" class="bankList"></div><div class="bankFooter"><button class="primary" id="bankImport" style="display:none">Aggiungi movimenti selezionati</button></div></div></div>
+<div class="modal" id="bankModal"><div class="sheet bankSheet"><div class="sheetHead"><div class="sheetTitle">🏦 Importa estratto conto <small>Intesa Sanpaolo</small></div><button class="close" id="bankClose">✕</button></div><div class="bankIntro">Carica un PDF anche da gennaio a oggi: i movimenti saranno distribuiti automaticamente nei rispettivi mesi. Verifica prima di aggiungere. Controlla il riepilogo per mese prima di confermare; per sicurezza fai un backup.</div><div class="bankUpload"><label for="bankFile">📄 Seleziona il PDF Intesa</label><input type="file" id="bankFile" accept="application/pdf,.pdf"></div><div id="bankStatus" class="bankStatus">Nessun file selezionato.</div><div id="bankRows" class="bankList"></div><div class="bankFooter"><button class="primary" id="bankImport" style="display:none">Aggiungi movimenti selezionati</button></div></div></div>
 <style>
 .bankSheet{width:min(96vw,540px)!important;max-width:540px!important;max-height:calc(100dvh - 24px)!important;height:min(850px,calc(100dvh - 24px));display:flex;flex-direction:column;overflow:hidden!important;padding:16px!important;border-radius:24px!important;box-sizing:border-box}
 .bankSheet .sheetHead{flex-shrink:0;align-items:flex-start}.bankSheet .sheetTitle{font-size:clamp(19px,5vw,25px);line-height:1.12;min-width:0}.bankSheet .sheetTitle small{display:block;font-size:12px;color:#687896;margin-top:4px}.bankIntro{font-size:12px;color:#69758b;margin:9px 0}.bankUpload{padding:11px;background:#eef5ff;border:1px dashed #8ab3ff;border-radius:14px;flex-shrink:0}.bankUpload label{display:block;font-weight:800;color:#2053a3;margin-bottom:6px}.bankUpload input{width:100%;max-width:100%;font-size:12px;box-sizing:border-box}.bankStatus{background:#f0f6ff;border-radius:12px;padding:10px;margin:9px 0;font-size:12px;line-height:1.45;color:#203a65;flex-shrink:0}.bankList{overflow-y:auto;overflow-x:hidden;flex:1;min-height:0;overscroll-behavior:contain}.bankRow{border:1px solid #e1e9f6;border-radius:14px;padding:12px!important;margin:7px 0;background:#fff;font-size:13px;box-sizing:border-box;min-width:0}.bankRow.warn{background:#fff5d8;border-color:#f5c45b}.bankRow.old{background:#f3f5f8;opacity:.8}.bankTop{display:flex;align-items:center;gap:8px;min-width:0}.bankTop input{width:20px;height:20px;flex-shrink:0;accent-color:#2865ee}.bankDay{background:#eaf1ff;color:#2355ac;border-radius:9px;padding:5px 7px;font-weight:800;font-size:11px;flex-shrink:0}.bankName{font-weight:850;overflow-wrap:anywhere;flex:1;min-width:0}.bankAmt{font-weight:900;white-space:nowrap;font-size:13px;color:#c42b44}.bankAmt.positive{color:#16825c}.bankSub{font-size:11px;color:#68758b;margin:7px 0 6px 29px;overflow-wrap:anywhere}.bankRow select{display:block;width:calc(100% - 29px);margin-left:29px;padding:8px;border-radius:9px;border:1px solid #d5e0f3;background:#f6f9ff;font-size:12px;box-sizing:border-box}.bankRow button{border:0;background:#f7df90;border-radius:9px;padding:8px;margin:5px 0 0 29px;text-align:left;font-size:12px}.bankMatches{white-space:pre-wrap;background:#fff9df;padding:8px;border-radius:8px;margin:5px 0 0 29px;font-size:12px}.bankFooter{padding:10px 0 0;flex-shrink:0;background:white}.bankFooter .primary{width:100%;border-radius:13px;padding:14px 10px;font-size:14px}
@@ -1516,8 +1516,49 @@ $('bankClose').onclick=()=>bankModal.classList.remove('open');
 function bankNormalize(s){return String(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9 ]/g,' ').replace(/\s+/g,' ').trim()}
 function bankExisting(k,sign){return (sign>0?['income']:['fixed','needs','policies']).flatMap(t=>items(t,k).map(x=>({...x,type:t})));}
 function bankCandidates(r){let k=r.date.slice(0,7);return bankExisting(k,Math.sign(r.amount)).filter(x=>Math.abs(Number(x.amount)-Math.abs(r.amount))<=1.0).map(x=>({x,exact:Math.abs(Number(x.amount)-Math.abs(r.amount))<0.005,sameDay:dayOf(x)===Number(r.date.slice(8)),nameMatch:bankNormalize(x.name).includes(bankNormalize(r.name))||bankNormalize(r.name).includes(bankNormalize(x.name))}));}
-function bankSignature(r){return [r.date,r.amount.toFixed(2),bankNormalize(r.name)].join('|')}
-function bankShortName(raw){const n=bankNormalize(raw);if(n.includes('crai'))return 'Crai Supermercato';if(n.includes('condominio talea'))return 'Condominio Talea';if(n.includes('condominio vico'))return 'Condominio Vico III';if(n.includes('enel'))return 'Enel Energia';if(n.includes('agos'))return 'Rata Agos';if(n.includes('sky'))return 'Sky';if(n.includes('apple'))return 'Apple';if(n.includes('uci matera'))return 'Cinema UCI';if(n.includes('giroconto'))return 'Giroconto';if(n.includes('commissione'))return 'Commissione bancaria';if(n.includes('agenzia delle entrate'))return 'Agenzia Entrate';if(n.includes('farmacia montesano'))return 'Bonifico Farmacia Montesano';if(n.includes('pagamento tramite pos'))return 'Spesa';if(n.includes('pellegrino lucia'))return 'Alimentari Pellegrino';if(n.includes('carta di credito'))return 'Carta di credito';if(n.includes('deliveroo'))return 'Deliveroo';if(n.includes('lindt'))return 'Lindt';if(n.includes('old wild west'))return 'Old Wild West';if(n.includes('intrend'))return 'Intrend';if(n.includes('klarna'))return 'Klarna';if(n.includes('coin'))return 'Coin';if(n.includes('prelievo'))return 'Prelievo';return String(raw||'Movimento bancario').split(/\s+(?:Generi alimentari|Bonifici ricevuti|Domiciliazioni|Ristoranti e bar)/i)[0].slice(0,55)}
+function bankSignature(r){return [r.date,r.amount.toFixed(2),bankNormalize(r.rawName||r.name)].join('|')}
+function bankStoredCount(signature){
+ let count=0;
+ for(const month of Object.values(data.months||{}))for(const type of ['income','fixed','needs','policies'])for(const x of (month[type]||[])){
+  if(x.bankSignature===signature)count++;
+ }
+ return count;
+}
+function bankCents(value){return Math.round(Number(value)*100)}
+function bankAudit(rows){
+ const seen=new Set(),months=new Map();let income=0,outgoing=0;
+ for(const r of rows){
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(r.date)||!Number.isFinite(r.amount)||bankCents(r.amount)===0)throw Error('Data o importo non valido: importazione interrotta.');
+  const signature=bankSignature(r)+'#'+r.bankOccurrence;
+  if(seen.has(signature))throw Error('Movimento duplicato nella selezione: '+r.date);
+  seen.add(signature);
+  const cents=bankCents(r.amount),key=r.date.slice(0,7);
+  const entry=months.get(key)||{count:0,income:0,outgoing:0};entry.count++;
+  if(cents>0){income+=cents;entry.income+=cents}else{outgoing-=cents;entry.outgoing-=cents}
+  months.set(key,entry);
+ }
+ return {count:rows.length,income,outgoing,months};
+}
+function bankPersistBatch(selected){
+ // All-or-nothing localStorage write: no partial months if browser storage fails.
+ const next=JSON.parse(JSON.stringify(data));next.bankImported=next.bankImported||[];
+ for(const r of selected){
+  const sig=bankSignature(r)+'#'+r.bankOccurrence;
+  if(next.bankImported.includes(sig))throw Error('Movimento gia importato: '+r.date+' '+r.amount);
+  const k=r.date.slice(0,7),type=r.amount>0?'income':r.type;
+  if(!['income','fixed','needs'].includes(type))throw Error('Destinazione non valida.');
+  if(!next.months[k])next.months[k]={income:[],fixed:[],needs:[],policies:[]};
+  if(!Array.isArray(next.months[k][type]))next.months[k][type]=[];
+  next.months[k][type].push({id:'bank-'+Date.now()+'-'+Math.random().toString(36).slice(2),name:(r.cleanName||bankInterpret(r).name).trim(),amount:Math.abs(r.amount),dueDay:Number(r.date.slice(8)),bankDate:r.date,bankImported:true,bankPosted:r.posted,bankSignature:bankSignature(r),bankOriginalDescription:r.rawName,bankOriginalCategory:r.bankCategory,expenseCategory:type==='income'?undefined:r.importCategory,categoryManual:type!=='income'});
+  next.bankImported.push(sig);
+ }
+ const serialized=JSON.stringify(next);
+ localStorage.setItem(KEY,serialized);
+ if(localStorage.getItem(KEY)!==serialized)throw Error('Verifica del salvataggio fallita.');
+ data=next;
+ return selected.length;
+}
+function bankShortName(raw){const n=bankNormalize(raw);if(n.includes('crai'))return 'Crai Supermercato';if(n.includes('condominio talea'))return 'Condominio Talea';if(n.includes('condominio vico'))return 'Condominio Vico III';if(n.includes('enel'))return 'Enel Energia';if(n.includes('agos'))return 'Rata Agos';if(n.includes('sky'))return 'Sky';if(n.includes('apple'))return 'Apple';if(n.includes('uci matera'))return 'Cinema UCI';if(n.includes('giroconto'))return 'Giroconto';if(n.includes('commissione'))return 'Commissione bancaria';if(n.includes('agenzia delle entrate'))return 'Agenzia Entrate';if(n.includes('farmacia montesano'))return 'Bonifico Farmacia Montesano';if(n.includes('pagamento tramite pos'))return 'Pagamento POS';if(n.includes('pellegrino lucia'))return 'Alimentari Pellegrino';if(n.includes('carta di credito'))return 'Carta di credito';if(n.includes('deliveroo'))return 'Deliveroo';if(n.includes('lindt'))return 'Lindt';if(n.includes('old wild west'))return 'Old Wild West';if(n.includes('intrend'))return 'Intrend';if(n.includes('klarna'))return 'Klarna';if(n.includes('coin'))return 'Coin';if(n.includes('prelievo'))return 'Prelievo';return String(raw||'Movimento bancario').split(/\s+(?:Generi alimentari|Bonifici ricevuti|Domiciliazioni|Ristoranti e bar)/i)[0].slice(0,55)}
 function bankCleanName(raw){
  let s=String(raw||'').replace(/\s+/g,' ').trim();
  s=s.replace(/^(?:operazione|descrizione|dettaglio)\s*[:\-]\s*/i,'').replace(/\b(?:Si|No)\s*$/i,'').trim();
@@ -1529,27 +1570,27 @@ function bankInterpret(r){
  const has=x=>n.includes(x),cat=x=>c.includes(x);
  let name='Movimento bancario',category='Altro',type=r.amount>0?'income':'needs';
  if(r.amount>0){name=has('farmacia montesano')?'Bonifico Farmacia Montesano':has('palermo maria luisa')?'Bonifico Palermo Maria Luisa':'Bonifico ricevuto';return {name,category,type:'income'};}
- if(has('commissione')){name=has('bonifico')?'Commissione bonifico':has('pagopa')||has('cbill')?'Commissione PagoPA':'Commissione bancaria';category='Commissioni';}
+ if(has('commissione') && !has('agenzia delle entrate') && !cat('domiciliazioni')){name=has('bonifico')?'Commissione bonifico':has('pagopa')||has('cbill')?'Commissione PagoPA':'Commissione bancaria';category='Commissioni';}
  else if(has('condominio')){name=has('talea')?'Condominio Talea':has('vico')?'Condominio Vico III Cappelluti':'Spese condominiali';category='Casa';}
  else if(has('agos')){name='Rata Agos';category='Finanziamenti';type='fixed';}
  else if(has('enel')){name='Bolletta Enel';category='Casa';}
- else if(has('agenzia delle entrate')){name='Agenzia delle Entrate';category='Casa';}
- else if(has('sky')){name='Sky';category='Tempo libero';type='fixed';}
- else if(has('crai')){name='Spesa CRAI';category='Alimentari';}
- else if(has('pellegrino lucia')){name='Spesa Pellegrino Lucia';category='Alimentari';}
- else if(has('lindt')){name='Lindt';category='Alimentari';}
- else if(has('old wild west')){name='Old Wild West';category='Tempo libero';}
- else if(has('deliveroo')){name='Deliveroo';category='Alimentari';}
+ else if(has('agenzia delle entrate')){name='Agenzia delle Entrate';category='Tasse';}
+ else if(has('sky')){name='Sky';category='Abbonamenti';type='fixed';}
+ else if(has('crai')){name='Supermercato CRAI';category='Alimentari';}
+ else if(has('pellegrino lucia')){name='Alimentari Pellegrino Lucia';category='Alimentari';}
+ else if(has('lindt')){name='Cioccolateria Lindt';category='Alimentari';}
+ else if(has('old wild west')){name='Ristorante Old Wild West';category='Ristoranti e bar';}
+ else if(has('deliveroo')){name='Consegna cibo Deliveroo';category='Ristoranti e bar';}
  else if(has('intrend')){name='Intrend';category='Shopping';}
  else if(has('coin')){name='Coin';category='Shopping';}
- else if(has('klarna')&&has('logitravel')){name='Klarna Logitravel';category='Tempo libero';}
- else if(has('apple')){name='Apple';category='Altro';type='fixed';}
+ else if(has('klarna')&&has('logitravel')){name='Klarna Logitravel';category='Viaggi';}
+ else if(has('apple')){name='Apple';category='Abbonamenti';type='fixed';}
  else if(has('uci')){name='Cinema UCI';category='Tempo libero';}
  else if(has('prelievo')){name='Prelievo contanti';category='Altro';}
  else if(has('giroconto')){name='Giroconto';category='Altro';}
- else if(has('carta di credito')){name='Saldo carta di credito';category='Finanziamenti';}
- else if(cat('alimentari')||cat('supermercato')){name='Spesa';category='Alimentari';}
- else if(cat('ristoranti')){name='Ristorante';category='Tempo libero';}
+ else if(has('carta di credito')){name='Saldo carta di credito';category='Altro';}
+ else if(cat('alimentari')||cat('supermercato')){name='Supermercato';category='Alimentari';}
+ else if(cat('ristoranti')){name='Ristorante';category='Ristoranti e bar';}
  else if(cat('abbigliamento')){name='Abbigliamento';category='Shopping';}
  else if(cat('gas')||cat('energia')||cat('utenze')){name='Bolletta utenze';category='Casa';}
  else if(cat('condominiali')){name='Condominio';category='Casa';}
@@ -1557,49 +1598,89 @@ function bankInterpret(r){
  else if(cat('spettacoli')){name='Cinema e svago';category='Tempo libero';}
  else if(cat('prelievi')){name='Prelievo contanti';category='Altro';}
  else if(cat('giroconti')){name='Giroconto';category='Altro';}
- else {name=bankCleanName(r.rawName||r.name).slice(0,55)||'Movimento bancario';category=expenseCategory(name);}
+ else {const original=bankCleanName(r.rawName||r.name).slice(0,55);const inferred=inferExpense(original);if(inferred.confidence>=.9){name=original||'Spesa da verificare';category=inferred.category;}else{name='Spesa da verificare';category='Altro';}}
  return {name,category,type};
 }
 function bankSuggestedCategory(r){return bankInterpret(r).category}
-function bankSuspicious(r){return !r.name||r.name.length<3||r.name.length>95||/\b(?:saldo disponibile|pagina \d+|intestazione|totale movimenti|data contabile)\b/i.test(r.name)||/\d{2}\.\d{2}\.\d{4}/.test(r.name)}
-function bankRender(){const root=$('bankRows');root.innerHTML='';let nNew=0,nReview=0,nOld=0;const occurrences=new Map();bankRows.forEach((r,i)=>{const signature=bankSignature(r);const occurrence=occurrences.get(signature)||0;occurrences.set(signature,occurrence+1);r.bankOccurrence=occurrence;const already=(data.bankImported||[]).includes(signature+'#'+occurrence);const candidates=bankCandidates(r);r.candidates=candidates;const uncertain=!already&&(candidates.length>0||bankSuspicious({...r,name:bankInterpret(r).name}));if(already)nOld++;else if(uncertain)nReview++;else nNew++;const row=document.createElement('div');row.className='bankRow'+(uncertain?' warn':'')+(already?' old':'');const top=document.createElement('div');top.className='bankTop';const cb=document.createElement('input');cb.type='checkbox';cb.checked=!already&&!uncertain&&r.posted;cb.disabled=already;cb.onchange=()=>r.selected=cb.checked;r.selected=cb.checked;const date=document.createElement('span');date.className='bankDay';date.textContent=r.date.slice(8)+'/'+r.date.slice(5,7);const name=document.createElement('span');name.className='bankName';name.textContent=bankInterpret(r).name;name.title=r.name;const amt=document.createElement('span');amt.className='bankAmt'+(r.amount>0?' positive':'');amt.textContent=(r.amount>0?'+':'−')+euro(Math.abs(r.amount));top.append(cb,date,name,amt);row.append(top);const sub=document.createElement('div');sub.className='bankSub';sub.textContent=already?'✓ Già importato':uncertain?(bankSuspicious(r)?'⚠ Descrizione dubbia: correggi prima di importare':'⚠ Importo simile: controlla prima di selezionare'):r.posted?'Nuovo movimento':'Non contabilizzato · seleziona manualmente';row.append(sub);if(uncertain&&candidates.length){const btn=document.createElement('button');btn.textContent='Mostra '+candidates.length+' movimenti simili';const detail=document.createElement('div');detail.className='bankMatches';detail.hidden=true;detail.textContent=candidates.map(c=>c.x.name+' · '+euro(c.x.amount)).join('\n');btn.onclick=()=>detail.hidden=!detail.hidden;row.append(btn,detail)}if(!already){const sel=document.createElement('select');[['needs','Fabbisogno / spese variabili'],['fixed','Uscite fisse'],['income','Entrate']].forEach(([v,t])=>{const o=document.createElement('option');o.value=v;o.textContent=t;sel.append(o)});sel.value=r.type||bankInterpret(r).type;sel.onchange=()=>r.type=sel.value;r.type=sel.value;row.append(sel);
+function bankSuspicious(r){return bankInterpret(r).name==='Spesa da verificare'||!r.name||r.name.length<3||r.name.length>95||/\b(?:saldo disponibile|pagina \d+|intestazione|totale movimenti|data contabile)\b/i.test(r.name)||/\d{2}\.\d{2}\.\d{4}/.test(r.name)}
+function bankRender(){const root=$('bankRows');root.innerHTML='';let nNew=0,nReview=0,nOld=0;const occurrences=new Map();bankRows.forEach((r,i)=>{const signature=bankSignature(r);const occurrence=occurrences.get(signature)||0;occurrences.set(signature,occurrence+1);r.bankOccurrence=occurrence;const already=(data.bankImported||[]).includes(signature+'#'+occurrence)||bankStoredCount(signature)>occurrence;const candidates=bankCandidates(r);r.candidates=candidates;const uncertain=!already&&(candidates.length>0||bankSuspicious({...r,name:bankInterpret(r).name}));if(already)nOld++;else if(uncertain)nReview++;else nNew++;const row=document.createElement('div');row.className='bankRow'+(uncertain?' warn':'')+(already?' old':'');const top=document.createElement('div');top.className='bankTop';const cb=document.createElement('input');cb.type='checkbox';cb.checked=!already&&(typeof r.selected==='boolean'?r.selected:(!uncertain&&r.posted));cb.disabled=already;cb.onchange=()=>r.selected=cb.checked;r.selected=cb.checked;const date=document.createElement('span');date.className='bankDay';date.textContent=r.date.slice(8)+'/'+r.date.slice(5,7);const name=document.createElement('span');name.className='bankName';name.textContent=r.cleanName||bankInterpret(r).name;name.title=r.rawName||r.name;const amt=document.createElement('span');amt.className='bankAmt'+(r.amount>0?' positive':'');amt.textContent=(r.amount>0?'+':'−')+euro(Math.abs(r.amount));top.append(cb,date,name,amt);row.append(top);const sub=document.createElement('div');sub.className='bankSub';sub.textContent=already?'✓ Già importato':uncertain?(bankSuspicious(r)?'⚠ Descrizione dubbia: correggi prima di importare':'⚠ Importo simile: controlla prima di selezionare'):r.posted?'Nuovo movimento':'Non contabilizzato · seleziona manualmente';row.append(sub);if(uncertain&&candidates.length){const btn=document.createElement('button');btn.textContent='Mostra '+candidates.length+' movimenti simili';const detail=document.createElement('div');detail.className='bankMatches';detail.hidden=true;detail.textContent=candidates.map(c=>c.x.name+' · '+euro(c.x.amount)).join('\n');btn.onclick=()=>detail.hidden=!detail.hidden;row.append(btn,detail)}if(!already){const sel=document.createElement('select');[['needs','Fabbisogno / spese variabili'],['fixed','Uscite fisse'],['income','Entrate']].forEach(([v,t])=>{const o=document.createElement('option');o.value=v;o.textContent=t;sel.append(o)});sel.value=r.type||bankInterpret(r).type;sel.onchange=()=>r.type=sel.value;r.type=sel.value;row.append(sel);
  const edit=document.createElement('input');edit.type='text';edit.value=r.cleanName||bankInterpret(r).name;edit.maxLength=110;edit.setAttribute('aria-label','Nome spesa da importare');edit.style.cssText='width:100%;margin-top:6px;padding:7px;border:1px solid #cbd5e1;border-radius:7px';edit.oninput=()=>{r.cleanName=edit.value.trim();};row.append(edit);
  const cat=document.createElement('select');cat.setAttribute('aria-label','Categoria della spesa');for(const [name] of categoryPalette){const option=document.createElement('option');option.value=name;option.textContent=name;cat.append(option)}cat.value=r.importCategory||bankSuggestedCategory(r);r.importCategory=cat.value;cat.onchange=()=>r.importCategory=cat.value;cat.style.marginTop='5px';cat.style.display=r.type==='income'?'none':'';row.append(cat);sel.addEventListener('change',()=>cat.style.display=sel.value==='income'?'none':'');
- }root.append(row)});const expected=bankRows.expectedCount;const mismatch=expected&&expected!==bankRows.length;$('bankStatus').textContent=(mismatch?'⚠ Attenzione: il PDF indica '+expected+' movimenti, ma ne sono stati letti '+bankRows.length+'. Importazione bloccata per sicurezza. ':'')+bankRows.length+' trovati · '+nNew+' nuovi · '+nReview+' da verificare · '+nOld+' già importati.';$('bankImport').style.display=bankRows.length&&!mismatch?'block':'none';}
+ }root.append(row)});const months=[...new Set(bankRows.map(r=>r.date.slice(0,7)))].sort();const period=months.length?(' · Periodo '+months[0]+' → '+months[months.length-1]+' ('+months.length+' mesi)'):'';const expected=bankRows.expectedCount;const mismatch=expected&&expected!==bankRows.length;$('bankStatus').textContent=(mismatch?'⚠ Attenzione: il PDF indica '+expected+' movimenti, ma ne sono stati letti '+bankRows.length+'. Importazione bloccata per sicurezza. ':'')+bankRows.length+' trovati'+period+' · Entrate '+euro(bankRows.filter(r=>r.amount>0).reduce((s,r)=>s+r.amount,0))+' · Uscite '+euro(-bankRows.filter(r=>r.amount<0).reduce((s,r)=>s+r.amount,0))+' · '+nNew+' nuovi · '+nReview+' da verificare · '+nOld+' già importati.';$('bankImport').style.display=bankRows.length&&!mismatch?'block':'none';}
 async function bankLoadPdf(file){
- if(!window.pdfjsLib){await new Promise((resolve,reject)=>{let script=document.createElement('script');script.src='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';script.onload=resolve;script.onerror=()=>reject(Error('Libreria PDF non caricabile. Serve una connessione internet.'));document.head.append(script)})}
+ if(!window.pdfjsLib){await new Promise((resolve,reject)=>{const script=document.createElement('script');script.src='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';script.onload=resolve;script.onerror=()=>reject(Error('Libreria PDF non caricabile.'));document.head.append(script)})}
  pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
  const doc=await pdfjsLib.getDocument({data:new Uint8Array(await file.arrayBuffer())}).promise;
  const result=[];let expectedCount=null;
- for(let p=1;p<=doc.numPages;p++){
-  const page=await doc.getPage(p),content=await page.getTextContent(),lines=[];
-  for(const it of content.items){if(!it.str.trim())continue;const y=Math.round(it.transform[5]*2)/2;let line=lines.find(l=>Math.abs(l.y-y)<2);if(!line){line={y,parts:[]};lines.push(line)}line.parts.push({x:it.transform[4],text:it.str})}
-  lines.sort((a,b)=>b.y-a.y);
-  let active=null;
+ for(let pageNo=1;pageNo<=doc.numPages;pageNo++){
+  const page=await doc.getPage(pageNo),content=await page.getTextContent(),lines=[];
+  for(const it of content.items){if(!it.str.trim())continue;const y=it.transform[5],x=it.transform[4];let line=lines.find(l=>Math.abs(l.y-y)<2.3);if(!line){line={y,parts:[]};lines.push(line)}line.parts.push({x,text:it.str.trim()})}
+  for(const line of lines)line.parts.sort((a,b)=>a.x-b.x);
+  const join=parts=>parts.map(p=>p.text).join(' ').replace(/\s+/g,' ').trim();
+  const pageText=lines.slice().sort((a,b)=>b.y-a.y).map(l=>join(l.parts)).join(' ');const countMatch=pageText.match(/movimenti selezionati sono\s*:?\s*(\d+)/i);if(countMatch)expectedCount=Number(countMatch[1]);
+  const anchors=[];let incompleteRows=0;
   for(const line of lines){
-   const parts=line.parts.sort((a,b)=>a.x-b.x),text=parts.map(x=>x.text).join(' ').replace(/\s+/g,' ').trim();
-   if(/movimenti selezionati sono/i.test(text)){const m=text.match(/(\d+)\s*$/);if(m)expectedCount=Number(m[1]);}
-   const date=text.match(/\b(\d{2})\.(\d{2})\.(\d{4})\b/);
-   const money=[...text.matchAll(/(?:€\s*)?(-?\s?\d{1,3}(?:\.\d{3})*,\d{2})\b/g)];
-   if(date&&money.length){
-    const amt=money[money.length-1][1],amount=Number(amt.replace(/\s/g,'').replace(/\./g,'').replace(',','.'));
-    const between=parts.filter(x=>x.x>100&&x.x<420).map(x=>x.text).join(' ').replace(/\b(?:Si|No)\b/g,' ').trim();
-    const category=parts.filter(x=>x.x>=420&&x.x<570).map(x=>x.text).join(' ').trim();
-    active={date:date[3]+'-'+date[2]+'-'+date[1],amount,name:between||text.slice(text.indexOf(date[0])+date[0].length,text.lastIndexOf(money[money.length-1][0])).trim(),rawName:between,bankCategory:category,posted:!/(?:^|\s)No(?:\s|$)/.test(text)};
-    result.push(active);
-   }else if(active && !/^(?:DATA|CONTABILE|OPERAZIONE|CATEGORIA|IMPORTO|I movimenti|Lista movimenti)/i.test(text)){
-    const extraName=parts.filter(x=>x.x>100&&x.x<420).map(x=>x.text).join(' ').trim();
-    const extraCat=parts.filter(x=>x.x>=420&&x.x<570).map(x=>x.text).join(' ').trim();
-    if(extraName && !/^(?:Si|No)$/i.test(extraName))active.rawName+=' '+extraName;
-    if(extraCat)active.bankCategory+=' '+extraCat;
+   const datePart=line.parts.find(p=>p.x<125&&/\b\d{2}\.\d{2}\.\d{4}\b/.test(p.text));
+   const moneyPart=line.parts.filter(p=>p.x>=490).map(p=>p.text).join(' ');
+   const date=datePart&&datePart.text.match(/(\d{2})\.(\d{2})\.(\d{4})/);
+   const amountMatch=moneyPart.match(/(-?\s*\d{1,3}(?:\.\d{3})*,\d{2})/);
+   if(date&&!amountMatch)incompleteRows++;
+   if(!date||!amountMatch)continue;
+   const parsedDay=new Date(Number(date[3]),Number(date[2])-1,Number(date[1]));if(parsedDay.getFullYear()!==Number(date[3])||parsedDay.getMonth()!==Number(date[2])-1||parsedDay.getDate()!==Number(date[1]))throw Error('Data bancaria non valida: '+date[0]);
+   anchors.push({y:line.y,date:date[3]+'-'+date[2]+'-'+date[1],amount:Number(amountMatch[1].replace(/\s/g,'').replace(/\./g,'').replace(',','.')),nameParts:[],catParts:[],posted:true});
+  }
+  anchors.sort((a,b)=>b.y-a.y);
+  if(incompleteRows)throw Error('Pagina '+pageNo+': '+incompleteRows+' righe con data ma senza importo. Verifica il formato PDF: importazione bloccata.');
+  if(!anchors.length)continue;
+  for(const line of lines){
+   // The table header is not a transaction, even on pages starting at the top.
+   const lineText=join(line.parts);
+   if(/\b(?:DATA CONTABILE|CONTABILIZZATO|CATEGORIA|IMPORTO|OPERAZIONE)\b/i.test(lineText) &&
+      !/\d{2}\.\d{2}\.\d{4}/.test(lineText))continue;
+   if(line.y>anchors[0].y+24||line.y<anchors[anchors.length-1].y-24)continue;
+   // A row owns the vertical band halfway to its neighbors, not an arbitrary
+   // +/-33 point region that can bleed across two transactions.
+   let owner=null;
+   for(let i=0;i<anchors.length;i++){
+    const row=anchors[i];
+    const upper=i===0?row.y+24:(anchors[i-1].y+row.y)/2;
+    const lower=i===anchors.length-1?row.y-24:(row.y+anchors[i+1].y)/2;
+    if(line.y<=upper && line.y>lower){owner=row;break}
    }
+   if(!owner)continue;
+   const names=line.parts.filter(p=>p.x>=120&&p.x<300);
+   const categories=line.parts.filter(p=>p.x>=390&&p.x<490);
+   const status=line.parts.filter(p=>p.x>=300&&p.x<390);
+   if(names.length)owner.nameParts.push({y:line.y,text:join(names)});
+   if(categories.length)owner.catParts.push({y:line.y,text:join(categories)});
+   if(Math.abs(line.y-owner.y)<3&&status.some(p=>/^No$/i.test(p.text)))owner.posted=false;
+  }
+  for(const row of anchors){
+   const sorted=arr=>arr.sort((a,b)=>b.y-a.y).map(x=>x.text).join(' ').replace(/\s+/g,' ').trim();
+   const rawName=sorted(row.nameParts),bankCategory=sorted(row.catParts);
+   if(!rawName)throw Error('Movimento del '+row.date+' da '+Math.abs(row.amount).toFixed(2)+' euro senza descrizione: importazione bloccata.');
+   const r={date:row.date,amount:row.amount,name:rawName,rawName,bankCategory,posted:row.posted};
+   const interpreted=bankInterpret(r);r.cleanName=interpreted.name;r.importCategory=interpreted.category;r.type=interpreted.type;
+   result.push(r);
   }
  }
- for(const r of result){r.rawName=(r.rawName||r.name).trim();r.name=r.rawName;const interpreted=bankInterpret(r);r.cleanName=interpreted.name;r.importCategory=interpreted.category;r.type=interpreted.type;}
- result.expectedCount=expectedCount;return result.filter(r=>Number.isFinite(r.amount)&&r.name);
+ if(expectedCount!==null&&expectedCount!==result.length)throw Error('Movimenti attesi '+expectedCount+', letti '+result.length+'. Nessuna importazione consentita.');
+ return Object.assign(result,{expectedCount});
 }
-$('bankFile').onchange=async e=>{const file=e.target.files[0];if(!file)return;$('bankStatus').textContent='Lettura PDF in corso…';$('bankRows').innerHTML='';$('bankImport').style.display='none';try{bankRows=await bankLoadPdf(file);if(!bankRows.length)throw Error('Nessun movimento riconosciuto: controlla che sia una lista movimenti Intesa in PDF testuale.');bankRender()}catch(err){$('bankStatus').textContent='Errore: '+err.message}};
-$('bankImport').onclick=()=>{let selected=bankRows.filter(r=>r.selected);if(!selected.length)return alert('Nessun movimento selezionato.');if(selected.some(r=>!(r.cleanName||bankInterpret(r).name).trim()||bankSuspicious({...r,name:r.cleanName||bankInterpret(r).name})))return alert('Correggi i nomi dubbi prima di importare.');if(!confirm('Importare '+selected.length+' movimenti? Controlla che non siano duplicati.'))return;data.bankImported=data.bankImported||[];for(const r of selected){const k=r.date.slice(0,7);ensure(k);let t=r.amount>0?'income':(['sky','apple','agos'].some(v=>bankNormalize(r.rawName||r.name).includes(v))&&r.type!=='needs'?'fixed':r.type);data.months[k][t].push({id:'bank-'+Date.now()+'-'+Math.random().toString(36).slice(2),name:(r.cleanName||bankInterpret(r).name).trim(),amount:Math.abs(r.amount),dueDay:Number(r.date.slice(8)),bankDate:r.date,bankImported:true,bankPosted:r.posted,expenseCategory:r.type==="income"?undefined:r.importCategory,categoryManual:r.type!=="income"});data.bankImported.push(bankSignature(r)+'#'+r.bankOccurrence)}save();render();bankModal.classList.remove('open');bankRows=[];$('bankFile').value='';$('bankRows').innerHTML='';$('bankStatus').textContent='Nessun file selezionato.';$('bankImport').style.display='none';window.scrollTo({top:0,behavior:'smooth'});alert('Importati '+selected.length+' movimenti. Home aggiornata.')};
+$('bankFile').onchange=async e=>{const file=e.target.files[0];if(!file)return;$('bankStatus').textContent='Lettura PDF in corso…';$('bankRows').innerHTML='';$('bankImport').style.display='none';bankRows=[];try{bankRows=await bankLoadPdf(file);if(!bankRows.length)throw Error('Nessun movimento riconosciuto: controlla che sia una lista movimenti Intesa in PDF testuale.');bankRender()}catch(err){$('bankStatus').textContent='Errore: '+err.message}};
+$('bankImport').onclick=()=>{
+ const selected=bankRows.filter(r=>r.selected);
+ if(!selected.length)return alert('Nessun movimento selezionato.');
+ if(selected.some(r=>!(r.cleanName||bankInterpret(r).name).trim()||bankSuspicious({...r,name:r.cleanName||bankInterpret(r).name})))return alert('Correggi i nomi dubbi prima di importare.');
+ try{
+  const audit=bankAudit(selected);
+  const detail=[...audit.months.entries()].sort().map(([month,v])=>month+': '+v.count+' movimenti, entrate '+euro(v.income/100)+', uscite '+euro(v.outgoing/100)).join('\n');
+  if(!confirm('Confermi '+audit.count+' movimenti?\nEntrate: '+euro(audit.income/100)+'\nUscite: '+euro(audit.outgoing/100)+'\n\n'+detail+'\n\nControlla i duplicati prima di continuare.'))return;
+  bankPersistBatch(selected);
+  try{dailyBackup()}catch(e){console.warn('Backup automatico non disponibile',e)}
+  render();bankModal.classList.remove('open');bankRows=[];$('bankFile').value='';$('bankRows').innerHTML='';$('bankStatus').textContent='Nessun file selezionato.';$('bankImport').style.display='none';window.scrollTo({top:0,behavior:'smooth'});alert('Importati '+selected.length+' movimenti. Home aggiornata.');
+ }catch(e){alert('Importazione annullata: '+e.message)}
+};
 
 $("smartReview").onclick=()=>{const btn=$("smartReview"),status=$("smartStatus");btn.disabled=true;status.textContent="Controllo in corso…";try{const count=backfillExpenseCategories(true);save();render();const pending=new Set();for(const month of Object.values(data.months||{}))for(const type of ['fixed','needs','policies'])for(const x of (month[type]||[])){if(!x.categoryManual&&inferExpense(x.name).confidence<.9)pending.add(normExpense(x.name))}status.textContent=count+" voci aggiornate · "+pending.size+" descrizioni da verificare";}catch(e){console.error(e);status.textContent="Errore: "+e.message}finally{btn.disabled=false}};
 $('v48PreImportBtn').onclick=()=>{try{const raw=localStorage.getItem(PRE_IMPORT_BACKUP_KEY);if(!raw)return alert("Nessuna copia precedente disponibile.");const blob=new Blob([raw],{type:"application/json"}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='Spese_Famiglia_Prima_Ripristino.json';document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1500)}catch(e){alert("Copia non disponibile: "+e.message)}};
