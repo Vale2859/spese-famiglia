@@ -450,6 +450,8 @@ input, select, button {
 #incomeSwipe.pendingVisible>.incomePanel:first-child{display:none!important}
 #incomeSwipe.pendingVisible>.incomePanel:nth-child(2){display:flex!important}
 #pendingTab[hidden],#backIncomeTab[hidden]{display:none!important}
+
+.v65AnnualLink{display:block;margin:5px auto 15px;border:0;background:transparent;color:#2877b8;font-size:12px;font-weight:800;text-decoration:underline;text-underline-offset:3px;padding:8px 12px;cursor:pointer}.v65Toggle{display:flex;gap:8px;align-items:center;font-weight:750;font-size:13px;color:#29476a}.v65Toggle input{width:18px;height:18px}.v65Budget{background:#eaf5ee;border-radius:13px;padding:14px;margin:10px 0;font-weight:750}.v65Budget strong{color:#08734a}.v65SubRow{display:flex;align-items:center;gap:8px;padding:11px 3px;border-bottom:1px solid #e4e8ef;font-size:13px}.v65SubRow span{flex:1;min-width:0}.v65SubRow button{border:0;border-radius:7px;background:#f8e5e5;color:#a52a2a;padding:7px}.v65Inputs{display:grid;grid-template-columns:1fr 1fr;gap:8px}.v65YearKpis{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:14px 0}.v65YearKpis>div{background:#edf4fc;border-radius:12px;padding:12px;font-weight:800}.v65YearKpis small{display:block;color:#607088}.v65AnnualMonth{margin:10px 0;border-bottom:1px solid #e6ebf0;padding:6px 0}.v65AnnualMonth .v65Bars{display:flex;gap:4px;height:9px;margin-top:7px}.v65Bars i{display:block;border-radius:5px;background:#3687cc;min-width:0}.v65Bars i:last-child{background:#ed996b}.v65CatLine{display:flex;justify-content:space-between;gap:8px;padding:9px 0;border-bottom:1px solid #e9edf1;font-size:13px}.v65SectionTitle{margin:18px 0 9px;font-size:16px;font-weight:900;color:#172d4d}
 </style>
 <style>
 .categoryPanel{margin:12px 10px 18px;padding:16px 12px;background:#fff;border-radius:19px;box-shadow:0 3px 14px #20305012}.categoryHeading{font-size:13px;font-weight:900;color:#32486d;margin-bottom:12px}.categoryLayout{display:flex;align-items:center;justify-content:center;gap:17px;flex-wrap:wrap}.categoryDonut{width:170px;height:170px;flex-shrink:0;border-radius:50%;display:grid;place-items:center;position:relative}.categoryDonut:before{content:'';position:absolute;inset:28px;border-radius:50%;background:white}.categoryCenter{position:relative;text-align:center;font-weight:900;font-size:12px;max-width:105px;overflow-wrap:anywhere}.categoryCenter strong{display:block;font-size:17px;margin-top:4px}.categoryLegend{flex:1;min-width:145px;max-width:340px}.categoryLegend button{display:flex;align-items:center;gap:7px;width:100%;border:0;background:transparent;padding:6px 3px;text-align:left;font-size:12px;color:#25334a;cursor:pointer}.categoryLegend button.active{background:#edf3ff;border-radius:7px}.categoryDot{width:10px;height:10px;flex:none;border-radius:50%}.categoryLegend .categoryPercent{margin-left:auto;font-weight:800}.colName{overflow-wrap:anywhere;word-break:normal}
@@ -647,6 +649,7 @@ button{cursor:pointer}button:focus-visible,[role=button]:focus-visible{outline:3
       <div class="scheduleSub" id="balanceSub">Inserisci il saldo reale del conto per attivare le previsioni</div>
     </div>
     <div class="arrow">›</div>
+  <button id="annualOpen" type="button" class="v65AnnualLink">📊 Analisi annuale entrate e uscite ›</button>
   </div>
 </div>
 
@@ -668,7 +671,7 @@ button{cursor:pointer}button:focus-visible,[role=button]:focus-visible{outline:3
         <div><div class="label">Importo base €</div><input id="newAmount" type="number" step="0.01" min="0" inputmode="decimal"></div>
       </div>
       <div><div class="label">Nome voce</div><input id="newName" placeholder="Es. Luce, assicurazione, stipendio"></div><div id="newExpenseCategoryBox"><div class="label">Categoria della spesa (proposta automaticamente, modificabile)</div><select id="newExpenseCategory"><option value="Casa">Casa</option><option value="Alimentari">Alimentari</option><option value="Trasporti">Trasporti</option><option value="Finanziamenti">Finanziamenti</option><option value="Tempo libero">Tempo libero</option><option value="Shopping">Shopping</option><option value="Commissioni">Commissioni</option><option value="Altro">Altro</option></select></div>
-      <div id="newDayBox"><div class="label">Giorno del movimento (1-31, facoltativo)</div><input id="newDay" type="number" min="1" max="31" inputmode="numeric" placeholder="Es. 15"></div>
+      <label class="v65Toggle"><input type="checkbox" id="newSubEnabled"> Attiva sottocategorie / budget per questa voce</label><div id="newDayBox"><div class="label">Giorno del movimento (1-31, facoltativo)</div><input id="newDay" type="number" min="1" max="31" inputmode="numeric" placeholder="Es. 15"></div>
       <div><div class="label">Frequenza</div>
         <select id="frequency">
           <option value="once">Solo questo mese</option>
@@ -705,7 +708,7 @@ button{cursor:pointer}button:focus-visible,[role=button]:focus-visible{outline:3
         <div class="label">Importo €</div>
         <input id="editAmount" type="number" step="0.01" min="0">
       </div>
-      <div id="editDayBox"><div class="label">Giorno del movimento (1-31, facoltativo)</div><input id="editDay" type="number" min="1" max="31" inputmode="numeric" placeholder="Es. 15">
+      <label class="v65Toggle"><input type="checkbox" id="editSubEnabled"> Attiva sottocategorie / budget per questa voce</label><div id="editDayBox"><div class="label">Giorno del movimento (1-31, facoltativo)</div><input id="editDay" type="number" min="1" max="31" inputmode="numeric" placeholder="Es. 15">
       </div>
 
       <div>
@@ -755,6 +758,10 @@ button{cursor:pointer}button:focus-visible,[role=button]:focus-visible{outline:3
   </div>
 </div>
 
+<div class="modal" id="v65ChoiceModal"><div class="sheet"><div class="sheetHead"><div class="sheetTitle" id="v65ChoiceTitle">Voce</div><button class="close" data-close="v65ChoiceModal">✕</button></div><div class="choice"><button class="primary" id="v65ShowSub">📋 Visualizza sottocategorie</button><button class="soft" id="v65EditChoice">✏️ Modifica voce</button></div></div></div>
+<div class="modal" id="v65SubModal"><div class="sheet"><div class="sheetHead"><div class="sheetTitle" id="v65SubTitle">Sottocategorie</div><button class="close" data-close="v65SubModal">✕</button></div><div class="v65Budget" id="v65Budget"></div><div id="v65SubRows"></div><div class="form"><div class="label">Nuova sottovoce (non aumenta le uscite del bilancio)</div><input id="v65SubName" placeholder="Es. Regalo compleanno, fiori, rimborso"><div class="v65Inputs"><input id="v65SubDate" type="date" aria-label="Data sottovoce"><input id="v65SubAmount" type="number" step="0.01" min="0.01" placeholder="Importo €" aria-label="Importo sottovoce"></div><div><div class="label">Frequenza sottovoce</div><select id="v66SubFrequency"><option value="once">Solo questo mese</option><option value="monthly">Ogni mese</option><option value="annual">Una volta all’anno</option><option value="selectedYearly">Mesi scelti ogni anno</option><option value="selectedOneYear">Mesi scelti solo in un anno</option></select></div><div id="v66SubAnnualBox" class="hidden"><div class="label">Mese annuale</div><select id="v66SubAnnualMonth"></select></div><div id="v66SubYearBox" class="hidden"><div class="label">Anno specifico</div><input id="v66SubYear" type="number" min="2020" max="2100"></div><div id="v66SubMonthsBox" class="hidden"><div class="label">Mesi interessati</div><div id="v66SubMonths" style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px"></div></div><button class="primary" id="v65SubAdd">＋ Aggiungi sottovoce</button></div></div></div>
+<div class="modal" id="v65AnnualModal"><div class="sheet"><div class="sheetHead"><div class="sheetTitle">📊 Analisi annuale</div><button class="close" data-close="v65AnnualModal">✕</button></div><div class="form"><div class="label">Seleziona anno</div><select id="v65AnnualYear"></select></div><div id="v65AnnualBody"></div></div></div>
+<div class="modal" id="v65CreateCategoryModal"><div class="sheet"><div class="sheetHead"><div class="sheetTitle">＋ Nuova categoria</div><button class="close" data-close="v65CreateCategoryModal">✕</button></div><div class="form"><label>Nome categoria<input id="v65CategoryName" maxlength="40" placeholder="Es. Regali"></label><label>Colore categoria<input id="v65CategoryColor" type="color" value="#6497b1"></label><button class="primary" id="v65CategorySave">Crea categoria</button></div></div></div>
 <div class="modal" id="balanceModal">
   <div class="sheet">
     <div class="sheetHead">
@@ -1034,15 +1041,18 @@ function syncCategoryOptions(){
     const select=$(id);if(!select)continue;
     // Una sincronizzazione della home non interrompe una scelta nel modulo aperto.
     const modal=select.closest('.modal');if(modal&&modal.classList.contains('open'))continue;
-    const names=categoryPalette.map(([name])=>name),existing=[...select.options].map(option=>option.value);
+    const names=['__v65_create__',...categoryPalette.map(([name])=>name)],existing=[...select.options].map(option=>option.value);
     if(existing.length===names.length&&existing.every((name,index)=>name===names[index]))continue;
     const selected=select.value;
-    const options=names.map(name=>{const option=document.createElement('option');option.value=name;option.textContent=name;return option});
+    const options=names.map(name=>{const option=document.createElement('option');option.value=name;option.textContent=name==='__v65_create__'?'＋ Crea categoria':name;return option});
     select.replaceChildren(...options);
     if(names.includes(selected))select.value=selected;
   }
 }
 syncCategoryOptions();
+let v65CategoryTarget=null;
+for(const id of ['newExpenseCategory','editExpenseCategory'])$(id).addEventListener('change',e=>{if(e.target.value==='__v65_create__'){v65CategoryTarget=id;e.target.value='Altro';$('v65CreateCategoryModal').classList.add('open');$('v65CategoryName').focus()}});
+$('v65CategorySave').onclick=()=>{const name=$('v65CategoryName').value.trim(),color=$('v65CategoryColor').value;if(!name)return alert('Inserisci un nome.');if(categoryPalette.some(([n])=>n.toLowerCase()===name.toLowerCase()))return alert('Categoria già presente.');data.customCategories=data.customCategories||[];data.customCategories.push({name,color});registerExistingCategories();for(const id of ['newExpenseCategory','editExpenseCategory']){const select=$(id);const opt=document.createElement('option');opt.value=name;opt.textContent=name;select.append(opt)}if(v65CategoryTarget)$(v65CategoryTarget).value=name;if(v65CategoryTarget==='newExpenseCategory')newCategoryTouched=true;$('v65CreateCategoryModal').classList.remove('open');$('v65CategoryName').value='';save()};
 // Motore interamente locale: i nomi e gli importi non vengono inviati online.
 function normExpense(n){return String(n||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,' ').trim().replace(/\s+/g,' ')}
 function learnedCategory(name){const n=normExpense(name),memory=data.categoryLearning||{};return categoryPalette.some(([category])=>category===memory[n])?memory[n]:null}
@@ -1132,7 +1142,7 @@ function renderCol(type,id){
     r.querySelector(".colName").textContent=shortExpenseName(x.name);r.querySelector(".colName").title=x.name;
     r.querySelector(".colAmt").textContent=euro(x.amount);
     r.querySelector(".colMeta").textContent=meta(x);
-    r.onclick=e=>{e.stopPropagation();openEdit(type,x)};el.appendChild(r);
+    r.onclick=e=>{e.stopPropagation();v65OpenItem(type,x)};el.appendChild(r);
   });
 }
 function v48FitTwoRows(){
@@ -1170,7 +1180,7 @@ function render(){syncCategoryOptions();renderPending();$("monthName").textConte
 $("prevMonth").onclick=()=>{const d=new Date(cy,cm-1,1);if(d.getFullYear()<2026)return;cy=d.getFullYear();cm=d.getMonth();render()};
 $("nextMonth").onclick=()=>{const d=new Date(cy,cm+1,1);if(d.getFullYear()>2100)return;cy=d.getFullYear();cm=d.getMonth();render()};
 
-function itemNode(type,item){const d=document.createElement("div");d.className="item";d.innerHTML='<div><div class="itemName"></div><div class="itemMeta"></div></div><div class="itemAmount"></div><div class="actions"><button class="edit">Modifica</button><button class="del">Elimina</button></div>';d.querySelector(".itemName").textContent=item.name;d.querySelector(".itemMeta").textContent=meta(item);d.querySelector(".itemAmount").textContent=euro(item.amount);d.querySelector(".edit").onclick=()=>openEdit(type,item);
+function itemNode(type,item){const d=document.createElement("div");d.className="item";d.innerHTML='<div><div class="itemName"></div><div class="itemMeta"></div></div><div class="itemAmount"></div><div class="actions"><button class="edit">Modifica</button><button class="del">Elimina</button></div>';d.querySelector(".itemName").textContent=item.name;d.querySelector(".itemMeta").textContent=meta(item);d.querySelector(".itemAmount").textContent=euro(item.amount);d.querySelector(".edit").onclick=()=>v65OpenItem(type,item);
 if(item.bankImported&&(type==='needs'||type==='fixed')){const move=document.createElement('button');move.textContent=type==='needs'?'Sposta in spese fisse':'Sposta in fabbisogno';move.onclick=()=>{const k=item.bankDate?item.bankDate.slice(0,7):key();ensure(k);const source=data.months[k][type],idx=source.findIndex(x=>x.id===item.id);if(idx<0)return;const target=type==='needs'?'fixed':'needs';source.splice(idx,1);data.months[k][target].push(item);save();render();if($('detailModal').classList.contains('open'))openDetail('expenses');};d.querySelector('.actions').prepend(move)}
 if(type==='income'){const pending=document.createElement('button');pending.textContent='In attesa';pending.onclick=()=>{moveIncomeToPending(item);openDetail('income')};d.querySelector('.actions').prepend(pending)}d.querySelector(".del").onclick=()=>openDelete(type,item);return d}
 function openDetail(which){lastDetail=which;const c=$("detailContent");c.innerHTML="";if(which==="income"){$("detailTitle").textContent="Entrate · "+label();$("detailTotal").textContent=euro(sum("income"));items("income").forEach(x=>c.appendChild(itemNode("income",x)));if(!items("income").length)c.innerHTML='<div class="itemMeta">Nessuna entrata</div>'}else{$("detailTitle").textContent="Uscite · "+label();$("detailTotal").textContent=euro(expenses());[["USCITE FISSE","fixed"],["FABBISOGNO","needs"]].forEach(([n,t])=>{const h=document.createElement("div");h.className="detailSection";h.textContent=n+" · "+euro(sum(t));c.appendChild(h);items(t).forEach(x=>c.appendChild(itemNode(t,x)))})}$("detailModal").classList.add("open")}
@@ -1264,7 +1274,7 @@ let newCategoryTouched=false;
 $("newExpenseCategory").addEventListener("change",()=>{newCategoryTouched=true});
 function updateNewExpenseCategory(){const visible=$("newType").value!=="income";$("newExpenseCategoryBox").style.display=visible?"":"none";if(visible&&!newCategoryTouched)$("newExpenseCategory").value=expenseCategory($("newName").value)}
 $("newName").addEventListener("input",updateNewExpenseCategory);$("newType").addEventListener("change",updateNewExpenseCategory);
-function openAdd(type){$("addMonth").textContent="STAI REGISTRANDO SU: "+label().toUpperCase();$("newType").value=type||"fixed";$("newName").value="";newCategoryTouched=false;updateNewExpenseCategory();$("newAmount").value="";$("newDay").value="";$("newDayBox").style.display="";$("frequency").value="once";$("targetYear").value=cy;updateFreq();document.querySelectorAll(".mp").forEach(x=>{x.classList.remove("sel");x.querySelector("input").classList.add("hidden");x.querySelector("input").value=""});$("addModal").classList.add("open")}
+function openAdd(type){$("addMonth").textContent="STAI REGISTRANDO SU: "+label().toUpperCase();$("newType").value=type||"fixed";$("newName").value="";newCategoryTouched=false;$('newSubEnabled').checked=false;updateNewExpenseCategory();$("newAmount").value="";$("newDay").value="";$("newDayBox").style.display="";$("frequency").value="once";$("targetYear").value=cy;updateFreq();document.querySelectorAll(".mp").forEach(x=>{x.classList.remove("sel");x.querySelector("input").classList.add("hidden");x.querySelector("input").value=""});$("addModal").classList.add("open")}
 document.querySelectorAll("[data-add]").forEach(b=>b.onclick=e=>{e.stopPropagation();openAdd(b.dataset.add)});
 function openBalance(){
   $("balanceModalMonth").textContent="SALDO REALE · "+label(realKey).toUpperCase();
@@ -1290,10 +1300,10 @@ $("clearBalanceBtn").onclick=()=>{
 };
 
 function collectMonthAmounts(baseAmount){const out={};document.querySelectorAll(".mp.sel").forEach(mp=>{const m=Number(mp.dataset.m),v=Number(mp.querySelector("input").value||baseAmount);out[m]=v});return out}
-$("addBtn").onclick=()=>{const type=$("newType").value,name=$("newName").value.trim(),expenseCategory=type==="income"?undefined:$("newExpenseCategory").value,amount=Number($("newAmount").value),f=$("frequency").value,k=key();let dueDay;try{dueDay=readDay("newDay")}catch(e){return alert(e.message)}if(!name||!Number.isFinite(amount)||amount<=0)return alert("Inserisci nome e importo valido.");ensure(k);if(type!=="income"&&newCategoryTouched)learnCategory(name,expenseCategory);if(f==="once"){data.months[k][type].push({id:"o-"+Date.now(),name,amount,dueDay,expenseCategory,categoryManual:newCategoryTouched})}else{const id="r-"+Date.now()+"-"+Math.random().toString(16).slice(2);let schedule;if(f==="monthly")schedule={kind:"monthly"};if(f==="annual")schedule={kind:"annual",month:Number($("annualMonth").value)};if(f==="selectedYearly"){const amounts=collectMonthAmounts(amount);if(Object.values(amounts).some(v=>!Number.isFinite(v)||v<=0))return alert("Inserisci importi validi per i mesi selezionati.");if(!Object.keys(amounts).length)return alert("Seleziona almeno un mese.");schedule={kind:"selectedYearly",amounts}}if(f==="selectedOneYear"){const amounts=collectMonthAmounts(amount);if(Object.values(amounts).some(v=>!Number.isFinite(v)||v<=0))return alert("Inserisci importi validi per i mesi selezionati.");if(!Object.keys(amounts).length)return alert("Seleziona almeno un mese.");schedule={kind:"selectedOneYear",year:Number($("targetYear").value),amounts}}data.rules[id]={id,type,name,start:k,end:null,skip:[],schedule,amount,dueDay,expenseCategory,categoryManual:newCategoryTouched};if(cmp(k,realKey)<=0&&ruleActive(data.rules[id],k)){const a=amountForRule(data.rules[id],k);data.months[k][type].push({id:"i-"+id+"-"+k,name,amount:a,ruleId:id,dueDay,expenseCategory,categoryManual:newCategoryTouched})}}$("addModal").classList.remove("open");save()};
+$("addBtn").onclick=()=>{const type=$("newType").value,name=$("newName").value.trim(),expenseCategory=type==="income"?undefined:$("newExpenseCategory").value,amount=Number($("newAmount").value),f=$("frequency").value,k=key();let dueDay;try{dueDay=readDay("newDay")}catch(e){return alert(e.message)}if(!name||!Number.isFinite(amount)||amount<=0)return alert("Inserisci nome e importo valido.");ensure(k);if(type!=="income"&&newCategoryTouched)learnCategory(name,expenseCategory);if(f==="once"){data.months[k][type].push({id:"o-"+Date.now(),name,amount,dueDay,expenseCategory,categoryManual:newCategoryTouched,subEnabled:$("newSubEnabled").checked})}else{const id="r-"+Date.now()+"-"+Math.random().toString(16).slice(2);let schedule;if(f==="monthly")schedule={kind:"monthly"};if(f==="annual")schedule={kind:"annual",month:Number($("annualMonth").value)};if(f==="selectedYearly"){const amounts=collectMonthAmounts(amount);if(Object.values(amounts).some(v=>!Number.isFinite(v)||v<=0))return alert("Inserisci importi validi per i mesi selezionati.");if(!Object.keys(amounts).length)return alert("Seleziona almeno un mese.");schedule={kind:"selectedYearly",amounts}}if(f==="selectedOneYear"){const amounts=collectMonthAmounts(amount);if(Object.values(amounts).some(v=>!Number.isFinite(v)||v<=0))return alert("Inserisci importi validi per i mesi selezionati.");if(!Object.keys(amounts).length)return alert("Seleziona almeno un mese.");schedule={kind:"selectedOneYear",year:Number($("targetYear").value),amounts}}data.rules[id]={id,type,name,start:k,end:null,skip:[],schedule,amount,dueDay,expenseCategory,categoryManual:newCategoryTouched,subEnabled:$("newSubEnabled").checked};if(cmp(k,realKey)<=0&&ruleActive(data.rules[id],k)){const a=amountForRule(data.rules[id],k);data.months[k][type].push({id:"i-"+id+"-"+k,name,amount:a,ruleId:id,dueDay,expenseCategory,categoryManual:newCategoryTouched,subEnabled:$("newSubEnabled").checked})}}$("addModal").classList.remove("open");save()};
 
 function openEdit(type,item){
-  pendingEdit={type,item};
+  pendingEdit={type,item};$("editSubEnabled").checked=!!(item.subEnabled||(item.ruleId&&data.rules[item.ruleId]?.subEnabled));
   $("editMovePending").style.display=type==="income"?"":"none";
   $("editTitle").textContent=item.name;
   $("editMonth").textContent="MESE: "+label().toUpperCase();
@@ -1323,7 +1333,7 @@ function applyEdit(mode){
   // Learn only after all input has passed validation. Existing rules retain their
   // historical category: monthly exceptions must never rewrite the whole series.
   if(type!=="income")learnCategory(name,expenseCategory);
-  const edited={...item,id:"edit-"+Date.now(),name,amount,dueDay,expenseCategory,categoryManual:true};delete edited.ruleId;
+  const edited={...item,id:"edit-"+Date.now(),name,amount,dueDay,expenseCategory,categoryManual:true,subEnabled:$("editSubEnabled").checked};delete edited.ruleId;
   if(mode==="month"){
     if(item.ruleId&&data.rules[item.ruleId]){
       const old=data.rules[item.ruleId];if(!Array.isArray(old.skip))old.skip=[];if(!old.skip.includes(k))old.skip.push(k);
@@ -1338,11 +1348,13 @@ function applyEdit(mode){
     }else a.splice(idx,1);
     if(newSchedule===null){edited.id="o-"+Date.now();delete edited.frequencyLabel;data.months[k][type].push(edited)}
     else{
-      const nid="r-edit-"+Date.now()+"-"+Math.random().toString(16).slice(2),nr={...inherited,id:nid,type,name,amount,dueDay,expenseCategory,categoryManual:true,start:k,end:null,skip:[],schedule:newSchedule};
+      const nid="r-edit-"+Date.now()+"-"+Math.random().toString(16).slice(2),nr={...inherited,id:nid,type,name,amount,dueDay,expenseCategory,categoryManual:true,subEnabled:$("editSubEnabled").checked,start:k,end:null,skip:[],schedule:newSchedule};
       data.rules[nid]=nr;
       if(cmp(k,realKey)<=0&&ruleActive(nr,k))data.months[k][type].push({...edited,id:"i-"+nid+"-"+k,amount:amountForRule(nr,k),ruleId:nid});
     }
   }
+  // Mantieni le sottovoci del mese anche se la voce cambia identificativo.
+  if(data.subentries){const oldKey=k+'|'+type+'|'+(item.ruleId||item.id);const latest=data.months[k][type].find(x=>x.id===edited.id||x.name===name&&x.amount===amount&&x.subEnabled);if(latest){const newKey=k+'|'+type+'|'+(latest.ruleId||latest.id);if(oldKey!==newKey&&data.subentries[oldKey]){data.subentries[newKey]=[...(data.subentries[newKey]||[]),...data.subentries[oldKey]];delete data.subentries[oldKey]}}}
   pendingEdit=null;
   $("editModal").classList.remove("open");$("detailModal").classList.remove("open");$("deleteModal").classList.remove("open");save();window.scrollTo({top:0,behavior:"smooth"});
 }
@@ -1867,6 +1879,31 @@ window.addEventListener('resize',v48ScheduleTwoRows,{passive:true});
 window.addEventListener('pageshow',v48ScheduleTwoRows);
 if(document.fonts)document.fonts.ready.then(v48ScheduleTwoRows);
 document.addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelectorAll('.modal.open').forEach(m=>m.classList.remove('open'))});
+
+
+// v65: sottovoci sono una ripartizione del budget, mai un'uscita aggiuntiva.
+let v65Current=null;
+function v65SubKey(type,item){return key()+'|'+type+'|'+(item.ruleId||item.id)}
+// Le sottovoci ricorrenti appartengono alla voce madre (regola o movimento), non al singolo mese.
+function v66Parent(type,item){return type+'|'+(item.ruleId||item.id)}
+function v66Month(){return key()}
+function v66MonthNumber(k){return Number(k.slice(5,7))}
+function v66Matches(x,k){if(x.frequency==='once'||!x.frequency)return (x.startMonth||x.date?.slice(0,7))===k;const start=x.startMonth||x.date?.slice(0,7)||k;if(k<start)return false;const m=v66MonthNumber(k);if(x.frequency==='monthly')return true;if(x.frequency==='annual')return m===Number(x.annualMonth);if(x.frequency==='selectedYearly')return (x.months||[]).includes(m);if(x.frequency==='selectedOneYear')return Number(k.slice(0,4))===Number(x.year)&&(x.months||[]).includes(m);return false}
+function v66AllSubs(){data.subentries=data.subentries||{};const parent=v66Parent(v65Current.type,v65Current.item);const entries=[...(data.subentries['recurring|'+parent]||[])];const old=data.subentries[v65SubKey(v65Current.type,v65Current.item)]||[];for(const x of old)if(!entries.some(z=>z.id===x.id))entries.push({...x,frequency:'once',startMonth:key()});return entries}
+function v65SubList(){return v66AllSubs().filter(x=>v66Matches(x,key()))}
+function v66FrequencyLabel(x){return {once:'Solo questo mese',monthly:'Ogni mese',annual:'Una volta all’anno',selectedYearly:'Mesi scelti ogni anno',selectedOneYear:'Mesi scelti solo in un anno'}[x.frequency||'once']||'Solo questo mese'}
+function v66SetFrequency(){const f=$('v66SubFrequency').value;$('v66SubAnnualBox').classList.toggle('hidden',f!=='annual');$('v66SubMonthsBox').classList.toggle('hidden',!['selectedYearly','selectedOneYear'].includes(f));$('v66SubYearBox').classList.toggle('hidden',f!=='selectedOneYear')}
+$('v66SubFrequency').onchange=v66SetFrequency;
+const v66MonthNames=['Gen','Feb','Mar','Apr','Mag','Giu','Lug','Ago','Set','Ott','Nov','Dic'];
+for(let i=0;i<12;i++){const o=document.createElement('option');o.value=i+1;o.textContent=v66MonthNames[i];$('v66SubAnnualMonth').append(o);const label=document.createElement('label');label.style.cssText='font-size:12px;display:flex;gap:3px;align-items:center';const c=document.createElement('input');c.type='checkbox';c.value=i+1;c.className='v66SubMonthCheck';label.append(c,document.createTextNode(v66MonthNames[i]));$('v66SubMonths').append(label)}
+function v66FillForm(x){$('v65SubName').value=x?.name||'';$('v65SubAmount').value=x?.amount||'';$('v65SubDate').value=x?.date||new Date().toLocaleDateString('en-CA');$('v66SubFrequency').value=x?.frequency||'once';$('v66SubAnnualMonth').value=x?.annualMonth||v66MonthNumber(key());$('v66SubYear').value=x?.year||Number(key().slice(0,4));document.querySelectorAll('.v66SubMonthCheck').forEach(c=>c.checked=!!x?.months?.includes(Number(c.value)));v66SetFrequency()}
+let v66Editing=null;
+function v66SaveSub(){if(!v65Current)return;const name=$('v65SubName').value.trim(),amount=Number($('v65SubAmount').value),date=$('v65SubDate').value,f=$('v66SubFrequency').value;if(!name||!Number.isFinite(amount)||amount<=0||!date)return alert('Inserisci descrizione, data e importo.');const months=[...document.querySelectorAll('.v66SubMonthCheck:checked')].map(c=>Number(c.value));if(['selectedYearly','selectedOneYear'].includes(f)&&!months.length)return alert('Seleziona almeno un mese.');const parent=v66Parent(v65Current.type,v65Current.item),id='recurring|'+parent;data.subentries=data.subentries||{};data.subentries[id]=data.subentries[id]||[];const old=v66Editing;const entry={id:old?.id||'s-'+Date.now()+'-'+Math.random().toString(16).slice(2),name,amount,date,frequency:f,startMonth:old?.startMonth||key(),annualMonth:Number($('v66SubAnnualMonth').value),year:Number($('v66SubYear').value),months};if(old){data.subentries[id]=data.subentries[id].filter(z=>z.id!==old.id);const legacy=v65SubKey(v65Current.type,v65Current.item);if(data.subentries[legacy])data.subentries[legacy]=data.subentries[legacy].filter(z=>z.id!==old.id)}data.subentries[id].push(entry);v66Editing=null;v66FillForm(null);$('v65SubAdd').textContent='＋ Aggiungi sottovoce';save();v65RenderSubs()}
+function v65RenderSubs(){const rows=$('v65SubRows');rows.replaceChildren();const list=v65SubList(),used=list.reduce((n,x)=>n+Number(x.amount||0),0),budget=Number(v65Current.item.amount||0);$('v65Budget').innerHTML='Budget: '+euro(budget)+' · Utilizzato: '+euro(used)+'<br>Disponibile: <strong>'+euro(budget-used)+'</strong>';for(const x of list){const row=document.createElement('div');row.className='v65SubRow';const t=document.createElement('span');t.textContent=(x.date?new Date(x.date+'T12:00:00').toLocaleDateString('it-IT')+' · ':'')+x.name+' · '+v66FrequencyLabel(x);const v=document.createElement('b');v.textContent=euro(x.amount);const edit=document.createElement('button');edit.textContent='✎';edit.title='Modifica sottovoce';edit.onclick=()=>{v66Editing=x;v66FillForm(x);$('v65SubAdd').textContent='Salva modifiche'};const del=document.createElement('button');del.textContent='✕';del.title='Elimina sottovoce';del.onclick=()=>{if(!confirm('Eliminare questa sottovoce?'))return;const id='recurring|'+v66Parent(v65Current.type,v65Current.item);data.subentries[id]=(data.subentries[id]||[]).filter(z=>z.id!==x.id);const legacy=v65SubKey(v65Current.type,v65Current.item);if(data.subentries[legacy])data.subentries[legacy]=data.subentries[legacy].filter(z=>z.id!==x.id);save();v65RenderSubs()};row.append(t,v,edit,del);rows.append(row)}if(!list.length){const p=document.createElement('p');p.className='itemMeta';p.textContent='Nessuna sottovoce registrata per questo mese.';rows.append(p)}}
+$('v65SubAdd').onclick=v66SaveSub;
+// v65: riepilogo per anno, senza ricontare le sottovoci.
+function v65RenderAnnual(){const year=Number($('v65AnnualYear').value),body=$('v65AnnualBody');body.replaceChildren();const months=[],cats=new Map();let inc=0,out=0;for(let m=0;m<12;m++){const k=key(year,m);let income=0,expense=0;for(const x of items('income',k))income+=Number(x.amount||0);for(const type of ['fixed','needs','policies'])for(const x of items(type,k)){const v=Number(x.amount||0);expense+=v;const cat=categoryForItem(x);cats.set(cat,(cats.get(cat)||0)+v)}months.push({name:ML[m],income,expense});inc+=income;out+=expense}const kpis=document.createElement('div');kpis.className='v65YearKpis';for(const [n,v] of [['Entrate',inc],['Uscite',out],['Differenza',inc-out]]){const box=document.createElement('div');const small=document.createElement('small');small.textContent=n;const strong=document.createElement('strong');strong.textContent=euro(v);box.append(small,strong);kpis.append(box)}body.append(kpis);const title=document.createElement('div');title.className='v65SectionTitle';title.textContent='Andamento mensile';body.append(title);const max=Math.max(1,...months.flatMap(m=>[m.income,m.expense]));for(const m of months){const row=document.createElement('div');row.className='v65AnnualMonth';const txt=document.createElement('div');txt.textContent=m.name+' · Entrate '+euro(m.income)+' · Uscite '+euro(m.expense);txt.style.fontSize='12px';const bars=document.createElement('div');bars.className='v65Bars';for(const v of [m.income,m.expense]){const bar=document.createElement('i');bar.style.width=(v/max*100)+'%';bars.append(bar)}row.append(txt,bars);body.append(row)}const heading=document.createElement('div');heading.className='v65SectionTitle';heading.textContent='Uscite annuali per categoria';body.append(heading);for(const [name,v] of [...cats].sort((a,b)=>b[1]-a[1])){const row=document.createElement('div');row.className='v65CatLine';const n=document.createElement('span');n.textContent=name;const a=document.createElement('b');a.textContent=euro(v)+' · '+(out?Math.round(v/out*100):0)+'%';row.append(n,a);body.append(row)}if(!cats.size){const empty=document.createElement('p');empty.textContent='Nessuna uscita registrata per questo anno.';body.append(empty)}}
+$('annualOpen').onclick=e=>{e.stopPropagation();const select=$('v65AnnualYear');select.replaceChildren();const years=new Set([cy,new Date().getFullYear(),2026,...Object.keys(data.months||{}).map(k=>Number(k.slice(0,4)))]);for(const y of [...years].filter(Number.isFinite).sort((a,b)=>b-a)){const opt=document.createElement('option');opt.value=y;opt.textContent=y;select.append(opt)}select.value=cy;$('v65AnnualModal').classList.add('open');v65RenderAnnual()};$('v65AnnualYear').onchange=v65RenderAnnual;
 
 try{dailyBackup()}catch(e){console.warn("Backup automatico non disponibile",e)}render();checkDueAlerts();
 if("serviceWorker" in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}));
