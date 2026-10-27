@@ -1,3 +1,1 @@
-Spese Famiglia v76 - correzione avvio mese corrente e inizializzazione dashboard Revolut.
-Non include dati personali.
-I 7 file vanno nella radice del repository GitHub Pages.
+Spese Famiglia v77 - Basata sulla v70 fornita. Dashboard sottocategorie con importazione PDF/CSV Revolut, mese/anno e ritorno alla Home. Dati personali non preinstallati.
