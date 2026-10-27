@@ -504,6 +504,13 @@ input, select, button {
 #v65SubModal .v65SubRow button{background:#eaf2fc;color:#2867a7;border-radius:10px;padding:8px 10px;font-weight:850}#v65SubModal .v65SubRow button.v69Delete{background:#fff0ef;color:#c84b4b}
 .v69Fineprint{color:#6d819a;font-size:12px;line-height:1.5;margin:6px 0 14px}.v69SubForm{gap:12px}.v69Field{display:flex;flex-direction:column;gap:7px;color:#506680;font-weight:800;font-size:12px;min-width:0}.v69Field input,.v69Field select{box-sizing:border-box;width:100%;min-width:0;background:#f9fbff;border:1px solid #d9e4f1;border-radius:12px;padding:12px 11px;font-size:15px;color:#17314d;min-height:47px}.v69Field input:focus,.v69Field select:focus{outline:2px solid #8db8ed;outline-offset:0}.v69SubSave{border-radius:13px!important;min-height:49px;margin-top:4px}.v69Months{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}
 @media(max-width:370px){#v65SubModal .v69SubSheet{padding-left:13px;padding-right:13px}.v69BudgetBottom{gap:6px}.v69BudgetStat{padding:8px}.v69BudgetStat b{font-size:16px}}
+
+/* v70: saldo annuale progressivo e riconciliazione con Home */
+.v70AnnualRollup{margin:12px 0 22px;padding:14px 18px;border:1px solid #dce8ed;border-radius:18px;background:#f7fafc;color:#18314f}
+.v70AnnualRollupRow{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:9px 0;font-size:14px}
+.v70AnnualRollupRow strong{text-align:right;white-space:nowrap}
+.v70AnnualRollupTotal{border-top:1px solid #d8e3e9;margin-top:5px;padding-top:14px;font-weight:800;color:#087c50}
+@media(max-width:390px){.v70AnnualRollupRow{font-size:12px}}
 </style>
 <style>
 .categoryPanel{margin:12px 10px 18px;padding:16px 12px;background:#fff;border-radius:19px;box-shadow:0 3px 14px #20305012}.categoryHeading{font-size:13px;font-weight:900;color:#32486d;margin-bottom:12px}.categoryLayout{display:flex;align-items:center;justify-content:center;gap:17px;flex-wrap:wrap}.categoryDonut{width:170px;height:170px;flex-shrink:0;border-radius:50%;display:grid;place-items:center;position:relative}.categoryDonut:before{content:'';position:absolute;inset:28px;border-radius:50%;background:white}.categoryCenter{position:relative;text-align:center;font-weight:900;font-size:12px;max-width:105px;overflow-wrap:anywhere}.categoryCenter strong{display:block;font-size:17px;margin-top:4px}.categoryLegend{flex:1;min-width:145px;max-width:340px}.categoryLegend button{display:flex;align-items:center;gap:7px;width:100%;border:0;background:transparent;padding:6px 3px;text-align:left;font-size:12px;color:#25334a;cursor:pointer}.categoryLegend button.active{background:#edf3ff;border-radius:7px}.categoryDot{width:10px;height:10px;flex:none;border-radius:50%}.categoryLegend .categoryPercent{margin-left:auto;font-weight:800}.colName{overflow-wrap:anywhere;word-break:normal}
@@ -2000,8 +2007,24 @@ function v65RenderAnnual(){
   months.push({name:ML[m],income,expense});inc+=income;out+=expense;
  }
  const node=(tag,cls,txt)=>{const e=document.createElement(tag);if(cls)e.className=cls;if(txt!==undefined)e.textContent=txt;return e};
- const hero=node('div','v67AnnualHero');hero.append(node('div','v67Eyebrow','BILANCIO '+year));hero.append(node('div','v67HeroValue',euro(inc-out)));hero.append(node('div','v67HeroLabel','Risultato annuale · entrate meno uscite'));body.append(hero);
- const kpis=node('div','v67YearKpis');for(const [name,value,cls] of [['Entrate',inc,'income'],['Uscite',out,'expense'],['Risparmio',inc-out,'saving']]){const card=node('div','v67YearKpi '+cls);card.append(node('small','',name),node('strong','',euro(value)));kpis.append(card)}body.append(kpis);
+ // Il bilancio annuale e' un saldo cumulativo, non il solo risultato dell'anno.
+ // Si utilizza la medesima proiezione della Home al 31 dicembre dell'anno scelto:
+ // cosi' il saldo iniziale del 2027 coincide con quello finale del 2026.
+ const annualResult=inc-out;
+ const yearEnd=key(year,11),previousYearEnd=key(year-1,11);
+ const closingBalance=projectedBalance(yearEnd);
+ const openingBalance=projectedBalance(previousYearEnd);
+ const hero=node('div','v67AnnualHero');
+ hero.append(node('div','v67Eyebrow','SALDO FINALE PREVISTO · '+year));
+ hero.append(node('div','v67HeroValue',closingBalance===null?'Saldo da impostare':euro(closingBalance)));
+ hero.append(node('div','v67HeroLabel',closingBalance===null?'Imposta il saldo reale del conto nella Home per calcolare il saldo cumulativo.':'Saldo complessivo al 31 dicembre '+year+', incluso il saldo degli anni precedenti.'));
+ body.append(hero);
+ const rollup=node('div','v70AnnualRollup');
+ const opening=node('div','v70AnnualRollupRow');opening.append(node('span','','Saldo al 31/12/'+(year-1)),node('strong','',openingBalance===null?'—':euro(openingBalance)));rollup.append(opening);
+ const movement=node('div','v70AnnualRollupRow');movement.append(node('span','','Entrate − uscite '+year),node('strong','',euro(annualResult)));rollup.append(movement);
+ const ending=node('div','v70AnnualRollupRow v70AnnualRollupTotal');ending.append(node('span','','Saldo al 31/12/'+year),node('strong','',closingBalance===null?'—':euro(closingBalance)));rollup.append(ending);
+ body.append(rollup);
+ const kpis=node('div','v67YearKpis');for(const [name,value,cls] of [['Entrate',inc,'income'],['Uscite',out,'expense'],['Risultato dell’anno',inc-out,'saving']]){const card=node('div','v67YearKpi '+cls);card.append(node('small','',name),node('strong','',euro(value)));kpis.append(card)}body.append(kpis);
  const head=node('div','v67SectionHeading');head.append(node('h3','', 'Andamento mensile'),node('p','','Confronto tra entrate e uscite'));body.append(head);
  const legend=node('div','v67Legend');legend.innerHTML='<span><i class="v67Blue"></i>Entrate</span><span><i class="v67Orange"></i>Uscite</span>';body.append(legend);
  const max=Math.max(1,...months.flatMap(m=>[m.income,m.expense]));const chart=node('div','v67MonthlyChart');

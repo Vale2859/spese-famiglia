@@ -1,1 +1,1 @@
-Spese Famiglia v64 - pulizia delle spese automatiche v61 per installazioni esistenti. Rimuove regole e movimenti con ID generati da v61; preserva voci manuali e importate. Il saldo 396,35 non e distinguibile in modo affidabile da uno manuale nelle vecchie versioni e viene preservato. Nessun dato preimpostato per nuove installazioni.
+Spese Famiglia v70 - Analisi annuale con saldo progressivo. Il saldo finale al 31 dicembre deriva dalla stessa proiezione della Home; il risultato annuo resta separato. Nessun dato personale preimpostato.
