@@ -1,5 +1,1 @@
-Spese Famiglia v56 - classificazione leggibile.
-Import multi-mese v55 mantenuto.
-Categorie da estratto Intesa: POS alimentari = Supermercato, CRAI = Supermercato CRAI, altre regole di esercenti.
-Descrizioni ambigue = Spesa da verificare.
-Anteprima modificabile prima del salvataggio; backup consigliato.
+Spese Famiglia v64 - pulizia delle spese automatiche v61 per installazioni esistenti. Rimuove regole e movimenti con ID generati da v61; preserva voci manuali e importate. Il saldo 396,35 non e distinguibile in modo affidabile da uno manuale nelle vecchie versioni e viene preservato. Nessun dato preimpostato per nuove installazioni.

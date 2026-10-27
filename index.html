@@ -843,21 +843,40 @@ function mergeOldPolicies(){
   for(const rule of Object.values(data.rules))if(rule.type==="policies")rule.type="fixed";
 }
 mergeOldPolicies();
-// v61: set up only missing recurring charges; never duplicate existing entries.
-(function initRequestedMonthlyCharges(){
- const requested=[['Assicurazione Generali mamma',149.29,'Assicurazioni'],['Mediobanca casa',371.89,'Casa'],['Canone Fisso',4,'Altro']];
+// v64: one-time cleanup of v61-generated charges in existing installations.
+// Only deterministic generated identifiers are deleted: names/amounts alone
+// cannot distinguish user-entered expenses from template-generated ones.
+(function removeOldTemplateCharges(){
+ const flag='speseFamiglia_v64_templateCleanup';
+ if(localStorage.getItem(flag)==='done')return;
+ const ids=new Set([
+  'v61-recurring-assicurazionegeneralimamma',
+  'v61-recurring-mediobancacasa',
+  'v61-recurring-canonefisso'
+ ]);
  let changed=false;
- for(const [name,amount,expenseCategory] of requested){
-  const norm=s=>String(s||'').toLowerCase().replace(/[^a-z0-9]/g,'');
-  const exists=Object.values(data.rules).some(r=>r.type==='fixed'&&norm(r.name)===norm(name)&&Math.abs(Number(r.amount)-amount)<.01)||Object.values(data.months).some(m=>(m.fixed||[]).some(x=>norm(x.name)===norm(name)&&Math.abs(Number(x.amount)-amount)<.01));
-  if(exists)continue;
-  const id='v61-recurring-'+norm(name);
-  data.rules[id]={id,type:'fixed',name,start:'2026-10',end:null,skip:[],schedule:{kind:'monthly'},amount,dueDay:null,expenseCategory,categoryManual:true};changed=true;
+ for(const id of ids){if(Object.prototype.hasOwnProperty.call(data.rules,id)){delete data.rules[id];changed=true}}
+ for(const month of Object.values(data.months||{})){
+  if(!month||typeof month!=='object')continue;
+  for(const type of ['fixed','policies','needs']){
+   if(!Array.isArray(month[type]))continue;
+   const before=month[type].length;
+   month[type]=month[type].filter(x=>{
+    if(!x||typeof x!=='object')return true;
+    if(ids.has(x.ruleId))return false;
+    // v61 materialization always used this exact generated ID.
+    return ![...ids].some(id=>typeof x.id==='string'&&x.id==='i-'+id+'-'+Object.keys(data.months).find(k=>data.months[k]===month));
+   });
+   if(month[type].length!==before)changed=true;
+  }
  }
- if(!data.balance){const d=new Date();data.balance={amount:396.35,anchorMonth:d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0'),anchorIsCurrent:true,updatedAt:d.toISOString(),updatedLabel:d.toLocaleDateString('it-IT')};changed=true;}
- if(changed)try{localStorage.setItem(KEY,JSON.stringify(data))}catch(e){console.warn('Impossibile salvare le impostazioni iniziali',e)}
+ // The v61 auto-seeded balance was not tagged as automatic. It is impossible
+ // to distinguish it safely from a user-entered 396.35 EUR balance; retain it.
+ try{
+  if(changed)localStorage.setItem(KEY,JSON.stringify(data));
+  localStorage.setItem(flag,'done');
+ }catch(e){console.warn('Pulizia dati preimpostati non completata',e)}
 })();
-
 
 const now=new Date();const realKey=now.getFullYear()+"-"+String(now.getMonth()+1).padStart(2,"0");
 let cy=Math.max(2026,now.getFullYear()),cm=(cy===now.getFullYear()?now.getMonth():0);
