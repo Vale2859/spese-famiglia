@@ -431,6 +431,17 @@ input, select, button {
 .incomeCard.showPending .incomePendingTotal{display:flex}
 .incomeSwipe{overscroll-behavior-x:contain;touch-action:pan-y!important;scroll-behavior:smooth}
 .incomePanel{scroll-snap-stop:always}
+
+/* v59: category exploration, retains the original compact dashboard */
+.categorySwipe{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;overscroll-behavior-x:contain;scrollbar-width:thin;padding:8px 2px 4px;margin-top:8px;touch-action:pan-x pan-y}
+.categorySlide{flex:0 0 100%;scroll-snap-align:start;box-sizing:border-box;border:1px solid #e5eaf4;border-radius:12px;padding:10px;background:#fbfcff;min-width:0}
+.categorySlideTitle{display:flex;justify-content:space-between;gap:8px;align-items:center;font-size:12px;font-weight:850;color:#283953;margin-bottom:8px}
+.categorySlideTitle small{font-size:10px;color:#64748b;font-weight:650}
+.categorySlideRow{display:grid;grid-template-columns:34px minmax(0,1fr) auto;gap:7px;align-items:center;border-top:1px solid #e9edf5;padding:7px 0;font-size:11px;color:#283953}
+.categorySlideDay{font-weight:800;color:#61738d}.categorySlideName{overflow-wrap:anywhere}.categorySlideAmt{font-weight:850;white-space:nowrap}
+.categorySlideMore{width:100%;border:0;border-radius:8px;background:#eaf1ff;color:#18539b;padding:8px;margin-top:6px;font-size:11px;font-weight:800}
+.categorySlideHint{font-size:10px;color:#71819b;text-align:center;margin-top:5px}
+.categoryLegend .categoryMore{font-size:10px!important}
 </style>
 <style>
 .categoryPanel{margin:12px 10px 18px;padding:16px 12px;background:#fff;border-radius:19px;box-shadow:0 3px 14px #20305012}.categoryHeading{font-size:13px;font-weight:900;color:#32486d;margin-bottom:12px}.categoryLayout{display:flex;align-items:center;justify-content:center;gap:17px;flex-wrap:wrap}.categoryDonut{width:170px;height:170px;flex-shrink:0;border-radius:50%;display:grid;place-items:center;position:relative}.categoryDonut:before{content:'';position:absolute;inset:28px;border-radius:50%;background:white}.categoryCenter{position:relative;text-align:center;font-weight:900;font-size:12px;max-width:105px;overflow-wrap:anywhere}.categoryCenter strong{display:block;font-size:17px;margin-top:4px}.categoryLegend{flex:1;min-width:145px;max-width:340px}.categoryLegend button{display:flex;align-items:center;gap:7px;width:100%;border:0;background:transparent;padding:6px 3px;text-align:left;font-size:12px;color:#25334a;cursor:pointer}.categoryLegend button.active{background:#edf3ff;border-radius:7px}.categoryDot{width:10px;height:10px;flex:none;border-radius:50%}.categoryLegend .categoryPercent{margin-left:auto;font-weight:800}.colName{overflow-wrap:anywhere;word-break:normal}
@@ -599,7 +610,7 @@ button{cursor:pointer}button:focus-visible,[role=button]:focus-visible{outline:3
     </div>
 
     <div id="smartCategoryPanel" style="margin:5px 10px 8px;display:flex;align-items:center;gap:9px;flex-wrap:wrap"><button type="button" id="smartReview" style="padding:8px 12px;border:1px solid #b8c9e2;border-radius:10px;background:#f4f8ff;color:#24466b;font-size:12px;font-weight:800">✨ Categorie</button><span id="smartStatus" aria-live="polite" style="font-size:11px;color:#53657b;flex:1"></span></div>
-<div class="categoryPanel"><div class="categoryHeading">📊 DOVE VANNO LE USCITE · <span id="categoryMonth"></span></div><div class="categoryLayout"><div class="categoryDonut" id="categoryDonut"><div class="categoryCenter" id="categoryCenter">Nessuna spesa</div></div><div class="categoryLegend" id="categoryLegend"></div></div></div>
+<div class="categoryPanel"><div class="categoryHeading">📊 DOVE VANNO LE USCITE · <span id="categoryMonth"></span></div><div class="categoryLayout"><div class="categoryDonut" id="categoryDonut"><div class="categoryCenter" id="categoryCenter">Nessuna spesa</div></div><div class="categoryLegend" id="categoryLegend"></div></div><div class="categorySwipe" id="categorySwipe" aria-label="Scorri tra le categorie"></div></div>
     <div class="cols">
       <div class="col fixed" data-type="fixed">
         <div class="colHead"><div class="colTitle">🏠 USCITE FISSE</div><div class="colTotal" id="fixedTotal">€ 0</div></div>
@@ -1029,22 +1040,31 @@ function backfillExpenseCategories(force=false){
   }
   return changed;
 }
+let v59CategoryTimer=null;
 function renderCategories(){
- const all=v48CategoryEntries(),totals=new Map(),counts=new Map();
- for(const {item:x} of all){const value=Number(x.amount)||0;if(value<=0)continue;const c=categoryForItem(x);totals.set(c,(totals.get(c)||0)+value);counts.set(c,(counts.get(c)||0)+1)}
- const total=[...totals.values()].reduce((a,b)=>a+b,0),donut=$('categoryDonut'),legend=$('categoryLegend'),center=$('categoryCenter');
- $('categoryMonth').textContent=ML[cm]+' '+cy;legend.replaceChildren();
+ const all=v48CategoryEntries(),totals=new Map(),entries=new Map();
+ for(const entry of all){const x=entry.item,value=Number(x.amount)||0;if(value<=0)continue;const c=categoryForItem(x);totals.set(c,(totals.get(c)||0)+value);if(!entries.has(c))entries.set(c,[]);entries.get(c).push(entry)}
+ const total=[...totals.values()].reduce((a,b)=>a+b,0),donut=$('categoryDonut'),legend=$('categoryLegend'),center=$('categoryCenter'),swipe=$('categorySwipe');
+ $('categoryMonth').textContent=ML[cm]+' '+cy;legend.replaceChildren();swipe.replaceChildren();
  const review=all.filter(({item})=>v48NeedsReview(item)).length;
  $('smartStatus').textContent=totals.size+' categorie'+(review?' · '+review+' da verificare':' · tutto classificato');
- donut.setAttribute('role','button');donut.tabIndex=0;donut.title='Tocca per vedere i movimenti della categoria';
- if(!total){donut.style.background='#e9edf4';center.textContent='Nessuna spesa';legend.innerHTML='<button type="button" class="categoryMore">Gestisci categorie ›</button>';legend.firstChild.onclick=()=>v48OpenReview();donut.onclick=()=>v48OpenReview();return}
- const sorted=categoryPalette.filter(([n])=>totals.has(n)).sort((a,b)=>totals.get(b[0])-totals.get(a[0]));let start=0;
- donut.style.background='conic-gradient('+sorted.map(([name,color])=>{const end=start+totals.get(name)/total*100,part=color+' '+start+'% '+end+'%';start=end;return part}).join(',')+')';
- function choose(name){v48SelectedCategory=name;center.replaceChildren();const labelEl=document.createElement('div');labelEl.textContent=name||'Totale uscite';const value=document.createElement('strong');value.textContent=euro(name?totals.get(name):total);const hint=document.createElement('div');hint.textContent=name?(totals.get(name)/total*100).toLocaleString('it-IT',{maximumFractionDigits:1})+'%':'Tocca per dettagli';hint.style.fontSize='8px';center.append(labelEl,value,hint);legend.querySelectorAll('[data-cat]').forEach(b=>b.classList.toggle('active',b.dataset.cat===name));donut.setAttribute('aria-label','Mostra movimenti '+(name||'tutte le categorie'))}
- for(const [name,color] of sorted.slice(0,5)){const btn=document.createElement('button');btn.type='button';btn.dataset.cat=name;const dot=document.createElement('span');dot.className='categoryDot';dot.style.background=color;const title=document.createElement('span');title.textContent=name;const pct=document.createElement('span');pct.className='categoryPercent';pct.textContent=(totals.get(name)/total*100).toLocaleString('it-IT',{maximumFractionDigits:0})+'%';btn.append(dot,title,pct);btn.onclick=()=>choose(name);legend.append(btn)}
- const more=document.createElement('button');more.type='button';more.className='categoryMore';more.textContent=sorted.length>5?'＋ Altre '+(sorted.length-5)+' categorie · vedi tutte ›':'Vedi tutte le categorie ›';more.onclick=()=>v48OpenReview();legend.append(more);
- if(!totals.has(v48SelectedCategory))v48SelectedCategory=null;choose(v48SelectedCategory);donut.onclick=()=>v48OpenReview(v48SelectedCategory);donut.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();v48OpenReview(v48SelectedCategory)}};
+ if(v59CategoryTimer){clearTimeout(v59CategoryTimer);v59CategoryTimer=null}
+ if(!total){donut.style.background='#e9edf4';center.textContent='Nessuna spesa';return}
+ const sorted=[...totals.keys()].map(name=>[name,(categoryPalette.find(x=>x[0]===name)||[name,'#9ca3af'])[1]]).sort((a,b)=>totals.get(b[0])-totals.get(a[0]));
+ let start=0;donut.style.background='conic-gradient('+sorted.map(([name,color])=>{const end=start+totals.get(name)/total*100,part=color+' '+start+'% '+end+'%';start=end;return part}).join(',')+')';
+ let activeSlide=-1;
+ function centerShow(name){center.replaceChildren();const label=document.createElement('div');label.textContent=name||'Totale mese';const value=document.createElement('strong');value.textContent=euro(name?totals.get(name):total);const hint=document.createElement('div');hint.textContent=name?(totals.get(name)/total*100).toLocaleString('it-IT',{maximumFractionDigits:1})+'%':'Tutte le uscite';hint.style.fontSize='9px';center.append(label,value,hint);legend.querySelectorAll('[data-cat]').forEach(x=>x.classList.toggle('active',x.dataset.cat===name))}
+ function preview(name){if(v59CategoryTimer)clearTimeout(v59CategoryTimer);centerShow(name);v59CategoryTimer=setTimeout(()=>{centerShow(activeSlide<0?null:sorted[activeSlide][0]);v59CategoryTimer=null},5000)}
+ function goTo(i){if(v59CategoryTimer){clearTimeout(v59CategoryTimer);v59CategoryTimer=null}activeSlide=i;centerShow(i<0?null:sorted[i][0]);if(i>=0){swipe.children[i]?.scrollIntoView({behavior:'smooth',block:'nearest',inline:'start'})}else{swipe.scrollTo({left:0,behavior:'smooth'})}}
+ let expanded=false;
+ function drawLegend(){legend.replaceChildren();for(const [i,[name,color]] of sorted.entries()){if(i>=5&&!expanded)continue;const btn=document.createElement('button');btn.type='button';btn.dataset.cat=name;const dot=document.createElement('span');dot.className='categoryDot';dot.style.background=color;const title=document.createElement('span');title.textContent=name;const pct=document.createElement('span');pct.className='categoryPercent';pct.textContent=(totals.get(name)/total*100).toLocaleString('it-IT',{maximumFractionDigits:0})+'%';btn.append(dot,title,pct);btn.onclick=()=>preview(name);legend.append(btn)}if(sorted.length>5){const more=document.createElement('button');more.type='button';more.className='categoryMore';more.textContent=expanded?'− Mostra meno':'＋ Altre '+(sorted.length-5)+' categorie · vedi tutte';more.onclick=()=>{expanded=!expanded;drawLegend();centerShow(activeSlide<0?null:sorted[activeSlide][0])};legend.append(more)}}
+ drawLegend();
+ sorted.forEach(([name,color],index)=>{const slide=document.createElement('section');slide.className='categorySlide';slide.setAttribute('aria-label','Categoria '+name);const title=document.createElement('div');title.className='categorySlideTitle';const label=document.createElement('span');label.textContent=name;label.style.color=color;const summary=document.createElement('small');summary.textContent=euro(totals.get(name))+' · '+entries.get(name).length+' mov.';title.append(label,summary);slide.append(title);const list=document.createElement('div');slide.append(list);const rows=entries.get(name).slice().sort((a,b)=>(dayOf(a.item)??0)-(dayOf(b.item)??0));let showAll=false;function paint(){list.replaceChildren();for(const {item} of rows.slice(0,showAll?rows.length:6)){const row=document.createElement('div');row.className='categorySlideRow';const day=document.createElement('span');day.className='categorySlideDay';day.textContent=dayOf(item)==null?'—':String(dayOf(item)).padStart(2,'0');const nm=document.createElement('span');nm.className='categorySlideName';nm.textContent=shortExpenseName(item.name);const amt=document.createElement('span');amt.className='categorySlideAmt';amt.textContent=euro(item.amount);row.append(day,nm,amt);list.append(row)}if(rows.length>6){const more=document.createElement('button');more.type='button';more.className='categorySlideMore';more.textContent=showAll?'Mostra solo 6':'Vedi tutte le '+rows.length+' voci';more.onclick=()=>{showAll=!showAll;paint()};list.append(more)}}paint();swipe.append(slide)});
+ const hint=document.createElement('div');hint.className='categorySlideHint';hint.textContent='← Scorri le categorie →';swipe.after(hint);const oldHint=swipe.parentElement.querySelectorAll('.categorySlideHint');for(let i=0;i<oldHint.length-1;i++)oldHint[i].remove();
+ let scrollTimer=null;swipe.onscroll=()=>{if(scrollTimer)clearTimeout(scrollTimer);scrollTimer=setTimeout(()=>{const width=swipe.children[0]?.getBoundingClientRect().width||1;const gap=10;const idx=Math.max(0,Math.min(sorted.length-1,Math.round(swipe.scrollLeft/(width+gap))));activeSlide=idx;if(v59CategoryTimer){clearTimeout(v59CategoryTimer);v59CategoryTimer=null}centerShow(sorted[idx][0])},90)};
+ centerShow(null);donut.onclick=()=>{if(activeSlide<0){goTo(0)}else{goTo(-1)}};donut.setAttribute('role','button');donut.tabIndex=0;donut.title='Tocca per vedere il totale del mese';donut.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();donut.click()}};
 }
+
 let v48SelectedCategory=null;
 function v48CategoryEntries(){return ['fixed','needs','policies'].flatMap(type=>items(type).map(item=>({type,item})));}
 function v48NeedsReview(x){const guess=inferExpense(x.name);return !x.categoryManual&&(guess.confidence<.9||categoryForItem(x)!==guess.category);}
