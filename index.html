@@ -1619,15 +1619,32 @@ async function bankLoadPdf(file){
   const join=parts=>parts.map(p=>p.text).join(' ').replace(/\s+/g,' ').trim();
   const pageText=lines.slice().sort((a,b)=>b.y-a.y).map(l=>join(l.parts)).join(' ');const countMatch=pageText.match(/movimenti selezionati sono\s*:?\s*(\d+)/i);if(countMatch)expectedCount=Number(countMatch[1]);
   const anchors=[];let incompleteRows=0;
+  // Date and amount may be separate PDF text lines (different baselines).
+  // Only dates inside the transaction table's first column qualify as rows.
+  const tableHeaders=lines.filter(line=>line.parts.some(p=>/CONTABILE/i.test(p.text)) && line.parts.some(p=>/IMPORTO/i.test(p.text)));
+  const tableTop=tableHeaders.length?Math.max(...tableHeaders.map(l=>l.y)):Infinity;
+  const dated=[];
   for(const line of lines){
-   const datePart=line.parts.find(p=>p.x<125&&/\b\d{2}\.\d{2}\.\d{4}\b/.test(p.text));
-   const moneyPart=line.parts.filter(p=>p.x>=490).map(p=>p.text).join(' ');
-   const date=datePart&&datePart.text.match(/(\d{2})\.(\d{2})\.(\d{4})/);
-   const amountMatch=moneyPart.match(/(-?\s*\d{1,3}(?:\.\d{3})*,\d{2})/);
-   if(date&&!amountMatch)incompleteRows++;
-   if(!date||!amountMatch)continue;
-   const parsedDay=new Date(Number(date[3]),Number(date[2])-1,Number(date[1]));if(parsedDay.getFullYear()!==Number(date[3])||parsedDay.getMonth()!==Number(date[2])-1||parsedDay.getDate()!==Number(date[1]))throw Error('Data bancaria non valida: '+date[0]);
-   anchors.push({y:line.y,date:date[3]+'-'+date[2]+'-'+date[1],amount:Number(amountMatch[1].replace(/\s/g,'').replace(/\./g,'').replace(',','.')),nameParts:[],catParts:[],posted:true});
+   const datePart=line.parts.find(p=>p.x<125&&/^\s*\d{2}\.\d{2}\.\d{4}\s*$/.test(p.text));
+   if(!datePart||line.y>=tableTop)continue;
+   const date=datePart.text.match(/(\d{2})\.(\d{2})\.(\d{4})/);
+   const parsedDay=new Date(Number(date[3]),Number(date[2])-1,Number(date[1]));
+   if(parsedDay.getFullYear()!==Number(date[3])||parsedDay.getMonth()!==Number(date[2])-1||parsedDay.getDate()!==Number(date[1]))continue;
+   dated.push({y:line.y,date:date[3]+'-'+date[2]+'-'+date[1]});
+  }
+  // A valid movement has an amount in the amount column at essentially the
+  // same vertical position. The 12pt tolerance handles PDF baseline offsets.
+  for(const d of dated){
+   const moneyLines=lines.map(line=>({line,dist:Math.abs(line.y-d.y)}))
+    .filter(v=>v.dist<=12).sort((a,b)=>a.dist-b.dist);
+   let amountMatch=null;
+   for(const {line} of moneyLines){
+    const moneyPart=line.parts.filter(p=>p.x>=490).map(p=>p.text).join(' ');
+    amountMatch=moneyPart.match(/(-?\s*\d{1,3}(?:\.\d{3})*,\d{2})/);
+    if(amountMatch)break;
+   }
+   if(!amountMatch){incompleteRows++;continue}
+   anchors.push({y:d.y,date:d.date,amount:Number(amountMatch[1].replace(/\s/g,'').replace(/\./g,'').replace(',','.')),nameParts:[],catParts:[],posted:true});
   }
   anchors.sort((a,b)=>b.y-a.y);
   if(incompleteRows)throw Error('Pagina '+pageNo+': '+incompleteRows+' righe con data ma senza importo. Verifica il formato PDF: importazione bloccata.');
