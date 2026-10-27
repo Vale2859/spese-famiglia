@@ -1,1 +1,3 @@
-Spese Famiglia v70 - Analisi annuale con saldo progressivo. Il saldo finale al 31 dicembre deriva dalla stessa proiezione della Home; il risultato annuo resta separato. Nessun dato personale preimpostato.
+Spese Famiglia v75 - controllo calendario e analisi annuale.
+7 file nella radice del repository.
+Non caricare dati personali nei file.

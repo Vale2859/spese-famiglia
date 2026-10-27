@@ -9,7 +9,7 @@
 <meta name="apple-mobile-web-app-title" content="Spese Famiglia">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-192.png">
-<title>Spese Famiglia v73</title>
+<title>Spese Famiglia v74</title>
 <style>
 :root{
   --ink:#10243f;--muted:#718096;--line:#dfe7ef;
@@ -965,6 +965,7 @@ mergeOldPolicies();
 
 const now=new Date();const realKey=now.getFullYear()+"-"+String(now.getMonth()+1).padStart(2,"0");
 let cy=Math.max(2026,now.getFullYear()),cm=(cy===now.getFullYear()?now.getMonth():0);
+function v75GoToCurrentMonth(){const d=new Date();const y=Math.max(2026,d.getFullYear()),m=d.getFullYear()<2026?0:d.getMonth();if(cy!==y||cm!==m){cy=y;cm=m;render();}}
 let pendingEdit=null,pendingDelete=null,lastDetail=null;
 
 function key(y=cy,m=cm){return y+"-"+String(m+1).padStart(2,"0")}
@@ -1959,26 +1960,30 @@ if(document.fonts)document.fonts.ready.then(v48ScheduleTwoRows);
 document.addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelectorAll('.modal.open').forEach(m=>m.classList.remove('open'))});
 
 
+// v75: when returning to the app after a month change, show the actual current month.
+window.addEventListener('pageshow',()=>{if(!document.querySelector('.modal.open'))v75GoToCurrentMonth()});
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&!document.querySelector('.modal.open'))v75GoToCurrentMonth()});
+
 // v67: menu sempre disponibile per le spese, anche prima di attivare sottovoci.
 function v65OpenItem(type,item){
- if(!(item.subEnabled||(item.ruleId&&data.rules[item.ruleId]?.subEnabled))){openEdit(type,item);return;}
+ // La voce senza sottocategorie apre la modifica. Con sottocategorie apre subito il dashboard.
+ const rule=item.ruleId&&data.rules[item.ruleId];
+ if(!(item.subEnabled||rule?.subEnabled)){openEdit(type,item);return;}
  v65Current={type,item};
- $('v65ChoiceTitle').textContent=item.name;
- $('v65ChoiceModal').classList.add('open');
+ v65OpenDashboard();
+}
+function v65OpenDashboard(){
+ if(!v65Current)return;
+ $('v65ChoiceModal').classList.remove('open');
+ $('v65SubTitle').textContent=v65Current.item.name;
+ $('v65SubModal').classList.add('open');
+ try{v71Open()}catch(error){console.error('Errore apertura sottocategorie',error);$('v71Dashboard').textContent='Impossibile visualizzare i movimenti: '+error.message;}
 }
 $('v65EditChoice').onclick=()=>{
  $('v65ChoiceModal').classList.remove('open');
  if(v65Current)openEdit(v65Current.type,v65Current.item);
 };
-$('v65ShowSub').onclick=()=>{
- $('v65ChoiceModal').classList.remove('open');
- if(!v65Current)return;
- $('v65SubTitle').textContent=v65Current.item.name;
- v66Editing=null;v66FillForm(null);
- $('v65SubAdd').textContent='＋ Aggiungi sottovoce';
- $('v65SubModal').classList.add('open');
- v71Open();
-};
+$('v65ShowSub').onclick=v65OpenDashboard;
 
 // v65: sottovoci sono una ripartizione del budget, mai un'uscita aggiuntiva.
 let v65Current=null;
@@ -2049,9 +2054,10 @@ function v65RenderAnnual(){
 }
 const v68Colors=['#6497b1','#1f9f83','#ed994f','#e8b900','#7569d7','#e8698e','#d65050','#455c7a'];
 const v68Palette=$('v68ColorChoices');for(const color of v68Colors){const b=document.createElement('button');b.type='button';b.className='v68ColorChip';b.style.background=color;b.setAttribute('aria-label','Seleziona colore '+color);b.onclick=()=>{$('v65CategoryColor').value=color;v68Palette.querySelectorAll('button').forEach(x=>x.classList.remove('selected'));b.classList.add('selected')};v68Palette.append(b)}
-$('annualOpen').onclick=e=>{e.stopPropagation();const select=$('v65AnnualYear');select.replaceChildren();const years=new Set([cy,new Date().getFullYear(),2026,...Object.keys(data.months||{}).map(k=>Number(k.slice(0,4)))]);for(const y of [...years].filter(Number.isFinite).sort((a,b)=>b-a)){const opt=document.createElement('option');opt.value=y;opt.textContent=y;select.append(opt)}select.value=cy;$('v65AnnualModal').classList.add('open');v65RenderAnnual()};$('v65AnnualYear').onchange=v65RenderAnnual;
+$('annualOpen').onclick=e=>{e.stopPropagation();const select=$('v65AnnualYear');select.replaceChildren();const years=new Set([...Array.from({length:51},(_,i)=>2026+i),cy,...Object.keys(data.months||{}).map(k=>Number(k.slice(0,4)))]);for(const y of [...years].filter(Number.isFinite).sort((a,b)=>a-b)){const opt=document.createElement('option');opt.value=y;opt.textContent=y;select.append(opt)}select.value=cy;$('v65AnnualModal').classList.add('open');v75SafeAnnual()};$('v65AnnualYear').onchange=v75SafeAnnual;
+function v75SafeAnnual(){try{v65RenderAnnual()}catch(err){console.error('Errore analisi annuale',err);$('v65AnnualBody').textContent='Impossibile calcolare il riepilogo: '+err.message}}
 
-try{dailyBackup()}catch(e){console.warn("Backup automatico non disponibile",e)}render();checkDueAlerts();
+try{dailyBackup()}catch(e){console.warn("Backup automatico non disponibile",e)}v75GoToCurrentMonth();render();checkDueAlerts();
 if("serviceWorker" in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}));
 
 // v71: statement transactions are isolated per budget item; never added to main expenses.
@@ -2062,8 +2068,8 @@ const v71Colors=['#fe638b','#8f6cf0','#34c985','#318bff','#ffb21e','#a9b6c7','#e
 function v71Esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function v71Parent(){return v66Parent(v65Current.type,v65Current.item)}
 function v71Records(){data.revolutStatements=data.revolutStatements||{};return data.revolutStatements[v71Parent()]||[]}
-function v71Budget(k){const parent=v65Current.item;const rule=parent.ruleId&&data.rules[parent.ruleId];const k0=key();if(k===k0)return Number(parent.amount)||0;if(rule){const found=items(v65Current.type,k).find(x=>x.ruleId===parent.ruleId);return Number(found?.amount)||0}return Number(parent.amount)||0}
-function v71Entries(k){const rec=v71Records().filter(x=>x.date?.startsWith(k));const original=v66AllSubs().filter(x=>v66Matches(x,k)).map(x=>({id:x.id,name:x.name,amount:x.amount,date:x.date,category:x.category||'Altro',manual:true,frequency:x.frequency}));return [...rec,...original].sort((a,b)=>(b.date||'').localeCompare(a.date||''))}
+function v71Budget(k){const parent=v65Current.item;const rule=parent.ruleId&&data.rules[parent.ruleId];const k0=key();if(k===k0)return Number(parent.amount)||0;if(rule){const found=items(v65Current.type,k).find(x=>x.ruleId===parent.ruleId);return Number(found?.amount)||0}const found=items(v65Current.type,k).find(x=>x.id===parent.id);return Number(found?.amount)||0}
+function v71Entries(k){const rec=v71Records().filter(x=>x.date?.startsWith(k));const original=v66AllSubs().filter(x=>v66Matches(x,k)).map(x=>({id:x.id,name:x.name,amount:x.amount,date:(x.frequency&&x.frequency!=='once'?k+'-'+String((x.date||'').slice(8,10)||'01').padStart(2,'0'):x.date),category:x.category||'Altro',manual:true,frequency:x.frequency}));return [...rec,...original].sort((a,b)=>(b.date||'').localeCompare(a.date||''))}
 function v71Cat(name){const s=name.toLowerCase();if(/crai|supermerc|aliment|market|esselunga|lidl|conad/.test(s))return 'Alimentari';if(/caff|bar|ristoran|pizz|mcdonald|glovo|deliveroo/.test(s))return 'Ristoranti e bar';if(/cinema|uci|teatro|netflix|spotify/.test(s))return /netflix|spotify/.test(s)?'Abbonamenti':'Tempo libero';if(/easypark|parchegg|uber|trenitalia|taxi|benzina|carburante/.test(s))return 'Trasporti';if(/apple|openai|chatgpt|icloud|prime/.test(s))return 'Abbonamenti';if(/commission|canone|fee/.test(s))return 'Commissioni';if(/farmac|dent|medic/.test(s))return 'Salute';if(/fiore|regal|compleanno/.test(s))return 'Regali';if(/amazon|zalando|negozio|shopping/.test(s))return 'Shopping';return 'Altro'}
 function v71Stats(rows){const cats={};for(const x of rows)cats[x.category||'Altro']=(cats[x.category||'Altro']||0)+Number(x.amount||0);return cats}
 function v71Donut(cats,total){if(!total)return '<div class="v71Empty">Ancora nessuna spesa registrata.</div>';let at=0;const parts=Object.entries(cats).sort((a,b)=>b[1]-a[1]).map(([cat,v])=>{const col=v71Colors[Math.max(0,v71Cats.indexOf(cat))%v71Colors.length];const from=at;at+=v/total*100;return `${col} ${from}% ${at}%`});return `<div class="v71Donut" style="background:conic-gradient(${parts.join(',')})"><div class="v71DonutCenter">Spese<strong>${euro(total)}</strong></div></div>`}
