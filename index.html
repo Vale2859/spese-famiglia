@@ -779,7 +779,7 @@ button{cursor:pointer}button:focus-visible,[role=button]:focus-visible{outline:3
         <input id="editAmount" type="number" step="0.01" min="0">
       </div>
       <label class="v65Toggle"><input type="checkbox" id="editSubEnabled"> Attiva sottocategorie / budget per questa voce</label><div id="editDayBox"><div class="label">Giorno del movimento (1-31, facoltativo)</div><input id="editDay" type="number" min="1" max="31" inputmode="numeric" placeholder="Es. 15">
-      </div>
+      </div><label class="v65Toggle" id="editPaidBox"><input type="checkbox" id="editPaid"> ✓ Pagato (anche senza data)</label>
 
       <div>
         <div class="label">Frequenza</div>
@@ -934,41 +934,7 @@ function mergeOldPolicies(){
   for(const rule of Object.values(data.rules))if(rule.type==="policies")rule.type="fixed";
 }
 mergeOldPolicies();
-// v64: one-time cleanup of v61-generated charges in existing installations.
-// Only deterministic generated identifiers are deleted: names/amounts alone
-// cannot distinguish user-entered expenses from template-generated ones.
-(function removeOldTemplateCharges(){
- const flag='speseFamiglia_v64_templateCleanup';
- if(localStorage.getItem(flag)==='done')return;
- const ids=new Set([
-  'v61-recurring-assicurazionegeneralimamma',
-  'v61-recurring-mediobancacasa',
-  'v61-recurring-canonefisso'
- ]);
- let changed=false;
- for(const id of ids){if(Object.prototype.hasOwnProperty.call(data.rules,id)){delete data.rules[id];changed=true}}
- for(const month of Object.values(data.months||{})){
-  if(!month||typeof month!=='object')continue;
-  for(const type of ['fixed','policies','needs']){
-   if(!Array.isArray(month[type]))continue;
-   const before=month[type].length;
-   month[type]=month[type].filter(x=>{
-    if(!x||typeof x!=='object')return true;
-    if(ids.has(x.ruleId))return false;
-    // v61 materialization always used this exact generated ID.
-    return ![...ids].some(id=>typeof x.id==='string'&&x.id==='i-'+id+'-'+Object.keys(data.months).find(k=>data.months[k]===month));
-   });
-   if(month[type].length!==before)changed=true;
-  }
- }
- // The v61 auto-seeded balance was not tagged as automatic. It is impossible
- // to distinguish it safely from a user-entered 396.35 EUR balance; retain it.
- try{
-  if(changed)localStorage.setItem(KEY,JSON.stringify(data));
-  localStorage.setItem(flag,'done');
- }catch(e){console.warn('Pulizia dati preimpostati non completata',e)}
-})();
-
+// Existing user records are never removed automatically during an update.
 const now=new Date();const realKey=now.getFullYear()+"-"+String(now.getMonth()+1).padStart(2,"0");
 let cy=Math.max(2026,now.getFullYear()),cm=(cy===now.getFullYear()?now.getMonth():0);
 let pendingEdit=null,pendingDelete=null,lastDetail=null;
@@ -985,7 +951,7 @@ function future(k=key()){return cmp(k,realKey)>0}
 
 function amountForRule(rule,k){const {y,m}=split(k),s=rule.schedule||{kind:"monthly"};if(s.kind==="monthly")return rule.amount;if(s.kind==="annual")return m===s.month?rule.amount:null;if(s.kind==="selectedYearly")return s.amounts&&s.amounts[m]!=null?Number(s.amounts[m]):null;if(s.kind==="selectedOneYear")return y===s.year&&s.amounts&&s.amounts[m]!=null?Number(s.amounts[m]):null;return null}
 function ruleActive(rule,k){if(cmp(k,rule.start)<0)return false;if(rule.end&&cmp(k,rule.end)>0)return false;if((rule.skip||[]).includes(k))return false;return amountForRule(rule,k)!=null}
-function materialize(k){if(cmp(k,BASE)<0)return;ensure(k);Object.values(data.rules).forEach(rule=>{if(!ruleActive(rule,k))return;const amt=amountForRule(rule,k),a=data.months[k][rule.type];if(!a.some(x=>x.ruleId===rule.id || (rule.id.startsWith("v61-recurring-") && String(x.name).toLowerCase().replace(/[^a-z0-9]/g,"")===String(rule.name).toLowerCase().replace(/[^a-z0-9]/g,"") && Math.abs(Number(x.amount)-amt)<.01)))a.push({id:"i-"+rule.id+"-"+k,name:rule.name,amount:amt,ruleId:rule.id,expenseCategory:rule.expenseCategory||expenseCategory(rule.name),categoryManual:!!rule.categoryManual})})}
+function materialize(k){if(cmp(k,BASE)<0)return;ensure(k);Object.values(data.rules).forEach(rule=>{if(!ruleActive(rule,k))return;const amt=amountForRule(rule,k),a=data.months[k][rule.type];if(!a.some(x=>x.ruleId===rule.id || (rule.id.startsWith("v61-recurring-") && String(x.name).toLowerCase().replace(/[^a-z0-9]/g,"")===String(rule.name).toLowerCase().replace(/[^a-z0-9]/g,"") && Math.abs(Number(x.amount)-amt)<.01)))a.push({id:"i-"+rule.id+"-"+k,name:rule.name,amount:amt,ruleId:rule.id,dueDay:rule.dueDay??null,paid:!!rule.paid,expenseCategory:rule.expenseCategory||expenseCategory(rule.name),categoryManual:!!rule.categoryManual})})}
 function items(type,k=key()){ensure(k);if(cmp(k,BASE)>=0)materialize(k);return data.months[k][type]}
 function sum(type){return items(type).reduce((s,x)=>s+Number(x.amount||0),0)}
 function expenses(){return sum("fixed")+sum("policies")+sum("needs")}
@@ -997,28 +963,81 @@ function netForMonth(k){
 function nextMonthKey(k){const {y,m}=split(k),d=new Date(y,m+1,1);return key(d.getFullYear(),d.getMonth())}
 function previousMonthKey(k){const {y,m}=split(k),d=new Date(y,m-1,1);return key(d.getFullYear(),d.getMonth())}
 function balanceConfigured(){return !!(data.balance&&Number.isFinite(Number(data.balance.amount))&&data.balance.anchorMonth)}
+// Snapshot of the payments already included when the real bank balance was recorded.
+function v80ItemKey(type,item){return type+'|'+String(item.name||'').trim().toLowerCase()+'|'+Number(item.amount||0).toFixed(2)}
+function v80Snapshot(day){
+  const result={};const k=data.balance.anchorMonth;
+  for(const type of ['fixed','needs','policies'])for(const item of items(type,k)){
+    const fingerprint=v80ItemKey(type,item);const d=dayOf(item);
+    (result[fingerprint]??=[]).push({amount:Number(item.amount||0),paid:!!item.paid||d!==null&&d<=day});
+  }
+  return result;
+}
+function v80EnsureSnapshot(){
+  if(!balanceConfigured()||!data.balance.anchorIsCurrent||data.balance.paymentSnapshot)return;
+  const d=data.balance.updatedAt?new Date(data.balance.updatedAt):new Date();
+  const anchorDay=Number.isFinite(d.getTime())?d.getDate():new Date().getDate();
+  data.balance.paymentSnapshot=v80Snapshot(anchorDay);
+  try{localStorage.setItem(KEY,JSON.stringify(data))}catch(e){console.warn('Snapshot non salvato',e)}
+}
+function v80CurrentNet(targetDay){
+  v80EnsureSnapshot();const original=data.balance.paymentSnapshot||{},k=data.balance.anchorMonth;
+  let result=0;const seen={};
+  for(const type of ['fixed','needs','policies'])for(const item of items(type,k)){
+    const fingerprint=v80ItemKey(type,item),index=seen[fingerprint]||0;seen[fingerprint]=index+1;
+    const old=(original[fingerprint]||[])[index];const d=dayOf(item);
+    const paid=!!item.paid||(d!==null&&d<=targetDay);
+    result+=((old?.paid?1:0)-(paid?1:0))*Number(item.amount||0);
+  }
+  // Include items that were removed after the bank balance was recorded.
+  for(const [fingerprint,rows] of Object.entries(original)){
+    const used=seen[fingerprint]||0;
+    for(const old of rows.slice(used))if(old.paid)result+=Number(old.amount||0);
+  }
+  // Incoming movements still follow their scheduled day, independent of expense payment status.
+  const raw=String(data.balance.updatedAt||'');const parsed=raw?new Date(raw):new Date();
+  const anchorDay=Number.isFinite(parsed.getTime())?parsed.getDate():new Date().getDate();
+  if(targetDay>anchorDay)for(const item of items('income',k)){
+    const d=dayOf(item);if(d!==null&&d>anchorDay&&d<=targetDay)result+=Number(item.amount||0);
+  }
+  return result;
+}
+function v80MonthNet(k){
+  const inc=items('income',k).reduce((sum,item)=>sum+Number(item.amount||0),0);
+  const out=['fixed','needs','policies'].reduce((sum,type)=>sum+items(type,k).reduce((sub,item)=>{
+    const d=dayOf(item);return sub+(item.paid||d!==null?Number(item.amount||0):0);
+  },0),0);
+  return inc-out;
+}
+
 function projectedBalance(k=key()){
   if(!balanceConfigured())return null;
-  const anchor=data.balance.anchorMonth;
-  const base=Number(data.balance.amount);
+  const anchor=data.balance.anchorMonth,base=Number(data.balance.amount);
   if(data.balance.anchorIsCurrent){
-    if(k===anchor)return base;
-    if(cmp(k,anchor)>0){let value=base,cur=nextMonthKey(anchor),guard=0;while(cmp(cur,k)<=0&&guard++<1200){value+=netForMonth(cur);cur=nextMonthKey(cur)}return value;}
-    let value=base,cur=anchor,guard=0;while(cmp(cur,k)>0&&guard++<1200){value-=netForMonth(cur);cur=previousMonthKey(cur)}return value;
+    if(k===anchor){
+      const today=new Date();
+      const day=k===realKey?today.getDate():31;
+      return base+v80CurrentNet(day);
+    }
+    if(cmp(k,anchor)>0){
+      let value=base+v80CurrentNet(31),cur=nextMonthKey(anchor),guard=0;
+      while(cmp(cur,k)<=0&&guard++<1200){value+=v80MonthNet(cur);cur=nextMonthKey(cur)}
+      return value;
+    }
+    let value=base,cur=anchor,guard=0;
+    while(cmp(cur,k)>0&&guard++<1200){value-=netForMonth(cur);cur=previousMonthKey(cur)}
+    return value;
   }
   if(cmp(k,anchor)>=0){
-    let total=base;
-    let cur=anchor,guard=0;
+    let total=base,cur=anchor,guard=0;
     while(cmp(cur,k)<=0&&guard++<1200){total+=netForMonth(cur);cur=nextMonthKey(cur)}
     return total;
   }
-  // Per i mesi precedenti mostriamo una stima retroattiva: togliamo i netti
-  // dall'ancora fino al mese successivo a quello visualizzato.
-  let total=base;
-  let cur=previousMonthKey(anchor),guard=0;
+  let total=base,cur=previousMonthKey(anchor),guard=0;
   while(cmp(cur,k)>=0&&guard++<1200){total-=netForMonth(cur);cur=previousMonthKey(cur)}
   return total;
 }
+
 function save(){try{localStorage.setItem(KEY,JSON.stringify(data))}catch(e){alert("Salvataggio non riuscito: memoria del browser non disponibile o piena. Esporta un backup e libera spazio.");return}try{dailyBackup()}catch(e){console.warn("Backup automatico non disponibile",e)}render()}
 
 function meta(item){if(!item.ruleId)return"Solo questo mese";const r=data.rules[item.ruleId];if(!r)return"Ricorrente";const s=r.schedule||{kind:"monthly"};if(s.kind==="monthly")return"Ogni mese";if(s.kind==="annual")return"Ogni "+ML[s.month];if(s.kind==="selectedYearly")return"Mesi scelti ogni anno";if(s.kind==="selectedOneYear")return"Mesi scelti solo "+s.year;return"Ricorrente"}
@@ -1251,12 +1270,12 @@ function renderBalance(){
   const k=key(),v=projectedBalance(k),title=$("balanceTitle"),value=$("balanceTotal"),sub=$("balanceSub");
   if(v===null){title.textContent="SALDO TOTALE";value.textContent="Imposta saldo";sub.textContent="Inserisci il saldo reale del conto per attivare le previsioni";return}
   const anchor=data.balance.anchorMonth;
-  title.textContent=k===anchor?"SALDO FINALE PREVISTO":"SALDO PREVISTO";
+  title.textContent=k===anchor?"SALDO ATTUALE STIMATO":"SALDO PREVISTO";
   value.textContent=euro(v);
   if(k===anchor){
-    sub.textContent="Saldo attuale "+euro(data.balance.amount)+" + utile mese "+euro(netForMonth(k))+" · tocca per aggiornare";
+    sub.textContent="Dal saldo reale: considera solo i movimenti con data successiva all’ultimo aggiornamento · senza data = da verificare";
   }else if(cmp(k,anchor)>0){
-    sub.textContent="Proiezione automatica da "+label(anchor)+" · utile mese "+euro(netForMonth(k));
+    sub.textContent="Proiezione dal saldo reale, comprese le scadenze ancora da pagare · "+label(anchor);
   }else{
     sub.textContent="Stima retroattiva rispetto al saldo aggiornato · "+label(anchor);
   }
@@ -1374,6 +1393,7 @@ $("saveBalanceBtn").onclick=()=>{
   if(!Number.isFinite(amount))return alert("Inserisci un saldo valido.");
   const d=new Date();
   data.balance={amount,anchorMonth:realKey,anchorIsCurrent:true,updatedAt:d.toISOString(),updatedLabel:d.toLocaleDateString("it-IT")};
+  data.balance.paymentSnapshot=v80Snapshot(d.getDate());
   $("balanceModal").classList.remove("open");
   save();
 };
@@ -1395,7 +1415,7 @@ function openEdit(type,item){
   $("editCategory").textContent=type==="income"?"ENTRATA":type==="fixed"?"USCITA FISSA":"USCITA CERTA";
   $("editExpenseCategoryBox").style.display=type==="income"?"none":"";$("editExpenseCategory").value=categoryForItem(item);
   $("editName").value=item.name;
-  $("editAmount").value=item.amount;$("editDay").value=dayOf(item)??"";$("editDayBox").style.display="";
+  $("editAmount").value=item.amount;$("editDay").value=dayOf(item)??"";$("editDayBox").style.display="";$("editPaidBox").style.display=type==="income"?"none":"";$("editPaid").checked=!!item.paid;
   $("editTargetYear").value=cy;
   fillEditFrequency(item);
   $("detailModal").classList.remove("open");
@@ -1418,7 +1438,7 @@ function applyEdit(mode){
   // Learn only after all input has passed validation. Existing rules retain their
   // historical category: monthly exceptions must never rewrite the whole series.
   if(type!=="income")learnCategory(name,expenseCategory);
-  const edited={...item,id:"edit-"+Date.now(),name,amount,dueDay,expenseCategory,categoryManual:true,subEnabled:$("editSubEnabled").checked};delete edited.ruleId;
+  const edited={...item,id:"edit-"+Date.now(),name,amount,dueDay,paid:type!=="income"&&$("editPaid").checked,expenseCategory,categoryManual:true,subEnabled:$("editSubEnabled").checked};delete edited.ruleId;
   if(mode==="month"){
     if(item.ruleId&&data.rules[item.ruleId]){
       const old=data.rules[item.ruleId];if(!Array.isArray(old.skip))old.skip=[];if(!old.skip.includes(k))old.skip.push(k);
@@ -1433,7 +1453,7 @@ function applyEdit(mode){
     }else a.splice(idx,1);
     if(newSchedule===null){edited.id="o-"+Date.now();delete edited.frequencyLabel;data.months[k][type].push(edited)}
     else{
-      const nid="r-edit-"+Date.now()+"-"+Math.random().toString(16).slice(2),nr={...inherited,id:nid,type,name,amount,dueDay,expenseCategory,categoryManual:true,subEnabled:$("editSubEnabled").checked,start:k,end:null,skip:[],schedule:newSchedule};
+      const nid="r-edit-"+Date.now()+"-"+Math.random().toString(16).slice(2),nr={...inherited,id:nid,type,name,amount,dueDay,paid:type!=="income"&&$("editPaid").checked,expenseCategory,categoryManual:true,subEnabled:$("editSubEnabled").checked,start:k,end:null,skip:[],schedule:newSchedule};
       data.rules[nid]=nr;
       if(cmp(k,realKey)<=0&&ruleActive(nr,k))data.months[k][type].push({...edited,id:"i-"+nid+"-"+k,amount:amountForRule(nr,k),ruleId:nid});
     }
