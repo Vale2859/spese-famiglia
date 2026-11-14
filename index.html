@@ -1015,9 +1015,8 @@ function projectedBalance(k=key()){
   const anchor=data.balance.anchorMonth,base=Number(data.balance.amount);
   if(data.balance.anchorIsCurrent){
     if(k===anchor){
-      const today=new Date();
-      const day=k===realKey?today.getDate():31;
-      return base+v80CurrentNet(day);
+      // Mostra il saldo di chiusura del mese, non quello alla data odierna.
+      return base+v80CurrentNet(31);
     }
     if(cmp(k,anchor)>0){
       let value=base+v80CurrentNet(31),cur=nextMonthKey(anchor),guard=0;
@@ -1270,14 +1269,14 @@ function renderBalance(){
   const k=key(),v=projectedBalance(k),title=$("balanceTitle"),value=$("balanceTotal"),sub=$("balanceSub");
   if(v===null){title.textContent="SALDO TOTALE";value.textContent="Imposta saldo";sub.textContent="Inserisci il saldo reale del conto per attivare le previsioni";return}
   const anchor=data.balance.anchorMonth;
-  title.textContent=k===anchor?"SALDO ATTUALE STIMATO":"SALDO PREVISTO";
+  title.textContent="SALDO FINALE PREVISTO";
   value.textContent=euro(v);
   if(k===anchor){
-    sub.textContent="Dal saldo reale: considera solo i movimenti con data successiva all’ultimo aggiornamento · senza data = da verificare";
+    sub.textContent="Saldo previsto a fine mese, considerando i movimenti ancora da contabilizzare";
   }else if(cmp(k,anchor)>0){
-    sub.textContent="Proiezione dal saldo reale, comprese le scadenze ancora da pagare · "+label(anchor);
+    sub.textContent="Saldo previsto a fine mese · partenza dal saldo reale di "+label(anchor);
   }else{
-    sub.textContent="Stima retroattiva rispetto al saldo aggiornato · "+label(anchor);
+    sub.textContent="Saldo finale stimato del mese · riferimento "+label(anchor);
   }
 }
 function render(){syncCategoryOptions();renderPending();$("monthName").textContent=ML[cm];$("monthYear").textContent=cy;$("futureBanner").style.display=future()?"block":"none";$("incomeTotal").textContent=euro(sum("income"));renderIncome();$("fixedTotal").textContent=euro(sum("fixed"));renderCol("fixed","fixedRows");$("needsTotal").textContent=euro(sum("needs"));renderCol("needs","needsRows");renderCategories();$("expenseTotal").textContent=euro(expenses());$("allExpenses").textContent=euro(expenses());$("savingTotal").textContent=euro(sum("income")-expenses());renderBalance();v48FitTwoRows()}
@@ -1988,11 +1987,9 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelect
 
 // v67: menu sempre disponibile per le spese, anche prima di attivare sottovoci.
 function v65OpenItem(type,item){
- // La voce senza sottocategorie apre la modifica. Con sottocategorie apre subito il dashboard.
- const rule=item.ruleId&&data.rules[item.ruleId];
- if(!(item.subEnabled||rule?.subEnabled)){openEdit(type,item);return;}
- v65Current={type,item};
- v65OpenDashboard();
+ // Tutte le voci, incluse quelle con sottocategorie, aprono la stessa scheda di modifica.
+ // Le sottocategorie e gli estratti conto gia' salvati non vengono eliminati.
+ openEdit(type,item);
 }
 function v65OpenDashboard(){
  if(!v65Current)return;

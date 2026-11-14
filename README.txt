@@ -1,1 +1,1 @@
-Spese Famiglia v77 - Basata sulla v70 fornita. Dashboard sottocategorie con importazione PDF/CSV Revolut, mese/anno e ritorno alla Home. Dati personali non preinstallati.
+Spese Famiglia v82 - Saldo finale previsto per il mese selezionato; tocco su ogni voce apre direttamente la scheda di modifica standard. Sottocategorie, estratti conto e dati locali preesistenti preservati.
